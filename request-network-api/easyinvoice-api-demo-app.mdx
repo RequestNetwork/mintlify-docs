@@ -1,0 +1,185 @@
+---
+title: "EasyInvoice: API Demo App"
+description: "An app for creating and paying requests using the Request Network API."
+---
+
+EasyInvoice is a web application built with Next.js that allows users to create and manage invoices, and accept crypto payments via the Request Network API. It mimics Web2 apps in its functionalities, providing a user-friendly experience with Google login and real-time updates.
+
+<Info>
+**Talk to an expert**
+
+Discover how your app can have its own EasyInvoice features - [book a call](https://calendly.com/mariana-rn/request-network-demo-docs) with us.
+
+</Info>
+<CardGroup>
+<Card title="Try it out" href="https://easyinvoice.request.network/" icon="joystick" horizontal/>
+<Card title="View Source" href="https://github.com/RequestNetwork/easy-invoice" icon="square-info" horizontal/>
+</CardGroup>
+
+## Key Features
+
+### Overall Supported Currencies and Chains
+
+15 stablecoins: USDC/USDT/DAI on 5 chains (Ethereum, Polygon, Arbitrum One, Base, OP Mainnet) + 4 testnet tokens on Sepolia + USD fiat for Conversion and Crypto-to-fiat payments.
+
+### **Invoice Creation**
+
+- **Invoice Creation**: A simple form to create invoices.
+  - Client name and email fields.
+  - Items, amounts, and notes fields.
+  - Invoice currency and payment currency options, supporting currency conversion via the Request Network API.
+- **Currency Conversion**: uses on-chain price feeds to calculate the exact payment currency amount based on the invoice currency at the moment of payment so you always receive the correct amount.
+  <Frame caption="EasyInvoice Create Invoice Page">
+    ![EasyInvoice Create Invoice
+    Page](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-3131460d6bf75ace6bb05d56d348b1bd5e26b0b0%252FScreenshot%2520from%25202025-02-13%252014-48-47.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=5f4d3ba9&sv=2)
+  </Frame>
+
+### **Dashboard**
+
+- **Dashboard**: View key metrics and a table of your invoices.
+  <Frame caption="EasyInvoice Dashboard">
+    ![EasyInvoice
+    Dashboard](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-08bb2c43cda2cbb658a9f1f253d09fe4aa153811%252FScreenshot%2520from%25202025-02-14%252001-00-51.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=41113f96&sv=2)
+  </Frame>
+
+### Invoice Payment
+
+- **Invoice Payment:**
+  - View invoice details and initiate payment using transaction calldata provided by the Request Network API.
+  - Compatible with 80+ different crypto wallets via Reown AppKit
+- **Real-time Updates**: The app receives webhooks from the Request Network API to update the invoice status in real-time.
+  <Frame caption="EasyInvoice Invoice Payment Page">
+    ![EasyInvoice Invoice Payment
+    Page](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-194de7d59aceefc3e98529f6fc470b68179e6a58%252FScreenshot%2520from%25202025-02-14%252001-01-00.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=45dd91bd&sv=2)
+  </Frame>
+  <br/>
+  <Frame caption="EasyInvoice supports 80+ wallets via Reown AppKit">
+    ![EasyInvoice supports 80+ wallets via Reown
+    AppKit](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-aa6eba6e357825684e36735b00922664fc6c43bd%252Fimage%2520%281%29.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=f019f5c4&sv=2)
+  </Frame>
+
+### Invoice Crosschain Payment
+
+<Frame>
+  ![](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-48739d507550f8489d876ba298ef0ee94cc5ede4%252FScreenshot%25202025-04-01%2520at%25204.07.30%25E2%2580%25AFPM.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=e1eaea42&sv=2)
+</Frame>
+<Frame>
+  <iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/OpAd3Xzu8zU"
+    title="How to Get Started With Qdrant Cloud"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
+</Frame>
+
+#### Crosschain Payment Supported Currencies
+
+For Crosschain (and Samechain) Payments, EasyInvoice supports 12 stablecoins: USDC/USDT/DAI on 4 chains (Ethereum, Arbitrum One, Base, OP Mainnet)
+
+### Crypto-to-fiat Payment
+
+<Frame>
+  <iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/1Y7QIi6oZoU"
+    title="How to Get Started With Qdrant Cloud"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
+</Frame>
+
+#### Crypto-to-fiat Payment Supported Currencies
+
+For Crypto-to-fiat Payments, EasyInvoice supports USDC on Sepolia.
+
+### Batch Pay Invoices
+
+<Frame>
+  <iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/BsbENNP00AI"
+    title="How to Get Started With Qdrant Cloud"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
+</Frame>
+### Recurring Invoices
+
+- **Recurring Invoice**: Automatically create new invoices based on the selected start date and frequency
+  <Frame caption="Create New Invoice page - Recurring Invoice Enabled">
+    ![Create New Invoice page - Recurring Invoice
+    Enabled](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-b0761801ebbfd42f807425721a07ae688b2205c5%252FScreenshot%25202025-04-02%2520at%25204.03.45%25E2%2580%25AFPM.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=ab9524e0&sv=2)
+  </Frame>
+  <br/>
+  <Frame caption="Invoice Dashboard - Recurring Invoice">
+    ![Invoice Dashboard - Recurring
+    Invoice](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-1b49f707f277973d2a3d2ca1a6c5729cdb6f8dc3%252FScreenshot%25202025-04-02%2520at%25204.08.57%25E2%2580%25AFPM.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=cbb4869&sv=2)
+  </Frame>
+
+### Payout
+
+- **Payout**: Send a payment without having to create a request first.
+  <Frame caption="EasyInvoice Direct Payment page">
+  ![EasyInvoice Direct Payment page](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-9d8b59fc962c49a59bedec3a10c0128ea7c5ee46%252Fimage%2520%286%29.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=75abda0e&sv=2)
+  </Frame>
+
+### Batch Payout
+
+<Frame>
+  <iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/craVMSj8PRs"
+    title="How to Get Started With Qdrant Cloud"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
+</Frame>
+
+### InvoiceMe Link
+
+- **InvoiceMe Link**: Prompt clients to send you an invoice prefilled with your name and email address.
+  <Frame caption="Create InvoiceMe Link page">
+    ![Create InvoiceMe Link
+    page](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-633e8cd81e5cfbf71d0c911a31be57b15429b0c6%252Fimage9.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=34532bc2&sv=2)
+  </Frame>
+  <br/>
+  <Frame caption="Create Invoice via InvoiceMe Link">
+    ![Create Invoice via InvoiceMe
+    Link](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-7cd1e7e68a5520effb952d1d1054e684e0b68d6d%252Fimage7.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=5a2ea20d&sv=2)
+  </Frame>
+
+### Subscriptions
+
+<Frame>
+  <iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/jEo5tYFuUs0"
+    title="How to Get Started With Qdrant Cloud"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
+</Frame>
+
+### Login
+
+- **Google Login**: Securely log in to your account using Google OAuth.
+  <Frame caption="EasyInvioce Login Page">
+    ![EasyInvoice Login
+    Page](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-ea25fd7becc61ac6c2b839899c854a1fe8e81dd4%252Fimage.png%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=a9079f7&sv=2)
+  </Frame>

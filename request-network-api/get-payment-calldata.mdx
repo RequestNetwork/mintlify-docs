@@ -1,0 +1,124 @@
+---
+title: "Get Payment Calldata"
+description: "Get the calldata needed to pay a request. For same-chain payments, returns transaction calldata that can be directly executed. For crosschain payments (when chain and token parameters are provided and differ from the request's native chain), returns a payment intent that needs to be signed and processed through the crosschain bridge. For off-ramp payments, use the query parameters clientUserId and paymentDetailsId. Note: Crosschain requests with an expectedAmount less than 1 are rejected."
+api: GET https://api.request.network/v2/request/{requestId}/pay
+contentType: application/json
+---
+
+<ApiEndpoint method="GET" path="/v2/request/{requestId}/pay" />
+
+## Path Parameters
+
+<ParamField path="requestId" type="string" required>
+  The requestId of the request Example:
+  `01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb`
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="wallet" type="string">
+  The wallet address of the payer Example:
+  `0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7`
+</ParamField>
+
+<ParamField query="chain" type="string">
+  The source chain of the crosschain payment
+  <Expandable title="Possible values:">
+    - `ethereum` - `arbitrum-one` - `base` - `op-mainnet`
+  </Expandable>
+</ParamField>
+
+<ParamField query="token" type="string">
+  The source token of the crosschain payment
+  <Expandable title="Possible values:">- `USDC` - `USDT` - `DAI`</Expandable>
+</ParamField>
+
+<ParamField query="amount" type="string">
+  The amount to pay, in human readable format
+</ParamField>
+
+<ParamField query="clientUserId" type="string">
+  Optional client user ID for off-ramp payments Example: `user-123`
+</ParamField>
+
+<ParamField query="paymentDetailsId" type="string">
+  Optional payment details ID for off-ramp payments Example:
+  `fa898aec-519c-46be-9b4c-e76ef4ff99d9`
+</ParamField>
+
+<ParamField query="feePercentage" type="string">
+  Fee percentage to apply at payment time (e.g., '2.5' for 2.5%) Example: `0.02`
+</ParamField>
+
+<ParamField query="feeAddress" type="string">
+  Address to receive the fee Example:
+  `0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7`
+</ParamField>
+
+## Headers parameters
+
+<ParamField query="x-api-key" type="string" required>
+  API key for authentication
+</ParamField>
+
+## Response
+
+### 200 Payment calldata retrieved successfully
+
+<ResponseField name="Response" type="any">
+  <Expandable>
+    <ResponseField name="SameChainPaymentResponse" type="object" optional>
+      <Expandable title="Response for same-chain payments with transaction calldata">
+        <ResponseField name="transactions" type="object[]" required>
+          Array of transactions to execute for the payment
+        </ResponseField>
+        <ResponseField name="metadata" type="object" required>
+          Metadata about the payment requirements
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="CrosschainPaymentResponse" type="object" optional>
+      <Expandable title="Response for crosschain payments with payment intent to be signed">
+        <ResponseField name="paymentIntentId" type="string" required>
+          Unique identifier for the payment intent
+        </ResponseField>
+
+        <ResponseField name="paymentIntent" type="string" required>
+          EIP-712 typed data for payment intent signature
+        </ResponseField>
+
+        <ResponseField name="approvalPermitPayload" type="string | nullable" optional>
+          Metadata about the payment requirements
+        </ResponseField>
+
+        <ResponseField name="approvalCalldata" type="object | nullable" optional>
+          Transaction calldata for token approval (for non-EIP-2612 tokens)
+        </ResponseField>
+
+        <ResponseField name="metadata" type="object" required>
+          Metadata about the crosschain payment
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+
+## Error Responses
+
+<ResponseField name="400" type="object">
+  Validation failed - check your request parameters
+</ResponseField>
+
+<ResponseField name="401" type="object">
+  Unauthorized - invalid API key
+</ResponseField>
+
+<ResponseField name="404" type="object">
+  Request not found
+</ResponseField>
+
+<ResponseField name="429" type="object">
+  Too Many Requests - rate limit exceeded
+</ResponseField>

@@ -1,69 +1,74 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "aspen",
+  "name": "Request Network Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#01B089",
+    "light": "#59F9D6",
+    "dark": "#01513B"
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "background": {
+    "decoration": "gradient"
   },
   "favicon": "/favicon.svg",
+  "fonts": {
+    "heading": {
+      "family": "Montserrat"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Docs",
         "groups": [
           {
-            "group": "Getting started",
+            "group": " ",
+            "pages": ["index"]
+          },
+          {
+            "group": "Request Network API",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              {
+                "group": "Create and Pay Requests",
+                "openapi": "https://api.request.network/open-api/openapi.json",
+                "pages": [
+                  "request-network-api/create-and-pay-requests"
+                ]
+              },
+              "request-network-api/easyinvoice-api-demo-app",
+              "request-network-api/api-portal-manage-api-keys-and-webhooks",
+              "request-network-api/migrate-to-v2",
+              "request-network-api/payment-detection"
             ]
           },
           {
-            "group": "Customization",
+            "group": "General",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "general/lifecycle-of-a-request",
+              "general/request-scan",
+              "general/request-network-token-list"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "FAQ",
         "groups": [
           {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
+            "group": " ",
+            "pages": ["faq"]
+          }
+        ]
+      },
+      {
+        "tab": "Glossary",
+        "groups": [
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": " ",
+            "pages": ["glossary"]
           }
         ]
       }
@@ -71,18 +76,18 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Status",
+          "href": "https://status.request.network",
+          "icon": "signal"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
+          "anchor": "Discord",
+          "href": "https://request.network/discord",
+          "icon": "discord"
         },
         {
           "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
+          "href": "https://request.network/blog",
           "icon": "newspaper"
         }
       ]
@@ -90,38 +95,41 @@
   },
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://request.network"
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Sign in",
+        "href": "https://portal.request.network"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get in touch",
+      "href": "https://bz0u5kkw58i.typeform.com/to/mELk8WLC"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/RequestNetwork",
+      "discord": "https://request.network/discord",
+      "github": "https://github.com/RequestNetwork",
+      "linkedin": "https://www.linkedin.com/company/request-network",
+      "bluesky": "https://bsky.app/profile/requestnetwork.bsky.social"
     }
   }
 }

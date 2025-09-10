@@ -1,0 +1,131 @@
+---
+title: "Initiate a Payment"
+description: "Initiate a payment without having to create a request first. Supports both one-time and recurring payments. For recurring payments, specify the recurrence object with start date, frequency, total executions, and payer address. The system will create a recurring payment schedule and return the necessary transactions for allowance approval and signature submission."
+api: POST https://api.request.network/v2/payouts
+contentType: application/json
+---
+
+<ApiEndpoint method="POST" path="/v2/payouts" />
+
+## Headers parameters
+
+<ParamField query="x-api-key" type="string" required>
+  API key for authentication
+</ParamField>
+
+## Body
+
+<ParamField body="payee" type="string" required>
+  The wallet address of the payee
+</ParamField>
+
+<ParamField body="amount" type="string" required>
+  The payable amount of the invoice, in human readable format
+</ParamField>
+
+<ParamField body="invoiceCurrency" type="string" required>
+  Invoice Currency ID, from the [Request Network Token List](/general/request-network-token-list) e.g: USD
+</ParamField>
+
+<ParamField body="paymentCurrency" type="string" required>
+  Payment currency ID, from the [Request Network Token List](/general/request-network-token-list) e.g: ETH-sepolia-sepolia
+</ParamField>
+
+<ParamField body="feePercentage" type="string">
+  Fee percentage to apply at payment time (e.g., '2.5' for 2.5%)
+</ParamField>
+
+<ParamField body="feeAddress" type="string">
+  Address to receive the fee
+</ParamField>
+
+<ParamField body="payerWallet" type="string">
+  The wallet address of the payer, use to check if payer approval exists
+</ParamField>
+
+<ParamField body="recurrence" type="object">
+  Recurring payment configuration (optional)
+  
+  <Expandable title="Recurrence Object Properties">
+    <ParamField body="startDate" type="string" required>
+      The start date of the payment, cannot be in the past
+    </ParamField>
+    
+    <ParamField body="frequency" type="string" required>
+      The frequency of the payment
+
+      Possible values: `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`
+    </ParamField>
+    
+    <ParamField body="totalPayments" type="number · min: 2 · max: 256" required>
+      The total number of times the payment will be executed (max 256).
+    </ParamField>
+
+    <ParamField body="payer" type="string" required>
+      The wallet address of the payer
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+### 201 Request created and payment initiated successfully
+<ResponseField name="Response" type="any">
+</ResponseField>
+
+
+
+
+## Error Responses
+
+<ResponseField name="401" type="object">
+  Unauthorized - invalid API key
+</ResponseField>
+
+<ResponseField name="404" type="object">
+  Wallet not found
+</ResponseField>
+
+<ResponseField name="429" type="object">
+  Too Many Requests - rate limit exceeded
+</ResponseField>
+
+
+<ResponseExample>
+
+```bash 201 Request created and payment initiated successfully
+{
+  "requestId": "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb",
+  "paymentReference": "0xb3581f0b0f74cc61",
+  "transactions": [
+    {
+      "data": "0xb868980b...00",
+      "to": "0x11BF2fDA23bF0A98365e1A4e04A87C9339e8687",
+      "value": {
+        "type": "BigNumber",
+        "hex": "0x038d7ea4c68000"
+      }
+    }
+  ],
+  "metadata": {
+    "stepsRequired": 1,
+    "needsApproval": false,
+    "approvalTransactionIndex": null,
+    "hasEnoughBalance": true,
+    "hasEnoughGas": true
+  }
+}
+```
+
+```bash 401 Unauthorized
+No content
+```
+
+```bash 404 Wallet not found
+No content
+```
+
+```bash 429 Too Many Requests
+No content
+```
+</ResponseExample>
