@@ -31,12 +31,10 @@
           {
             "group": "Request Network API",
             "pages": [
+              "request-network-api/create-and-pay-requests",
               {
-                "group": "Create and Pay Requests",
-                "openapi": "https://api.request.network/open-api/openapi.json",
-                "pages": [
-                  "request-network-api/create-and-pay-requests"
-                ]
+                "group": "API Reference",
+                "openapi": "https://api.request.network/open-api/openapi.json"
               },
               "request-network-api/easyinvoice-api-demo-app",
               "request-network-api/api-portal-manage-api-keys-and-webhooks",
