@@ -33,7 +33,7 @@
             "pages": [
               {
                 "group": "Create and Pay Requests",
-                "openapi": "https://api.request.network/open-api/openapi.json",
+                "openapi": "/Users/mantisclone/projects/mintlify-docs/openapi.yaml",
                 "pages": [
                   "request-network-api/create-and-pay-requests"
                 ]
