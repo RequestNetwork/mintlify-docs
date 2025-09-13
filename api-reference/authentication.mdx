@@ -1,0 +1,218 @@
+---
+title: "Authentication"
+description: "API authentication, key management, and security best practices"
+---
+
+## Authentication Overview
+
+Request Network API uses API key authentication to secure access to endpoints. This guide covers how to obtain, manage, and use your API keys securely.
+
+## Getting API Keys
+
+<Steps>
+  <Step title="Create Account">
+    Sign up for a Request Network account at the [Request Portal](https://portal.request.network)
+  </Step>
+  <Step title="Generate API Key">
+    Navigate to the API Keys section and create a new API key for your project
+  </Step>
+  <Step title="Configure Environment">
+    Store your API key securely in environment variables
+  </Step>
+  <Step title="Test Connection">
+    Make your first authenticated API call to verify setup
+  </Step>
+</Steps>
+
+## API Key Management
+
+<CardGroup cols={2}>
+  <Card title="Production Keys" icon="shield">
+    **Production Environment:**
+    - Use separate keys for production
+    - Implement key rotation policies
+    - Monitor usage and access logs
+    - Set up rate limiting and alerts
+  </Card>
+  
+  <Card title="Development Keys" icon="code">
+    **Development Environment:**
+    - Use testnet for development
+    - Separate keys for each environment
+    - Team access management
+    - Testing and debugging tools
+  </Card>
+</CardGroup>
+
+## Authentication Methods
+
+<Tabs>
+  <Tab title="Header Authentication">
+    **API Key in Header (Recommended):**
+    
+    ```bash
+    curl -X POST https://api.request.network/v2/requests \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "currency": "USD",
+        "expectedAmount": "100",
+        "payeeIdentity": "0x...",
+        "reason": "Test invoice"
+      }'
+    ```
+  </Tab>
+  
+  <Tab title="Environment Variables">
+    **Secure Key Storage:**
+    
+    ```javascript
+    // .env file
+    REQUEST_NETWORK_API_KEY=your_api_key_here
+    REQUEST_NETWORK_ENVIRONMENT=testnet
+    
+    // Application code
+    const requestNetwork = new RequestNetwork({
+      apiKey: process.env.REQUEST_NETWORK_API_KEY,
+      environment: process.env.REQUEST_NETWORK_ENVIRONMENT
+    });
+    ```
+  </Tab>
+  
+  <Tab title="SDK Configuration">
+    **SDK Authentication:**
+    
+    ```javascript
+    import { RequestNetwork } from '@requestnetwork/request-client.js';
+    
+    const requestNetwork = new RequestNetwork({
+      apiKey: process.env.REQUEST_NETWORK_API_KEY,
+      nodeConnectionConfig: {
+        baseURL: 'https://api.request.network'
+      }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="API Key Security">
+    **Protect Your API Keys:**
+    - Never commit API keys to version control
+    - Use environment variables for key storage
+    - Implement key rotation policies
+    - Monitor for unauthorized usage
+    - Use different keys for different environments
+  </Accordion>
+  
+  <Accordion title="Network Security">
+    **Secure Communication:**
+    - Always use HTTPS for API calls
+    - Implement request signing for sensitive operations
+    - Use webhook signature verification
+    - Implement rate limiting on your endpoints
+  </Accordion>
+  
+  <Accordion title="Access Control">
+    **Manage Access:**
+    - Use principle of least privilege
+    - Implement role-based access control
+    - Regular access audits
+    - Immediate revocation of compromised keys
+  </Accordion>
+</AccordionGroup>
+
+## Rate Limits
+
+<Info>
+**Rate Limiting Information**
+
+Current rate limits apply to API usage. Contact support for enterprise rate limit increases.
+</Info>
+
+<CardGroup cols={2}>
+  <Card title="Standard Limits" icon="clock">
+    **Default Rate Limits:**
+    - 100 requests per minute
+    - 1,000 requests per hour
+    - 10,000 requests per day
+    
+    **Applies to:** Most API endpoints
+  </Card>
+  
+  <Card title="Webhook Limits" icon="webhook">
+    **Webhook Rate Limits:**
+    - 50 webhook deliveries per minute
+    - Exponential backoff for retries
+    - Maximum 5 retry attempts
+    
+    **Applies to:** Webhook delivery endpoints
+  </Card>
+</CardGroup>
+
+## Error Codes
+
+Common authentication error responses:
+
+<CodeGroup>
+```json 401 Unauthorized
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid or missing API key",
+    "details": "Please provide a valid API key in the Authorization header"
+  }
+}
+```
+
+```json 403 Forbidden
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "API key does not have required permissions",
+    "details": "This operation requires additional permissions"
+  }
+}
+```
+
+```json 429 Rate Limited
+{
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded",
+    "details": "Too many requests. Please try again later.",
+    "retryAfter": 60
+  }
+}
+```
+</CodeGroup>
+
+## What's Next?
+
+<CardGroup cols={3}>
+  <Card 
+    title="🔗 Webhooks" 
+    href="/api-reference/webhooks"
+    icon="webhook"
+  >
+    Set up real-time event notifications
+  </Card>
+  
+  <Card 
+    title="🛠️ Create Request" 
+    href="/request-network-api/create-anew-request"
+    icon="plus"
+  >
+    Make your first API call
+  </Card>
+  
+  <Card 
+    title="🔑 API Portal" 
+    href="/api-setup/getting-started"
+    icon="key"
+  >
+    Manage your API keys and settings
+  </Card>
+</CardGroup>

@@ -1,0 +1,383 @@
+---
+title: "Supported Chains and Currencies"
+description: "Complete list of supported blockchain networks and currencies for Request Network"
+---
+
+## Overview
+
+Request Network supports payments across **10 EVM-compatible blockchain networks** with **553+ currencies** including major cryptocurrencies, stablecoins, and fiat currencies. This comprehensive coverage ensures global accessibility and flexibility for all payment scenarios.
+
+## Supported Blockchain Networks
+
+<CardGroup cols={2}>
+  <Card title="Ethereum" icon="ethereum">
+    **Mainnet & Sepolia Testnet**
+    
+    **Native Token:** ETH
+    **Popular Tokens:** USDC, USDT, DAI, LINK, UNI
+    **Network ID:** 1 (mainnet), 11155111 (sepolia)
+    
+    **Best For:** High-value transactions, DeFi integration
+  </Card>
+  
+  <Card title="Polygon" icon="polygon">
+    **Mainnet & Mumbai Testnet**
+    
+    **Native Token:** MATIC
+    **Popular Tokens:** USDC, USDT, DAI, WETH
+    **Network ID:** 137 (mainnet), 80001 (mumbai)
+    
+    **Best For:** Low-cost transactions, high throughput
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="Arbitrum" icon="arbitrum">
+    **One & Sepolia Testnet**
+    
+    **Native Token:** ETH
+    **Popular Tokens:** USDC, USDT, ARB, GMX
+    **Network ID:** 42161 (one), 421614 (sepolia)
+    
+    **Best For:** Lower fees with Ethereum security
+  </Card>
+  
+  <Card title="Optimism" icon="optimism">
+    **Mainnet & Sepolia Testnet**
+    
+    **Native Token:** ETH
+    **Popular Tokens:** USDC, USDT, OP, SNX
+    **Network ID:** 10 (mainnet), 11155420 (sepolia)
+    
+    **Best For:** Fast transactions, Ethereum compatibility
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="Base" icon="base">
+    **Mainnet & Sepolia Testnet**
+    
+    **Native Token:** ETH
+    **Popular Tokens:** USDC, cbETH, DAI
+    **Network ID:** 8453 (mainnet), 84532 (sepolia)
+    
+    **Best For:** Coinbase ecosystem integration
+  </Card>
+  
+  <Card title="Additional Networks" icon="network">
+    **More Networks Available:**
+    - BSC (Binance Smart Chain)
+    - Avalanche C-Chain
+    - Fantom Opera
+    - Gnosis Chain
+    - Celo
+  </Card>
+</CardGroup>
+
+## Currency Categories
+
+### Major Cryptocurrencies
+
+<Tabs>
+  <Tab title="Native Tokens">
+    **Blockchain Native Currencies:**
+    
+    | Currency | Symbol | Chains Available |
+    |----------|--------|------------------|
+    | Ethereum | ETH | Ethereum, Arbitrum, Optimism, Base |
+    | Polygon | MATIC | Polygon |
+    | Binance Coin | BNB | BSC |
+    | Avalanche | AVAX | Avalanche |
+    | Fantom | FTM | Fantom |
+  </Tab>
+  
+  <Tab title="Stablecoins">
+    **USD-Pegged Stablecoins:**
+    
+    | Currency | Symbol | Chains Available |
+    |----------|--------|------------------|
+    | USD Coin | USDC | All supported chains |
+    | Tether | USDT | Ethereum, Polygon, BSC, Avalanche |
+    | DAI | DAI | Ethereum, Polygon, Arbitrum, Optimism |
+    | BUSD | BUSD | BSC, Ethereum |
+    | FRAX | FRAX | Ethereum, Polygon, Arbitrum |
+    
+    **Other Stablecoins:**
+    - USDC.e (bridged USDC on various chains)
+    - sUSD (Synthetix USD)
+    - LUSD (Liquity USD)
+    - And many more...
+  </Tab>
+  
+  <Tab title="Popular Tokens">
+    **DeFi & Ecosystem Tokens:**
+    
+    | Currency | Symbol | Primary Chains |
+    |----------|--------|----------------|
+    | Chainlink | LINK | Ethereum, Polygon, Arbitrum |
+    | Uniswap | UNI | Ethereum, Polygon, Arbitrum |
+    | Aave | AAVE | Ethereum, Polygon |
+    | Compound | COMP | Ethereum |
+    | Curve DAO | CRV | Ethereum, Polygon |
+    | 1inch | 1INCH | Ethereum, BSC |
+  </Tab>
+</Tabs>
+
+### Fiat Currencies
+
+<AccordionGroup>
+  <Accordion title="Major Fiat Currencies">
+    **G7 & Major Global Currencies:**
+    
+    | Currency | Code | Region |
+    |----------|------|--------|
+    | US Dollar | USD | United States |
+    | Euro | EUR | European Union |
+    | British Pound | GBP | United Kingdom |
+    | Japanese Yen | JPY | Japan |
+    | Canadian Dollar | CAD | Canada |
+    | Australian Dollar | AUD | Australia |
+    | Swiss Franc | CHF | Switzerland |
+    | Chinese Yuan | CNY | China |
+    
+    **Note:** Fiat currencies are used for pricing and conversion. Actual payments settle in cryptocurrency.
+  </Accordion>
+  
+  <Accordion title="Emerging Market Currencies">
+    **Regional Currencies:**
+    
+    | Currency | Code | Region |
+    |----------|------|--------|
+    | Brazilian Real | BRL | Brazil |
+    | Indian Rupee | INR | India |
+    | Mexican Peso | MXN | Mexico |
+    | South African Rand | ZAR | South Africa |
+    | Turkish Lira | TRY | Turkey |
+    | Russian Ruble | RUB | Russia |
+    | Korean Won | KRW | South Korea |
+    | Thai Baht | THB | Thailand |
+    
+    **Total Coverage:** 150+ international fiat currencies
+  </Accordion>
+</AccordionGroup>
+
+## Currency Selection Guide
+
+### For Different Use Cases
+
+<CardGroup cols={2}>
+  <Card title="📄 Invoicing" icon="receipt">
+    **Recommended Currencies:**
+    - **Pricing:** USD, EUR, GBP (familiar fiat terms)
+    - **Settlement:** USDC, USDT, DAI (stable value)
+    - **Networks:** Polygon, Arbitrum (lower fees)
+    
+    [Learn More →](/use-cases/invoicing)
+  </Card>
+  
+  <Card title="💰 Payouts" icon="send">
+    **Recommended Currencies:**
+    - **High Volume:** USDC on Polygon (lowest fees)
+    - **Cross-border:** USDC, USDT (global acceptance)
+    - **Flexibility:** Native tokens for local markets
+    
+    [Learn More →](/use-cases/payouts)
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="🛒 Checkout" icon="shopping-cart">
+    **Recommended Currencies:**
+    - **Customer Choice:** Multiple payment options
+    - **Conversion:** USD pricing, crypto settlement
+    - **Popular:** ETH, USDC, MATIC, BNB
+    
+    [Learn More →](/use-cases/checkout)
+  </Card>
+  
+  <Card title="🔄 Subscriptions" icon="repeat">
+    **Recommended Currencies:**
+    - **Stability:** USDC, DAI (predictable values)
+    - **Low Fees:** Polygon, Arbitrum networks
+    - **Reliability:** Established stablecoins
+    
+    [Learn More →](/use-cases/subscriptions)
+  </Card>
+</CardGroup>
+
+## Network Selection Criteria
+
+### Cost Optimization
+
+<Tabs>
+  <Tab title="Transaction Fees">
+    **Average Transaction Costs (2025):**
+    
+    | Network | Native Transfer | ERC-20 Transfer | Typical Use |
+    |---------|----------------|-----------------|-------------|
+    | Polygon | $0.001-0.01 | $0.01-0.03 | High volume, frequent transactions |
+    | Arbitrum | $0.10-0.50 | $0.20-1.00 | Ethereum ecosystem, medium volume |
+    | Optimism | $0.10-0.50 | $0.20-1.00 | Ethereum ecosystem, medium volume |
+    | Base | $0.05-0.25 | $0.10-0.50 | Coinbase integration |
+    | Ethereum | $2-20 | $5-50 | High value, infrequent transactions |
+    
+    <Info>
+    **Fee Optimization Tips**
+    
+    - Use Polygon for high-frequency, low-value transactions
+    - Use Ethereum for high-value, security-critical transactions
+    - Consider L2 solutions (Arbitrum, Optimism) for balanced cost/security
+    </Info>
+  </Tab>
+  
+  <Tab title="Speed & Finality">
+    **Transaction Confirmation Times:**
+    
+    | Network | Block Time | Practical Finality | Best For |
+    |---------|------------|-------------------|----------|
+    | Polygon | 2 seconds | 30-60 seconds | Real-time applications |
+    | Base | 2 seconds | 30-60 seconds | Fast user experiences |
+    | Arbitrum | 1 second | 5-15 minutes | Balanced speed/security |
+    | Optimism | 2 seconds | 5-15 minutes | Balanced speed/security |
+    | Ethereum | 12 seconds | 5-15 minutes | Maximum security |
+  </Tab>
+  
+  <Tab title="Liquidity & Adoption">
+    **Network Ecosystem Maturity:**
+    
+    | Network | TVL | DEX Liquidity | Ecosystem | Adoption |
+    |---------|-----|---------------|-----------|----------|
+    | Ethereum | Highest | Highest | Most mature | Universal |
+    | Polygon | High | High | Very mature | High |
+    | Arbitrum | High | High | Mature | High |
+    | Optimism | Medium | Medium | Growing | Medium |
+    | Base | Growing | Growing | New but strong | Growing |
+  </Tab>
+</Tabs>
+
+## Currency Codes and Formats
+
+### Standard Format
+
+Request Network uses standardized currency codes:
+
+<CodeGroup>
+```javascript Native Tokens
+// Format: {SYMBOL}-{NETWORK}
+"ETH-mainnet"        // Ethereum on Ethereum mainnet
+"MATIC-matic"        // MATIC on Polygon mainnet
+"ETH-arbitrum-one"   // ETH on Arbitrum One
+"ETH-optimism"       // ETH on Optimism
+"BNB-bsc"           // BNB on BSC
+```
+
+```javascript ERC-20 Tokens
+// Format: {SYMBOL}-{NETWORK}-{OPTIONAL_SUFFIX}
+"USDC-mainnet"       // USDC on Ethereum
+"USDC-matic"         // USDC on Polygon
+"USDC-arbitrum-one"  // USDC on Arbitrum
+"USDC-optimism"      // USDC on Optimism
+"USDT-mainnet"       // USDT on Ethereum
+"DAI-mainnet"        // DAI on Ethereum
+```
+
+```javascript Fiat Currencies
+// Format: {ISO_CODE}
+"USD"                // US Dollar
+"EUR"                // Euro
+"GBP"                // British Pound
+"JPY"                // Japanese Yen
+"CAD"                // Canadian Dollar
+```
+</CodeGroup>
+
+### Currency Validation
+
+<CodeGroup>
+```javascript Validate Currency
+import { validateCurrency } from '@requestnetwork/request-client.js';
+
+// Check if currency is supported
+const isValid = validateCurrency('USDC-matic');
+console.log(isValid); // true
+
+// Get currency details
+const currencyInfo = getCurrencyInfo('USDC-matic');
+console.log(currencyInfo);
+// {
+//   symbol: 'USDC',
+//   network: 'matic',
+//   type: 'ERC20',
+//   decimals: 6,
+//   address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+// }
+```
+
+```javascript API Currency Check
+// Check supported currencies via API
+const response = await fetch('https://api.request.network/v2/currencies', {
+  headers: {
+    'Authorization': `Bearer ${apiKey}`
+  }
+});
+
+const currencies = await response.json();
+console.log(currencies.supported);
+```
+</CodeGroup>
+
+## Real-Time Price Data
+
+Request Network uses multiple price feed sources for accurate conversions:
+
+<AccordionGroup>
+  <Accordion title="Price Oracle Sources">
+    **Primary Data Sources:**
+    - Chainlink Price Feeds (on-chain)
+    - CoinGecko API (market aggregation)
+    - CoinMarketCap API (market data)
+    - DEX aggregators (real-time trading data)
+    
+    **Update Frequency:** Sub-minute updates for major pairs
+  </Accordion>
+  
+  <Accordion title="Supported Conversion Pairs">
+    **Fiat to Crypto:**
+    - Any fiat currency → Any supported cryptocurrency
+    - Real-time exchange rate calculation
+    - Slippage protection for large amounts
+    
+    **Crypto to Crypto:**
+    - Cross-chain token conversions
+    - Optimal routing through DEX aggregators
+    - Minimal slippage and MEV protection
+  </Accordion>
+</AccordionGroup>
+
+## What's Next?
+
+<CardGroup cols={3}>
+  <Card 
+    title="🔧 Smart Contracts" 
+    href="/resources/smart-contracts"
+    icon="code"
+  >
+    View smart contract addresses for all supported networks
+  </Card>
+  
+  <Card 
+    title="⚙️ Payment Types" 
+    href="/api-features/payment-types"
+    icon="credit-card"
+  >
+    Learn about different payment types and currency options
+  </Card>
+  
+  <Card 
+    title="🛠️ Integration" 
+    href="/api-setup/getting-started"
+    icon="rocket"
+  >
+    Start building with your preferred currencies and networks
+  </Card>
+</CardGroup>

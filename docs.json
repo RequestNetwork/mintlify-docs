@@ -25,31 +25,61 @@
         "tab": "Docs",
         "groups": [
           {
-            "group": " ",
+            "group": "🏠 Welcome",
             "pages": ["index"]
           },
           {
-            "group": "Request Network API",
+            "group": "📄 Use Cases",
+            "pages": [
+              "use-cases/invoicing",
+              "use-cases/payouts",
+              "use-cases/payroll",
+              "use-cases/checkout",
+              "use-cases/subscriptions"
+            ]
+          },
+          {
+            "group": "⚙️ API Features",
+            "pages": [
+              "api-features/payment-types",
+              "api-features/advanced-features",
+              "api-features/integration-patterns"
+            ]
+          },
+          {
+            "group": "📚 API Reference",
             "pages": [
               {
-                "group": "Create and Pay Requests",
-                  "openapi": "https://api.stage.request.network/open-api/openapi.json",
+                "group": "Endpoints",
+                "openapi": "https://api.stage.request.network/open-api/openapi.json",
                 "pages": [
                   "request-network-api/create-and-pay-requests"
                 ]
               },
-              "request-network-api/easyinvoice-api-demo-app",
-              "request-network-api/api-portal-manage-api-keys-and-webhooks",
-              "request-network-api/migrate-to-v2",
-              "request-network-api/payment-detection"
+              "api-reference/authentication",
+              "api-reference/webhooks"
             ]
           },
           {
-            "group": "General",
+            "group": "🌐 Resources",
             "pages": [
-              "general/lifecycle-of-a-request",
-              "general/request-scan",
-              "general/request-network-token-list"
+              "resources/supported-chains-and-currencies",
+              "resources/smart-contracts",
+              "resources/community"
+            ]
+          },
+          {
+            "group": "🔑 API Setup",
+            "pages": [
+              "request-network-api/api-portal-manage-api-keys-and-webhooks",
+              "api-setup/getting-started"
+            ]
+          },
+          {
+            "group": "🔧 SDK (Legacy)",
+            "pages": [
+              "request-network-api/migrate-to-v2",
+              "sdk-legacy/migration-guide"
             ]
           }
         ]

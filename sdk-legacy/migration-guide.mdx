@@ -1,0 +1,272 @@
+---
+title: "Migration Guide"
+description: "Simple migration guidance from deprecated SDK packages to Request Network API"
+---
+
+## Migration Overview
+
+The Request Network SDK has been deprecated in favor of the more robust and feature-rich Request Network API. This guide provides a straightforward migration path for the few existing SDK users.
+
+<Warning>
+**SDK Deprecation Notice**
+
+The Request Network SDK had near-zero adoption and is no longer maintained. All new development should use the Request Network API.
+</Warning>
+
+## Quick Migration Summary
+
+**From SDK to API:**
+- Replace direct blockchain interactions with API calls
+- Simplified authentication using API keys
+- Enhanced features including webhooks and advanced payment types
+- Better error handling and rate limiting
+- Comprehensive documentation and support
+
+## Migration Steps
+
+<Steps>
+  <Step title="Get API Keys">
+    Sign up for Request Network API access at [portal.request.network](https://portal.request.network)
+  </Step>
+  <Step title="Replace SDK Calls">
+    Convert SDK function calls to equivalent API endpoints
+  </Step>
+  <Step title="Update Error Handling">
+    Implement proper API error handling and retry logic
+  </Step>
+  <Step title="Add Webhooks">
+    Set up webhooks for real-time payment notifications
+  </Step>
+</Steps>
+
+## Code Comparison
+
+### Request Creation
+
+<CodeGroup>
+```javascript SDK (Deprecated)
+import { RequestNetwork } from '@requestnetwork/request-client.js';
+
+// SDK approach - deprecated
+const requestNetwork = new RequestNetwork({
+  nodeConnectionConfig: {
+    baseURL: 'https://goerli.gateway.request.network/'
+  }
+});
+
+const request = await requestNetwork.createRequest({
+  requestInfo: {
+    currency: 'ETH',
+    expectedAmount: '1000000000000000000',
+    payee: {
+      type: 'ethereumAddress',
+      value: '0x...'
+    }
+  }
+});
+```
+
+```javascript API (Recommended)
+// API approach - current and supported
+const response = await fetch('https://api.request.network/v2/requests', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.REQUEST_NETWORK_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    currency: 'ETH-sepolia',
+    expectedAmount: '1',
+    payeeIdentity: '0x...',
+    reason: 'Payment for services'
+  })
+});
+
+const request = await response.json();
+```
+</CodeGroup>
+
+### Payment Processing
+
+<CodeGroup>
+```javascript SDK (Deprecated)
+// SDK payment processing
+const paymentTx = await request.payWithWallet(wallet);
+await paymentTx.wait();
+```
+
+```javascript API (Recommended)
+// API payment processing with webhook
+const payment = await fetch('https://api.request.network/v2/payments', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.REQUEST_NETWORK_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    requestId: request.requestId,
+    amount: '1',
+    currency: 'ETH-sepolia'
+  })
+});
+
+// Webhook will notify you when payment is confirmed
+```
+</CodeGroup>
+
+## Benefits of API Migration
+
+<CardGroup cols={2}>
+  <Card title="🚀 Simplified Integration" icon="rocket">
+    **Easier Development:**
+    - No blockchain wallet management required
+    - Standard REST API calls
+    - Comprehensive error responses
+    - Built-in rate limiting and retry logic
+  </Card>
+  
+  <Card title="🔔 Real-time Updates" icon="bell">
+    **Enhanced Monitoring:**
+    - Webhook notifications for all events
+    - Real-time payment confirmations
+    - Automatic retry for failed webhooks
+    - Comprehensive event logging
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="⚙️ Advanced Features" icon="cog">
+    **New Capabilities:**
+    - Cross-chain payments
+    - Batch processing
+    - Recurring payments
+    - Platform fee collection
+    - Multi-currency support
+  </Card>
+  
+  <Card title="🛡️ Enterprise Ready" icon="shield">
+    **Production Features:**
+    - High availability and uptime
+    - Scalable infrastructure
+    - Professional support
+    - Security audits and compliance
+  </Card>
+</CardGroup>
+
+## Common Migration Patterns
+
+### Replace SDK Initialization
+
+<CodeGroup>
+```javascript Before (SDK)
+import { RequestNetwork } from '@requestnetwork/request-client.js';
+import { Web3SignatureProvider } from '@requestnetwork/web3-signature';
+
+const web3SignatureProvider = new Web3SignatureProvider(web3.currentProvider);
+const requestNetwork = new RequestNetwork({
+  nodeConnectionConfig: {
+    baseURL: 'https://goerli.gateway.request.network/'
+  },
+  signatureProvider: web3SignatureProvider
+});
+```
+
+```javascript After (API)
+// Simple API configuration
+const config = {
+  apiKey: process.env.REQUEST_NETWORK_API_KEY,
+  baseURL: 'https://api.request.network',
+  environment: 'testnet' // or 'mainnet'
+};
+
+// No complex initialization required
+```
+</CodeGroup>
+
+### Replace Event Listening
+
+<CodeGroup>
+```javascript Before (SDK)
+// SDK event listening
+request.on('payment', (payment) => {
+  console.log('Payment received:', payment);
+  updateOrderStatus(payment.requestId, 'paid');
+});
+```
+
+```javascript After (API)
+// Webhook endpoint for payment events
+app.post('/webhooks/payment-events', (req, res) => {
+  const { eventType, data } = req.body;
+  
+  if (eventType === 'payment_confirmed') {
+    console.log('Payment received:', data);
+    updateOrderStatus(data.requestId, 'paid');
+  }
+  
+  res.status(200).send('OK');
+});
+```
+</CodeGroup>
+
+## Migration Checklist
+
+<AccordionGroup>
+  <Accordion title="✅ Pre-Migration Preparation">
+    **Before You Start:**
+    - [ ] Review current SDK usage in your application
+    - [ ] Identify all SDK function calls and event listeners
+    - [ ] Sign up for Request Network API access
+    - [ ] Generate API keys for development and production
+    - [ ] Review API documentation for equivalent endpoints
+  </Accordion>
+  
+  <Accordion title="✅ Code Migration">
+    **Update Your Code:**
+    - [ ] Replace SDK initialization with API configuration
+    - [ ] Convert request creation to API calls
+    - [ ] Replace payment processing with API endpoints
+    - [ ] Set up webhook endpoints for event handling
+    - [ ] Update error handling for API responses
+    - [ ] Test all functionality with API integration
+  </Accordion>
+  
+  <Accordion title="✅ Testing & Deployment">
+    **Verify Migration:**
+    - [ ] Test request creation and payment flows
+    - [ ] Verify webhook event handling
+    - [ ] Test error scenarios and edge cases
+    - [ ] Performance test with expected load
+    - [ ] Deploy to staging environment
+    - [ ] Run end-to-end tests
+    - [ ] Deploy to production with monitoring
+  </Accordion>
+</AccordionGroup>
+
+## Need Help?
+
+<Info>
+**Limited SDK Support**
+
+Since the SDK had minimal adoption, migration support is available on a case-by-case basis. Most users will find the API migration straightforward and beneficial.
+</Info>
+
+<CardGroup cols={2}>
+  <Card title="📚 API Documentation" href="/api-reference/authentication" icon="book">
+    Comprehensive API documentation with examples and best practices
+  </Card>
+  
+  <Card title="🚀 Get Started" href="/api-setup/getting-started" icon="rocket">
+    Quick setup guide to get your API integration running
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="💰 Use Cases" href="/use-cases/invoicing" icon="use-case">
+    Explore specific business scenarios and implementation patterns
+  </Card>
+  
+  <Card title="🛠️ Integration Patterns" href="/api-features/integration-patterns" icon="puzzle-piece">
+    Common integration patterns and architectural guidance
+  </Card>
+</CardGroup>

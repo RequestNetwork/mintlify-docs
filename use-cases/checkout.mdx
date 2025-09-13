@@ -1,0 +1,284 @@
+---
+title: "🛒 Checkout"
+description: "Integrate crypto payments into your e-commerce with 80+ wallet support and seamless UX"
+---
+
+## Overview
+
+Transform your e-commerce checkout with Request Network's payment infrastructure. Accept crypto payments with support for 80+ wallets, enable cross-chain transactions, and provide customers with a seamless payment experience that rivals traditional payment processors.
+
+## 🚀 Quickstart: Integrate Your First Checkout Payment
+
+<Info>
+**Integrate your first checkout payment in under 1 minute**
+
+*Interactive quickstart experience coming soon*
+</Info>
+
+<Steps>
+  <Step title="Add Payment Widget">
+    Embed the Request Network payment widget in your checkout
+  </Step>
+  <Step title="Configure Currencies">
+    Set accepted payment currencies and conversion rates
+  </Step>
+  <Step title="Handle Payment Events">
+    Listen for payment confirmations and update order status
+  </Step>
+  <Step title="Reconcile Orders">
+    Automatically match payments to orders with zero manual work
+  </Step>
+</Steps>
+
+## EasyInvoice Demo
+
+Experience checkout payment flows through our demo:
+
+<CardGroup cols={2}>
+  <Card 
+    title="🎬 Payment Widget Demo" 
+    href="#" 
+    icon="play"
+  >
+    See the payment widget with wallet connection and direct payment forms
+  </Card>
+  
+  <Card 
+    title="🔗 Try Checkout Flow" 
+    href="https://easy-invoice-demo.vercel.app/pay" 
+    icon="external-link"
+  >
+    Experience the complete customer payment journey
+  </Card>
+</CardGroup>
+
+**Demo Features:**
+- 80+ wallet connection support (MetaMask, WalletConnect, Coinbase, etc.)
+- Direct payment forms with QR codes
+- Real-time payment status updates
+- Cross-chain payment options
+- Mobile-optimized payment experience
+
+## Integration Options
+
+<Tabs>
+  <Tab title="Use EasyInvoice As-Is">
+    **Best for:** Quick e-commerce integration, existing payment forms
+    
+    Embed payout functionality in existing e-commerce:
+    - Drop-in payment widget
+    - Hosted payment pages
+    - Minimal integration required
+    
+    [Get Embed Code →](#)
+  </Tab>
+  
+  <Tab title="Fork & Customize">
+    **Best for:** Custom checkout experience, brand matching
+    
+    Tailor checkout flow to match brand/UX requirements:
+    - Custom payment UI components
+    - Branded checkout experience
+    - Advanced payment flow customization
+    
+    [Fork Repository →](#) | [Checkout Customization Guide →](#)
+  </Tab>
+  
+  <Tab title="Custom Implementation">
+    **Best for:** Complete control, enterprise integration
+    
+    Build checkout with full control over user experience:
+    - Custom payment logic and validation
+    - Advanced fraud prevention
+    - Deep e-commerce platform integration
+    
+    [Checkout API Documentation →](/api-features/payment-types)
+  </Tab>
+</Tabs>
+
+## Key API Features for Checkout
+
+<CardGroup cols={2}>
+  <Card 
+    title="Payment Widget" 
+    href="/api-features/integration-patterns"
+    icon="credit-card"
+  >
+    Drop-in payment component with 80+ wallet support
+  </Card>
+  
+  <Card 
+    title="Cross-chain Payments" 
+    href="/api-features/payment-types"
+    icon="link"
+  >
+    Accept payments from any supported blockchain
+  </Card>
+  
+  <Card 
+    title="Platform Fees" 
+    href="/api-features/advanced-features"
+    icon="percentage"
+  >
+    Collect marketplace or processing fees automatically
+  </Card>
+  
+  <Card 
+    title="Error Handling" 
+    href="/api-features/advanced-features"
+    icon="exclamation-triangle"
+  >
+    Robust error handling for failed or partial payments
+  </Card>
+  
+  <Card 
+    title="Payment Routing" 
+    href="/api-features/payment-types"
+    icon="route"
+  >
+    Optimize payment paths for best rates and speed
+  </Card>
+  
+  <Card 
+    title="Real-time Updates" 
+    href="/api-features/advanced-features"
+    icon="bolt"
+  >
+    Instant payment confirmation and order updates
+  </Card>
+</CardGroup>
+
+## E-commerce Integration Patterns
+
+<AccordionGroup>
+  <Accordion title="🛍️ Traditional E-commerce">
+    Integrate with existing e-commerce platforms:
+    - Shopify, WooCommerce, Magento plugins
+    - Payment gateway replacement
+    - Inventory management integration
+    - Order fulfillment automation
+  </Accordion>
+  
+  <Accordion title="🎮 Digital Goods & Services">
+    Perfect for digital product sales:
+    - Instant payment confirmation
+    - Automated delivery for digital products
+    - Subscription and recurring billing
+    - Global payment acceptance without banking restrictions
+  </Accordion>
+  
+  <Accordion title="🏪 Marketplace Platforms">
+    Enable multi-vendor marketplaces:
+    - Automatic vendor payout splitting
+    - Marketplace fee collection
+    - Escrow and dispute resolution
+    - Multi-party payment flows
+  </Accordion>
+  
+  <Accordion title="🎫 Event & Ticket Sales">
+    Handle high-volume event sales:
+    - Instant ticket delivery
+    - Anti-fraud protection
+    - High-throughput payment processing
+    - Global accessibility without regional payment restrictions
+  </Accordion>
+</AccordionGroup>
+
+## Customer Experience Benefits
+
+<Tabs>
+  <Tab title="Wallet Choice">
+    **80+ Supported Wallets:**
+    - MetaMask, WalletConnect, Coinbase Wallet
+    - Hardware wallets (Ledger, Trezor)
+    - Mobile wallets (Trust Wallet, Rainbow)
+    - Exchange wallets and DeFi wallets
+  </Tab>
+  
+  <Tab title="Payment Flexibility">
+    **Multiple Payment Options:**
+    - Direct wallet payments
+    - QR code scanning for mobile
+    - Cross-chain payment routing
+    - Multiple currency options
+  </Tab>
+  
+  <Tab title="Security & Trust">
+    **Enhanced Security:**
+    - No stored payment credentials
+    - Transparent blockchain transactions
+    - Real-time payment verification
+    - Immutable payment records
+  </Tab>
+</Tabs>
+
+## Technical Implementation
+
+<CodeGroup>
+```javascript React Component
+import { PaymentWidget } from '@requestnetwork/payment-widget';
+
+function CheckoutPage({ orderTotal, orderId }) {
+  return (
+    <PaymentWidget
+      amount={orderTotal}
+      currency="USD"
+      paymentCurrencies={["ETH", "USDC", "DAI"]}
+      onPaymentSuccess={(payment) => {
+        // Handle successful payment
+        updateOrderStatus(orderId, 'paid');
+      }}
+      onPaymentError={(error) => {
+        // Handle payment errors
+        console.error('Payment failed:', error);
+      }}
+    />
+  );
+}
+```
+
+```javascript Webhook Handler
+app.post('/webhook/payment', (req, res) => {
+  const { eventType, request } = req.body;
+  
+  if (eventType === 'payment_confirmed') {
+    // Update order status
+    updateOrder(request.orderId, {
+      status: 'paid',
+      paymentHash: request.paymentHash,
+      paidAt: new Date()
+    });
+  }
+  
+  res.status(200).send('OK');
+});
+```
+</CodeGroup>
+
+## What's Next?
+
+<CardGroup cols={3}>
+  <Card 
+    title="🔄 Add Subscriptions" 
+    href="/use-cases/subscriptions"
+    icon="repeat"
+  >
+    Enable recurring billing for subscription products
+  </Card>
+  
+  <Card 
+    title="⚙️ Payment Types" 
+    href="/api-features/payment-types"
+    icon="cog"
+  >
+    Explore advanced payment options and routing
+  </Card>
+  
+  <Card 
+    title="🔑 Get Started" 
+    href="/api-setup/getting-started"
+    icon="rocket"
+  >
+    Set up your account and start integrating
+  </Card>
+</CardGroup>
