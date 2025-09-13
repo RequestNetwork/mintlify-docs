@@ -1,0 +1,143 @@
+---
+title: "Request API Release Notes"
+description: "Track updates, new features, and changes to the Request Network API"
+---
+
+# Request API Release Notes
+
+This page documents all updates to the Request Network API, including new features, improvements, bug fixes, and breaking changes.
+
+## Version 2.1.0 - Current
+
+<Update label="v2.1.0" description="Released September 2025">
+
+### 🎉 New Features
+
+- **Enhanced Payment Status Tracking**: New webhook events for granular payment status updates
+- **Bulk Request Creation**: Create multiple payment requests in a single API call
+- **Advanced Filtering**: Extended query parameters for request listing endpoints
+- **Payment Intent Support**: Integration with Stripe Payment Intents for card payments
+
+### 🚀 Improvements
+
+- **Performance**: 40% faster response times for request creation
+- **Rate Limiting**: Increased rate limits for authenticated requests (1000/minute → 2000/minute)
+- **Error Messages**: More descriptive error responses with actionable suggestions
+- **Documentation**: Interactive API explorer with live examples
+
+### 🐛 Bug Fixes
+
+- Fixed timestamp formatting inconsistencies in webhook payloads
+- Resolved issue with currency conversion precision for small amounts
+- Fixed pagination edge case in request listing endpoint
+- Corrected decimal handling for Japanese Yen transactions
+
+### ⚠️ Breaking Changes
+
+None in this release.
+
+</Update>
+
+## Version 2.0.5
+
+<Update label="v2.0.5" description="Released August 2025">
+
+### 🚀 Improvements
+
+- **Security**: Enhanced API key validation and rotation capabilities
+- **Monitoring**: Improved request tracing for better debugging
+- **Webhooks**: Retry mechanism with exponential backoff for failed deliveries
+
+### 🐛 Bug Fixes
+
+- Fixed rare concurrency issue in payment processing
+- Resolved webhook delivery order for high-volume scenarios
+- Corrected timezone handling in request expiration dates
+
+</Update>
+
+## Version 2.0.0 - Major Release
+
+<Update label="v2.0.0" description="Released June 2025">
+
+### 🎉 New Features
+
+- **Multi-chain Support**: Native support for Ethereum, Polygon, Arbitrum, and more
+- **Payment Methods**: Credit card payments via Stripe integration
+- **Request Templates**: Reusable templates for recurring payment scenarios
+- **Advanced Webhooks**: Configurable event filtering and custom headers
+
+### 🚀 Improvements
+
+- **RESTful Design**: Complete API redesign following REST principles
+- **OpenAPI Specification**: Comprehensive API documentation with interactive examples
+- **SDK Support**: Official SDKs for JavaScript, Python, and PHP
+- **Performance**: 10x improvement in request processing speed
+
+### ⚠️ Breaking Changes
+
+<Warning>
+This is a major version upgrade with significant breaking changes. Please review the migration guide carefully.
+</Warning>
+
+- **Endpoint Structure**: All endpoints have been restructured
+- **Authentication**: New API key format and authentication method
+- **Response Format**: Standardized response structure across all endpoints
+- **Field Names**: Several field names have been updated for consistency
+
+**Migration Resources:**
+- [Migration Guide](/request-network-api/migrate-to-v2)
+- [V1 to V2 Comparison Tool](https://portal.request.network/migration)
+- [Support Channel](https://request.network/discord) for migration assistance
+
+</Update>
+
+## API Versioning
+
+### Current Version Support
+
+- **v2.1.x**: Current stable version with full support
+- **v2.0.x**: Maintenance mode, security updates only
+- **v1.x**: **Deprecated** - End of life: December 2025
+
+### Version Headers
+
+Always specify the API version in your requests:
+
+```bash
+curl -H "API-Version: 2.1" \
+     -H "Authorization: Bearer YOUR_API_KEY" \
+     https://api.request.network/requests
+```
+
+### Breaking Change Policy
+
+<Info>
+We follow semantic versioning and provide advance notice for breaking changes:
+
+- **Major versions** (2.0.0): May include breaking changes
+- **Minor versions** (2.1.0): New features, backward compatible
+- **Patch versions** (2.1.1): Bug fixes, backward compatible
+</Info>
+
+## Upcoming Features
+
+### Q4 2025 Roadmap
+
+- **GraphQL API**: Alternative query interface for complex data retrieval
+- **Batch Operations**: Bulk operations for high-volume use cases
+- **Advanced Analytics**: Detailed payment and request analytics
+- **Mobile SDKs**: Native iOS and Android SDK support
+
+<Tip>
+Follow our [GitHub repository](https://github.com/RequestNetwork/request-api) to track development progress and provide feedback on upcoming features.
+</Tip>
+
+## Getting Help
+
+If you have questions about any release or need migration assistance:
+
+- 📚 [API Documentation](/api-reference/authentication)
+- 💬 [Discord Community](https://request.network/discord)
+- 📧 [Support Email](mailto:support@request.network)
+- 🐛 [Bug Reports](https://github.com/RequestNetwork/request-api/issues)

@@ -22,14 +22,19 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Docs",
+        "tab": "Welcome",
         "groups": [
           {
-            "group": "🏠 Welcome",
+            "group": "🏠 Getting Started",
             "pages": ["index"]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Use Cases",
+        "groups": [
           {
-            "group": "📄 Use Cases",
+            "group": "📄 Primary Use Cases",
             "pages": [
               "use-cases/invoicing",
               "use-cases/payouts",
@@ -37,9 +42,14 @@
               "use-cases/checkout",
               "use-cases/subscriptions"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "API Features",
+        "groups": [
           {
-            "group": "⚙️ API Features",
+            "group": "⚙️ Core Features",
             "pages": [
               "api-features/payment-types",
               "api-features/advanced-features",
@@ -47,36 +57,33 @@
             ]
           },
           {
+            "group": "🔑 API Setup",
+            "pages": [
+              "api-setup/getting-started",
+              "request-network-api/api-portal-manage-api-keys-and-webhooks"
+            ]
+          },
+          {
             "group": "📚 API Reference",
             "pages": [
+              "api-reference/authentication",
+              "api-reference/webhooks",
               {
                 "group": "Endpoints",
                 "openapi": "https://api.stage.request.network/open-api/openapi.json",
                 "pages": [
                   "request-network-api/create-and-pay-requests"
                 ]
-              },
-              "api-reference/authentication",
-              "api-reference/webhooks"
+              }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Advanced",
+        "groups": [
           {
-            "group": "🌐 Resources",
-            "pages": [
-              "resources/supported-chains-and-currencies",
-              "resources/smart-contracts",
-              "resources/community"
-            ]
-          },
-          {
-            "group": "🔑 API Setup",
-            "pages": [
-              "request-network-api/api-portal-manage-api-keys-and-webhooks",
-              "api-setup/getting-started"
-            ]
-          },
-          {
-            "group": "🔧 SDK (Legacy)",
+            "group": "🔧 SDK Documentation",
             "pages": [
               "request-network-api/migrate-to-v2",
               "sdk-legacy/migration-guide"
@@ -85,20 +92,35 @@
         ]
       },
       {
-        "tab": "FAQ",
+        "tab": "Resources",
         "groups": [
           {
-            "group": " ",
-            "pages": ["faq"]
+            "group": "🌐 Developer Resources",
+            "pages": [
+              "resources/supported-chains-and-currencies",
+              "resources/smart-contracts",
+              "resources/community"
+            ]
+          },
+          {
+            "group": "📖 Documentation",
+            "pages": [
+              "faq",
+              "glossary"
+            ]
           }
         ]
       },
       {
-        "tab": "Glossary",
+        "tab": "Release Notes",
         "groups": [
           {
-            "group": " ",
-            "pages": ["glossary"]
+            "group": "📋 Product Updates",
+            "pages": [
+              "release-notes/index",
+              "release-notes/request-api",
+              "release-notes/easy-invoice"
+            ]
           }
         ]
       }
