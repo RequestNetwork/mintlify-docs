@@ -23,12 +23,7 @@
     "tabs": [
       {
         "tab": "Welcome",
-        "groups": [
-          {
-            "group": "🏠 Getting Started",
-            "pages": ["index"]
-          }
-        ]
+        "pages": ["index"]
       },
       {
         "tab": "Use Cases",
@@ -124,26 +119,7 @@
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Status",
-          "href": "https://status.request.network",
-          "icon": "signal"
-        },
-        {
-          "anchor": "Discord",
-          "href": "https://request.network/discord",
-          "icon": "discord"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://request.network/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
