@@ -41,10 +41,10 @@
         ]
       },
       {
-        "tab": "API Features",
+        "tab": "API",
         "groups": [
           {
-            "group": "⚙️ Core Features",
+            "group": "⚙️ API Features",
             "pages": [
               "api-features/payment-types",
               "api-features/advanced-features",
@@ -110,7 +110,7 @@
         "tab": "Release Notes",
         "groups": [
           {
-            "group": "📋 Product Updates",
+            "group": "📋 Release Notes",
             "pages": [
               "release-notes/index",
               "release-notes/request-api",
