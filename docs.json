@@ -19,6 +19,10 @@
       "family": "Montserrat"
     }
   },
+  "banner": {
+    "content": "🚀 New: Check out our revamped documentation!",
+    "dismissible": true
+  },
   "navigation": {
     "tabs": [
       {
