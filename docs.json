@@ -129,14 +129,15 @@
   "navbar": {
     "links": [
       {
-        "label": "Sign in",
-        "href": "https://portal.request.network"
+        "label": "Get in touch",
+        "href": "https://bz0u5kkw58i.typeform.com/to/mELk8WLC"
       }
     ],
-    "primary": {
+    "primary": 
+    {
       "type": "button",
-      "label": "Get in touch",
-      "href": "https://bz0u5kkw58i.typeform.com/to/mELk8WLC"
+      "label": "Sign in",
+      "href": "https://portal.request.network"
     }
   },
   "contextual": {
