@@ -123,7 +123,26 @@
           }
         ]
       }
-    ]
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Status",
+          "href": "https://status.request.network",
+          "icon": "signal"
+        },
+        {
+          "anchor": "Discord",
+          "href": "https://discord.com/invite/FsVAR3ny3f",
+          "icon": "discord"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://request.network/blog",
+          "icon": "newspaper"
+        }
+      ]
+    }
   },
   "logo": {
     "light": "/logo/light.svg",
