@@ -127,12 +127,17 @@
     "global": {
       "anchors": [
         {
+          "anchor": "Support",
+          "href": "https://github.com/orgs/RequestNetwork/discussions",
+          "icon": "comment-dots"
+        },
+        {
           "anchor": "Status",
           "href": "https://status.request.network",
           "icon": "signal"
         },
         {
-          "anchor": "Discord",
+          "anchor": "Community",
           "href": "https://discord.com/invite/FsVAR3ny3f",
           "icon": "discord"
         },
