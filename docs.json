@@ -11,7 +11,11 @@
     "default": "dark"
   },
   "background": {
-    "decoration": "gradient"
+    "decoration": "gradient",
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#001912"
+    }
   },
   "favicon": "/favicon.svg",
   "fonts": {
