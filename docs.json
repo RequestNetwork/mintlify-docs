@@ -15,9 +15,7 @@
   },
   "favicon": "/favicon.svg",
   "fonts": {
-    "heading": {
-      "family": "Montserrat"
-    }
+    "family": "Montserrat"
   },
   "banner": {
     "content": "🚀 New: Check out our revamped documentation!",
