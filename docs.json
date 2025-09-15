@@ -8,7 +8,7 @@
     "dark": "#01513B"
   },
   "appearance": {
-    "default": "light"
+    "default": "dark"
   },
   "background": {
     "decoration": "gradient"
