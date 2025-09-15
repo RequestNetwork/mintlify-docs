@@ -17,6 +17,9 @@
   "fonts": {
     "family": "Montserrat"
   },
+  "thumbnails": {
+    "background": "thumbnail.png"
+  },
   "banner": {
     "content": "🚀 New: Check out our revamped documentation!",
     "dismissible": true
