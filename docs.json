@@ -18,6 +18,7 @@
     "family": "Montserrat"
   },
   "thumbnails": {
+    "appearance": "dark",
     "background": "thumbnail.png"
   },
   "banner": {
