@@ -164,7 +164,7 @@
     "primary": 
     {
       "type": "button",
-      "label": "Sign in",
+      "label": "Get your API Key",
       "href": "https://portal.request.network"
     }
   },
