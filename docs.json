@@ -79,18 +79,6 @@
         ]
       },
       {
-        "tab": "Legacy",
-        "groups": [
-          {
-            "group": "🔧 SDK Documentation",
-            "pages": [
-              "request-network-api/migrate-to-v2",
-              "sdk-legacy/migration-guide"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Resources",
         "groups": [
           {
@@ -106,6 +94,18 @@
             "pages": [
               "faq",
               "glossary"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Legacy",
+        "groups": [
+          {
+            "group": "🔧 SDK Documentation",
+            "pages": [
+              "request-network-api/migrate-to-v2",
+              "sdk-legacy/migration-guide"
             ]
           }
         ]
