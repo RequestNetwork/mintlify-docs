@@ -129,31 +129,7 @@
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Support",
-          "href": "https://github.com/orgs/RequestNetwork/discussions",
-          "icon": "comment-dots"
-        },
-        {
-          "anchor": "Status",
-          "href": "https://status.request.network",
-          "icon": "signal"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://discord.com/invite/FsVAR3ny3f",
-          "icon": "discord"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://request.network/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -163,8 +139,8 @@
   "navbar": {
     "links": [
       {
-        "label": "Get in touch",
-        "href": "https://bz0u5kkw58i.typeform.com/to/mELk8WLC"
+        "label": "Support",
+        "href": "https://github.com/orgs/RequestNetwork/discussions"
       }
     ],
     "primary": 
@@ -193,6 +169,33 @@
       "github": "https://github.com/RequestNetwork",
       "linkedin": "https://www.linkedin.com/company/request-network",
       "bluesky": "https://bsky.app/profile/requestnetwork.bsky.social"
-    }
+    },
+    "links": [
+      {
+        "items": [
+        {
+          "label": "Website",
+          "href": "https://request.network"
+        },
+        {
+          "label": "Community",
+          "href": "https://discord.com/invite/FsVAR3ny3f"
+        },
+        {
+          "label": "Scan",
+          "href": "https://scan.request.network"
+        },
+        {
+          "label": "Status",
+          "href": "https://status.request.network"
+        },
+        {
+          "label": "Blog",
+          "href": "https://request.network/blog"
+        }
+        ]
+
+      }
+    ]
   }
 }
