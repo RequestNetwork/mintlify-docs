@@ -54,18 +54,18 @@
         "tab": "API",
         "groups": [
           {
+            "group": "🔑 API Setup",
+            "pages": [
+              "api-setup/getting-started",
+              "request-network-api/api-portal-manage-api-keys-and-webhooks"
+            ]
+          },
+          {
             "group": "⚙️ API Features",
             "pages": [
               "api-features/payment-types",
               "api-features/advanced-features",
               "api-features/integration-patterns"
-            ]
-          },
-          {
-            "group": "🔑 API Setup",
-            "pages": [
-              "api-setup/getting-started",
-              "request-network-api/api-portal-manage-api-keys-and-webhooks"
             ]
           },
           {
