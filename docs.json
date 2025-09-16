@@ -19,8 +19,13 @@
   },
   "favicon": "/favicon.svg",
   "fonts": {
-    "family": "Montserrat",
-    "weight": 300
+    "heading": {
+      "family": "Montserrat"
+    },
+    "body": {
+      "family": "Montserrat",
+      "weight": 500
+    }
   },
   "thumbnails": {
     "appearance": "dark"
