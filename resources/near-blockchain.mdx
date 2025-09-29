@@ -3,6 +3,8 @@ title: "NEAR"
 description: "Request Network's support for NEAR including native and fungible token payments"
 ---
 
+import { CopyButton, ExternalLinkButton } from "/snippets/contract-buttons.jsx"
+
 ## Overview
 
 Request Network supports payments on NEAR, a sharded, proof-of-stake blockchain that offers unique capabilities compared to EVM-compatible chains. NEAR's architecture enables more complex smart contract interactions through asynchronous callbacks and cross-contract calls.
@@ -71,17 +73,17 @@ Payments for requests denominated in one currency (typically fiat like USD) but 
 
 | Payment Type | Contract Address | Actions | Description |
 |--------------|------------------|---------|-------------|
-| **Native NEAR Payments** | `requestnetwork.near` | <button onclick="navigator.clipboard.writeText('requestnetwork.near')" title="Copy Address">📋</button> [🔗](https://nearblocks.io/address/requestnetwork.near) | Direct NEAR token payments with references |
-| **Fungible Token Payments** | `pay.reqnetwork.near` | <button onclick="navigator.clipboard.writeText('pay.reqnetwork.near')" title="Copy Address">📋</button> [🔗](https://nearblocks.io/address/pay.reqnetwork.near) | NEP-141 token payments with fees |
-| **Native Conversion Payments** | `native.conversion.reqnetwork.near` | <button onclick="navigator.clipboard.writeText('native.conversion.reqnetwork.near')" title="Copy Address">📋</button> [🔗](https://nearblocks.io/address/native.conversion.reqnetwork.near) | Fiat/token to NEAR conversions |
+| **Native NEAR Payments** | `requestnetwork.near` | <CopyButton text="requestnetwork.near" /> <ExternalLinkButton href="https://nearblocks.io/address/requestnetwork.near" /> | Direct NEAR token payments with references |
+| **Fungible Token Payments** | `pay.reqnetwork.near` | <CopyButton text="pay.reqnetwork.near" /> <ExternalLinkButton href="https://nearblocks.io/address/pay.reqnetwork.near" /> | NEP-141 token payments with fees |
+| **Native Conversion Payments** | `native.conversion.reqnetwork.near` | <CopyButton text="native.conversion.reqnetwork.near" /> <ExternalLinkButton href="https://nearblocks.io/address/native.conversion.reqnetwork.near" /> | Fiat/token to NEAR conversions |
 
 ### Testnet (near-testnet)
 
 | Payment Type | Contract Address | Actions | Description |
 |--------------|------------------|---------|-------------|
-| **Native NEAR Payments** | `dev-1631521265288-35171138540673` | <button onclick="navigator.clipboard.writeText('dev-1631521265288-35171138540673')" title="Copy Address">📋</button> [🔗](https://testnet.nearblocks.io/address/dev-1631521265288-35171138540673) | Direct NEAR token payments with references |
-| **Fungible Token Payments** | `pay.reqnetwork.testnet` | <button onclick="navigator.clipboard.writeText('pay.reqnetwork.testnet')" title="Copy Address">📋</button> [🔗](https://testnet.nearblocks.io/address/pay.reqnetwork.testnet) | NEP-141 token payments with fees |
-| **Native Conversion Payments** | `native.conversion.reqnetwork.testnet` | <button onclick="navigator.clipboard.writeText('native.conversion.reqnetwork.testnet')" title="Copy Address">📋</button> [🔗](https://testnet.nearblocks.io/address/native.conversion.reqnetwork.testnet) | Fiat/token to NEAR conversions |
+| **Native NEAR Payments** | `dev-1631521265288-35171138540673` | <CopyButton text="dev-1631521265288-35171138540673" /> <ExternalLinkButton href="https://testnet.nearblocks.io/address/dev-1631521265288-35171138540673" /> | Direct NEAR token payments with references |
+| **Fungible Token Payments** | `pay.reqnetwork.testnet` | <CopyButton text="pay.reqnetwork.testnet" /> <ExternalLinkButton href="https://testnet.nearblocks.io/address/pay.reqnetwork.testnet" /> | NEP-141 token payments with fees |
+| **Native Conversion Payments** | `native.conversion.reqnetwork.testnet` | <CopyButton text="native.conversion.reqnetwork.testnet" /> <ExternalLinkButton href="https://testnet.nearblocks.io/address/native.conversion.reqnetwork.testnet" /> | Fiat/token to NEAR conversions |
 
 ## Payment Detection
 
