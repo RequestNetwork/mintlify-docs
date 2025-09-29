@@ -31,7 +31,7 @@ NEAR has several important architectural differences that affect how payments wo
   </Card>
   
   <Card title="Gas Model" icon="gas-pump">
-    NEAR uses a different gas model with TGas (TeraGas) units. Payment transactions typically require 50-400 TGas depending on complexity.
+    NEAR uses a different gas model with TGas (TeraGas) units. Gas costs are predictable and much lower than Ethereum mainnet.
   </Card>
 </CardGroup>
 
@@ -45,7 +45,6 @@ Direct payments using NEAR's native token through the payment proxy smart contra
 - ✅ Direct NEAR token transfers with payment references
 - ✅ Fee collection support
 - ✅ Payment detection and indexing
-- ⚠️ Contract is locked (non-upgradable) per NEAR Foundation requirements
 
 ### Fungible Token Payments (NEP-141)
 
@@ -54,39 +53,44 @@ Payments using NEAR's fungible token standard (NEP-141) equivalent to ERC-20 on 
 **Features:**
 - ✅ Support for all NEP-141 compliant tokens
 - ✅ Fee collection in the same token
-- ✅ Upgradable proxy contract
+- ✅ Payment detection and indexing
 - ⚠️ Requires storage deposit registration
 
 ### Native Token Conversion Payments
 
-Convert from fiat currencies or other tokens to NEAR native tokens during payment.
+Payments for requests denominated in one currency (typically fiat like USD) but paid in NEAR native tokens. On-chain oracles provide real-time price feeds to calculate the correct NEAR amount.
 
 **Features:**
-- ✅ Fiat-to-NEAR conversion payments
-- ✅ Oracle-based price feeds
-- ✅ Maximum slippage protection
-- ⚠️ Higher gas costs due to cross-contract calls
+- ✅ Conversion payments denominated in USD, settled in NEAR, using oracle price feeds
+- ✅ Price conversion at the moment of payment
+- ✅ Payment detection and indexing
 
 ## Smart Contract Addresses
 
 ### Mainnet (near)
 
-| Payment Type | Contract Address | Status | Description |
+| Payment Type | Contract Address | Actions | Description |
 |--------------|------------------|---------|-------------|
-| **Native NEAR Payments** | `requestnetwork.near` | 🔒 Locked | Direct NEAR token payments with references |
-| **Fungible Token Payments** | `pay.reqnetwork.near` | 🔄 Upgradable | NEP-141 token payments with fees |
-| **Native Conversion Payments** | `native.conversion.reqnetwork.near` | 🔄 Upgradable | Fiat/token to NEAR conversions |
+| **Native NEAR Payments** | `requestnetwork.near` | <button onclick="navigator.clipboard.writeText('requestnetwork.near')" title="Copy Address">📋</button> [🔗](https://nearblocks.io/address/requestnetwork.near) | Direct NEAR token payments with references |
+| **Fungible Token Payments** | `pay.reqnetwork.near` | <button onclick="navigator.clipboard.writeText('pay.reqnetwork.near')" title="Copy Address">📋</button> [🔗](https://nearblocks.io/address/pay.reqnetwork.near) | NEP-141 token payments with fees |
+| **Native Conversion Payments** | `native.conversion.reqnetwork.near` | <button onclick="navigator.clipboard.writeText('native.conversion.reqnetwork.near')" title="Copy Address">📋</button> [🔗](https://nearblocks.io/address/native.conversion.reqnetwork.near) | Fiat/token to NEAR conversions |
 
 ### Testnet (near-testnet)
 
-| Payment Type | Contract Address | Status | Description |
+| Payment Type | Contract Address | Actions | Description |
 |--------------|------------------|---------|-------------|
-| **Fungible Token Payments** | `pay.reqnetwork.testnet` | 🔄 Upgradable | NEP-141 token payments with fees |
-| **Native Conversion Payments** | `native.conversion.reqnetwork.testnet` | 🔄 Upgradable | Fiat/token to NEAR conversions |
+| **Native NEAR Payments** | `dev-1631521265288-35171138540673` | <button onclick="navigator.clipboard.writeText('dev-1631521265288-35171138540673')" title="Copy Address">📋</button> [🔗](https://testnet.nearblocks.io/address/dev-1631521265288-35171138540673) | Direct NEAR token payments with references |
+| **Fungible Token Payments** | `pay.reqnetwork.testnet` | <button onclick="navigator.clipboard.writeText('pay.reqnetwork.testnet')" title="Copy Address">📋</button> [🔗](https://testnet.nearblocks.io/address/pay.reqnetwork.testnet) | NEP-141 token payments with fees |
+| **Native Conversion Payments** | `native.conversion.reqnetwork.testnet` | <button onclick="navigator.clipboard.writeText('native.conversion.reqnetwork.testnet')" title="Copy Address">📋</button> [🔗](https://testnet.nearblocks.io/address/native.conversion.reqnetwork.testnet) | Fiat/token to NEAR conversions |
 
-<Info>
-**Contract Ownership**: Upgradable contracts are owned by `reqnetwork.near` with private keys secured in the team's credential management system.
-</Info>
+## Payment Detection
+
+Payment detection for NEAR transactions is handled through dedicated subgraphs:
+
+- **NEAR Mainnet**: [Request Payments Near Subgraph](https://thegraph.com/explorer/subgraphs/9yEg3h46CZiv4VuSqo1erMMBx5sHxRuW5Ai2V8goSpQL?view=Query&chain=arbitrum-one)
+- **NEAR Testnet**: [Request Payments Near Testnet Subgraph](https://thegraph.com/explorer/subgraphs/AusVyfndonsMVFrVzckuENLqx8t6kcXuxn6C6VbSGd7M?view=Query&chain=arbitrum-one)
+
+These subgraphs index payment events and transaction data to enable efficient payment detection and status tracking.
 
 ## Technical Considerations
 
@@ -116,16 +120,8 @@ Before receiving NEP-141 tokens, accounts must register with the token contract:
 
 ### Gas Considerations
 
-NEAR payment transactions have different gas requirements:
-
-| Payment Type | Typical Gas Cost | Description |
-|--------------|------------------|-------------|
-| **Native NEAR** | 50 TGas | Simple transfer with reference |
-| **Fungible Token** | 200 TGas | Cross-contract call to token |
-| **Conversion Payment** | 300-400 TGas | Multiple contract interactions |
-
 <Tip>
-Gas costs are predictable and much lower than Ethereum mainnet, typically costing fractions of a cent in USD terms.
+NEAR uses a TGas (TeraGas) unit system and gas costs are predictable and much lower than Ethereum mainnet, typically costing fractions of a cent in USD terms.
 </Tip>
 
 ## Integration Guide
@@ -153,25 +149,13 @@ const request = await requestNetwork.createRequest({
 });
 ```
 
-<Note>
-For complete integration examples and SDK usage, see the [Request Network SDK Documentation](/sdk-legacy/migration-guide).
-</Note>
-
-## Network Information
-
-| Network | Chain ID | Native Currency | Explorer |
-|---------|----------|-----------------|----------|
-| **NEAR Mainnet** | N/A | NEAR | [nearblocks.io](https://nearblocks.io) |
-| **NEAR Testnet** | N/A | NEAR | [testnet.nearblocks.io](https://testnet.nearblocks.io) |
-
 ## Limitations
 
 <Warning>
 **Current Limitations:**
 - NEAR support is SDK-only (not available in Request Network API)
-- Li.Fi bridge integrations do not support NEAR
+- Cross-chain payments to/from NEAR are not supported
 - Some advanced features like batch payments are not yet implemented
-- Cross-chain payments to/from NEAR require manual coordination
 </Warning>
 
 ## Developer Resources
