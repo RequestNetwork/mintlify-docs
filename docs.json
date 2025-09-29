@@ -96,6 +96,7 @@
             "group": "🌐 Developer Resources",
             "pages": [
               "resources/supported-chains-and-currencies",
+              "resources/near-blockchain",
               "resources/smart-contracts",
               "resources/community"
             ]
