@@ -68,9 +68,7 @@
           {
             "group": "⚙️ API Features",
             "pages": [
-              "api-features/payment-types",
-              "api-features/advanced-features",
-              "api-features/integration-patterns"
+              "api-features/payment-types-overview"
             ]
           },
           {
