@@ -71,7 +71,7 @@
               {
                 "group": "Requests",
                 "pages": [
-                  "api-features/create-requests-query-status"
+                  "api-features/create-requests"
                 ]
               },
               {
@@ -91,6 +91,7 @@
                 "group": "Reconciliation",
                 "pages": [
                   "api-features/payment-detection",
+                  "api-features/query-requests",
                   "api-features/query-payments",
                   "api-features/webhooks-events"
                 ]
