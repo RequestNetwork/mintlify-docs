@@ -1,0 +1,54 @@
+---
+title: "Conversion Payments"
+description: "Fiat-denominated requests settled in cryptocurrency with real-time conversion"
+---
+
+## Overview
+
+Conversion payments allow you to create requests denominated in fiat currencies (USD, EUR) while receiving settlement in cryptocurrency, with automatic exchange rate conversion at payment time.
+
+## How It Works
+
+```mermaid
+graph LR
+    A[Request: $100 USD] --> B[Real-time Rate] 
+    B --> C[Pay: 0.041 ETH]
+    C --> D[Receive: 0.041 ETH]
+```
+
+**Benefits:**
+- Stable pricing in familiar currencies
+- Automatic exchange rate handling
+- No manual conversion required
+
+## Supported Fiat Currencies
+
+- **USD** - US Dollar
+- **EUR** - Euro  
+- **GBP** - British Pound
+- **CNY** - Chinese Yuan
+- **JPY** - Japanese Yen
+
+## Exchange Rate Sources
+
+Real-time rates from multiple providers ensure accuracy and reliability.
+
+## Used In
+
+<CardGroup cols={3}>
+  <Card title="Invoicing" href="/use-cases/invoicing">
+    Professional invoices in fiat
+  </Card>
+  
+  <Card title="Checkout" href="/use-cases/checkout">
+    E-commerce pricing
+  </Card>
+  
+  <Card title="Subscriptions" href="/use-cases/subscriptions">
+    Predictable subscription pricing
+  </Card>
+</CardGroup>
+
+## Implementation Details
+
+See [API Reference - Conversion Payments](/api-reference/conversion-payments) for complete technical documentation.

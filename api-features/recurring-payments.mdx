@@ -1,0 +1,68 @@
+---
+title: "Recurring Payments"
+description: "Automated payment schedules for subscriptions and recurring billing"
+---
+
+## Overview
+
+Recurring payments enable automated payment collection on predefined schedules, supporting subscription services, installment plans, and regular business expenses.
+
+## Payment Types
+
+<CardGroup cols={2}>
+  <Card title="Subscriptions" icon="repeat">
+    Monthly/annual subscription billing
+  </Card>
+  
+  <Card title="Recurring Payouts" icon="calendar-days">
+    Scheduled payment disbursements
+  </Card>
+</CardGroup>
+
+## How It Works
+
+```mermaid
+graph TD
+    A[Create Payment Plan] --> B[Schedule Setup]
+    B --> C[First Payment]
+    C --> D[Automatic Execution]
+    D --> E[Next Payment Date]
+    E --> D
+```
+
+**Key Features:**
+- **Flexible Schedules:** Daily, weekly, monthly, yearly intervals
+- **Smart Contracts:** Automated execution without manual intervention
+- **Fail-Safe Logic:** Retry mechanisms and payment recovery
+
+## Configuration Options
+
+### Schedule Types
+- **Fixed Interval:** Regular payments (monthly, quarterly)
+- **Custom Dates:** Specific payment dates
+- **Business Days Only:** Skip weekends and holidays
+
+### Payment Amounts
+- **Fixed Amount:** Same amount each payment
+- **Variable Amount:** Different amounts per payment
+- **Escalation:** Automatic amount increases
+
+## Implementation Examples
+
+<CardGroup cols={2}>
+  <Card title="SaaS Subscriptions" icon="laptop-code">
+    Monthly software license fees
+  </Card>
+  
+  <Card title="Loan Payments" icon="hand-coins">
+    Structured repayment schedules
+  </Card>
+</CardGroup>
+
+## Available In EasyInvoice
+
+Both **Subscriptions** and **Recurring Payouts** are featured in the EasyInvoice demo with working examples.
+
+## Implementation Details
+
+See [API Reference - Recurring Payments](/api-reference/recurring-payments) for complete technical documentation.

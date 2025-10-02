@@ -1,0 +1,56 @@
+---
+title: "Batch Payments"
+description: "Process multiple payments in a single transaction for gas optimization"
+---
+
+## Overview
+
+Batch payments allow you to process multiple direct or conversion payments in a single blockchain transaction, significantly reducing gas costs and simplifying payment operations.
+
+## How It Works
+
+```mermaid
+graph TD
+    A[Multiple Recipients] --> B[Single Transaction]
+    B --> C[Atomic Execution]
+    C --> D[All Succeed or All Fail]
+```
+
+**Benefits:**
+- **Gas Savings:** Up to 60% reduction in total gas costs
+- **Atomic Operations:** All payments succeed or fail together
+- **Simplified Management:** One transaction to monitor
+
+## Requirements
+
+- All payments must be on the same network
+- Supports Native, ERC20, and Conversion payments
+- Maximum batch size limited by block gas limit
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Payroll Processing" icon="users">
+    Pay multiple employees simultaneously
+  </Card>
+  
+  <Card title="Vendor Payments" icon="building">
+    Process multiple supplier invoices
+  </Card>
+</CardGroup>
+
+## Used In
+
+<CardGroup cols={2}>
+  <Card title="Payroll" href="/use-cases/payroll">
+    Efficient employee payments
+  </Card>
+  
+  <Card title="Payouts" href="/use-cases/payouts">
+    Bulk vendor payments
+  </Card>
+</CardGroup>
+
+## Implementation Details
+
+See [API Reference - Batch Payments](/api-reference/batch-payments) for complete technical documentation.
