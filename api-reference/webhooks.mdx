@@ -1,82 +1,96 @@
 ---
 title: "Webhooks"
-description: "Real-time event notifications and webhook configuration guide"
+description: "Complete webhook implementation guide with event types, security, and retry configuration"
 ---
 
-## Webhook Overview
+## Overview
 
-Webhooks provide real-time notifications when events occur in your Request Network integration. Instead of polling for updates, webhooks push event data to your application immediately when payments are detected, requests are created, or other significant events happen.
+Webhooks deliver real-time notifications when payment and request events occur. Configure your endpoints to receive HMAC-signed POST requests with automatic retry logic and comprehensive event data.
 
-## Webhook Events
+## Webhook Configuration
+
+### Setup in Portal
+1. Navigate to **Settings → Webhooks** in Request Portal
+2. Add your HTTPS endpoint URL
+3. Copy your **Signing Secret** for signature verification
+4. Select event types to receive
+5. Test with **Send test webhooks** feature
+
+### Local Development
+Use ngrok to receive webhooks locally:
+```bash
+ngrok http 3000
+# Use the HTTPS URL (e.g., https://abc123.ngrok.io/webhook) in Portal
+```
+
+## Event Types
 
 ### Payment Events
-
 <CardGroup cols={2}>
-  <Card title="payment_detected" icon="search">
-    **When:** Payment transaction is detected on blockchain
+  <Card title="payment.confirmed" icon="check-circle">
+    Payment fully completed and settled
     
-    **Use Cases:**
-    - Show "Payment Pending" status to users
-    - Start order preparation
-    - Send confirmation emails
-    
-    **Typical Timing:** Within 1-5 seconds of transaction
+    **Timing:** After blockchain confirmation
+    **Use:** Complete fulfillment, release goods
   </Card>
   
-  <Card title="payment_confirmed" icon="check-circle">
-    **When:** Payment is confirmed on blockchain (sufficient confirmations)
+  <Card title="payment.partial" icon="clock">
+    Partial payment received for request
     
-    **Use Cases:**
-    - Complete order fulfillment
-    - Update accounting systems
-    - Release digital goods
+    **Scenarios:** Installments, partial orders
+    **Use:** Update balance, allow additional payments
+  </Card>
+  
+  <Card title="payment.failed" icon="x-circle">
+    Payment transaction failed or reverted
     
-    **Typical Timing:** 1-15 minutes after payment
+    **Triggers:** Failed TX, insufficient funds
+    **Use:** Notify failure, reset order status
+  </Card>
+  
+  <Card title="payment.refunded" icon="undo">
+    Payment has been refunded to payer
+    
+    **Context:** Crypto-to-fiat transactions
+    **Use:** Update order status, notify customer
   </Card>
 </CardGroup>
 
+### Processing Events
 <CardGroup cols={2}>
-  <Card title="payment_failed" icon="x-circle">
-    **When:** Payment transaction fails or is reverted
+  <Card title="payment.processing" icon="spinner">
+    Crypto-to-fiat conversion in progress
     
-    **Use Cases:**
-    - Notify customer of payment failure
-    - Reset order status
-    - Trigger retry workflows
-    
-    **Triggers:** Failed transactions, insufficient gas, reverted smart contract calls
-  </Card>
-  
-  <Card title="payment_partially_completed" icon="clock">
-    **When:** Partial payment is received for a request
-    
-    **Use Cases:**
-    - Update outstanding balance
-    - Notify of partial payment
-    - Allow additional payments
-    
-    **Common Scenarios:** Installment payments, partial order fulfillment
+    **Stages:** initiated, pending_assessment, ongoing_checks, sending_fiat, fiat_sent
+    **Use:** Track conversion status, update UI
   </Card>
 </CardGroup>
 
 ### Request Events
-
 <CardGroup cols={2}>
-  <Card title="request_created" icon="file-plus">
-    **When:** New payment request is created
+  <Card title="request.recurring" icon="repeat">
+    New recurring request generated
     
-    **Payload Includes:**
-    - Request ID and details
-    - Payment information
-    - Custom metadata
+    **Context:** Subscription renewals, scheduled payments
+    **Use:** Send renewal notifications, update billing
+  </Card>
+</CardGroup>
+
+### Compliance Events
+<CardGroup cols={2}>
+  <Card title="compliance.updated" icon="shield-check">
+    KYC or agreement status changed
     
-    **Use Cases:** CRM integration, analytics tracking
+    **KYC States:** initiated, pending, approved, rejected, failed
+    **Agreement States:** not_started, pending, completed, rejected, failed
+    **Use:** Update user permissions, notify status
   </Card>
   
-  <Card title="request_updated" icon="edit">
-    **When:** Request metadata or status is modified
+  <Card title="payment_detail.updated" icon="building-columns">
+    Bank account verification status updated
     
-    **Payload Includes:**
+    **States:** approved, failed, pending
+    **Use:** Enable fiat payments, update profiles
     - Updated fields
     - Previous values
     - Change timestamp
@@ -85,437 +99,321 @@ Webhooks provide real-time notifications when events occur in your Request Netwo
   </Card>
 </CardGroup>
 
-### Subscription Events
+## Security Implementation
 
-<CardGroup cols={2}>
-  <Card title="subscription_renewed" icon="repeat">
-    **When:** Recurring payment is successfully processed
+### Signature Verification
+Every webhook includes an HMAC SHA-256 signature in the `x-request-network-signature` header:
+
+```javascript
+import crypto from "node:crypto";
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(JSON.stringify(payload))
+    .digest("hex");
     
-    **Use Cases:**
-    - Extend subscription period
-    - Send renewal confirmation
-    - Update billing systems
-    
-    **For:** [Subscription](/use-cases/subscriptions) use cases
-  </Card>
+  return signature === expectedSignature;
+}
+
+// Usage in your webhook handler
+app.post("/webhook", (req, res) => {
+  const signature = req.headers["x-request-network-signature"];
   
-  <Card title="subscription_failed" icon="exclamation-triangle">
-    **When:** Recurring payment fails
-    
-    **Use Cases:**
-    - Notify customer of failed payment
-    - Initiate payment retry
-    - Manage subscription status
-    
-    **Common Causes:** Insufficient funds, expired payment methods
-  </Card>
-</CardGroup>
-
-## Webhook Configuration
-
-### Setting Up Webhooks
-
-<Steps>
-  <Step title="Configure Endpoint">
-    Set up a webhook endpoint URL in the [Request Portal](https://portal.request.network)
-  </Step>
-  <Step title="Select Events">
-    Choose which event types you want to receive
-  </Step>
-  <Step title="Test Endpoint">
-    Use the test webhook feature to verify your endpoint
-  </Step>
-  <Step title="Go Live">
-    Enable webhooks for production traffic
-  </Step>
-</Steps>
-
-### Webhook Endpoint Requirements
-
-<Tabs>
-  <Tab title="HTTP Requirements">
-    **Endpoint Specifications:**
-    - Must be publicly accessible HTTPS URL
-    - Should return 2xx status code for successful processing
-    - Timeout limit: 30 seconds
-    - Must handle duplicate events (idempotency)
-    
-    ```javascript
-    app.post('/webhooks/request-network', (req, res) => {
-      try {
-        // Process webhook event
-        const { eventType, data } = req.body;
-        
-        // Your business logic here
-        processEvent(eventType, data);
-        
-        // Return success status
-        res.status(200).send('OK');
-        
-      } catch (error) {
-        // Return error status for retry
-        console.error('Webhook processing error:', error);
-        res.status(500).send('Error processing webhook');
-      }
-    });
-    ```
-  </Tab>
+  if (!verifyWebhookSignature(req.body, signature, WEBHOOK_SECRET)) {
+    return res.status(401).json({ error: "Invalid signature" });
+  }
   
-  <Tab title="Security">
-    **Webhook Security:**
-    - Verify webhook signatures
-    - Use HTTPS only
-    - Implement request validation
-    - Rate limit webhook endpoints
-    
-    ```javascript
-    const crypto = require('crypto');
-    
-    function verifyWebhookSignature(req) {
-      const signature = req.headers['x-request-signature'];
-      const timestamp = req.headers['x-request-timestamp'];
-      const payload = JSON.stringify(req.body);
-      
-      // Verify timestamp (prevent replay attacks)
-      const currentTime = Math.floor(Date.now() / 1000);
-      if (Math.abs(currentTime - timestamp) > 300) { // 5 minute tolerance
-        return false;
-      }
-      
-      // Verify signature
-      const expectedSignature = crypto
-        .createHmac('sha256', process.env.WEBHOOK_SECRET)
-        .update(timestamp + payload)
-        .digest('hex');
-      
-      return crypto.timingSafeEqual(
-        Buffer.from(signature, 'hex'),
-        Buffer.from(expectedSignature, 'hex')
-      );
-    }
-    ```
-  </Tab>
-  
-  <Tab title="Retry Logic">
-    **Automatic Retries:**
-    - Retry schedule: 1s, 5s, 25s, 125s, 625s
-    - Maximum 5 retry attempts
-    - Exponential backoff with jitter
-    - Dead letter queue for failed webhooks
-    
-    **Error Handling:**
-    ```javascript
-    app.post('/webhooks/request-network', async (req, res) => {
-      try {
-        const { eventType, data } = req.body;
-        
-        // Process event
-        await processEvent(eventType, data);
-        
-        res.status(200).send('OK');
-        
-      } catch (error) {
-        if (error.permanent) {
-          // Don't retry permanent errors
-          res.status(400).send('Permanent error');
-        } else {
-          // Retry temporary errors
-          res.status(500).send('Temporary error');
-        }
-      }
-    });
-    ```
-  </Tab>
-</Tabs>
+  // Process webhook...
+  res.status(200).json({ success: true });
+});
+```
 
-## Webhook Payloads
+### Security Requirements
+- **HTTPS only:** Production webhooks require HTTPS endpoints
+- **Always verify signatures:** Never process unverified webhook requests
+- **Keep secrets secure:** Store signing secrets as environment variables
+- **Return 2xx for success:** Any 2xx status code confirms successful processing
 
-### Payment Confirmed Event
+## Request Headers
 
-<CodeGroup>
-```json Payment Confirmed
+Each webhook request includes these headers:
+
+| Header | Description | Example |
+|--------|-------------|---------|
+| `x-request-network-signature` | HMAC SHA-256 signature | `a1b2c3d4e5f6...` |
+| `x-request-network-delivery` | Unique delivery ID (ULID) | `01ARZ3NDEKTSV4RRFFQ69G5FAV` |
+| `x-request-network-retry-count` | Current retry attempt (0-3) | `0` |
+| `x-request-network-test` | Present for test webhooks | `true` |
+| `content-type` | Always JSON | `application/json` |
+
+## Retry Logic
+
+### Automatic Retries
+- **Max attempts:** 3 retries (4 total attempts)
+- **Retry delays:** 1s, 5s, 15s
+- **Trigger conditions:** Non-2xx response codes, timeouts, connection errors
+- **Timeout:** 5 seconds per request
+
+### Response Handling
+```javascript
+// ✅ Success - no retry
+res.status(200).json({ success: true });
+res.status(201).json({ created: true });
+
+// ❌ Error - triggers retry
+res.status(404).json({ error: "Resource not found" });
+res.status(500).json({ error: "Internal server error" });
+```
+
+### Error Logging
+Request API logs all webhook delivery failures with:
+- Endpoint URL
+- Attempt number
+- Error details
+- Final failure after all retries
+
+## Payload Examples
+
+### Payment Confirmed
+```json
 {
-  "eventType": "payment_confirmed",
-  "timestamp": "2025-09-12T10:30:00Z",
-  "data": {
-    "requestId": "req_1234567890abcdef",
-    "paymentReference": "pay_abcdef1234567890",
-    "transactionHash": "0x742d35cc6cf8a8cbeff61cf82c6b8b3b42a67f1d6c1e8a7b9e2f8d5c3a1b0e9f",
-    "blockNumber": 18523456,
-    "networkName": "matic",
-    "amount": "1000000000000000000000", // 1000 USDC (18 decimals)
-    "currency": "USDC-matic",
-    "payerAddress": "0x1234567890123456789012345678901234567890",
-    "payeeAddress": "0x0987654321098765432109876543210987654321",
-    "fees": {
-      "platformFee": "25000000000000000000", // 25 USDC
-      "gasFee": "0.02"
-    },
-    "metadata": {
-      "reason": "Invoice #INV-001",
-      "invoiceNumber": "INV-001",
-      "customerEmail": "customer@example.com",
-      "orderId": "ORD-2025-001"
-    }
+  "event": "payment.confirmed",
+  "requestId": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "paymentNetwork": "erc20-fee-proxy-contract",
+  "currency": "USDC",
+  "amount": "100.00",
+  "txHash": "0x1234567890abcdef...",
+  "timestamp": "2025-10-03T14:30:00Z",
+  "metadata": {
+    "orderId": "ORDER-123",
+    "customField": "value"
   }
 }
 ```
 
-```json Request Created
+### Payment Processing
+```json
 {
-  "eventType": "request_created",
-  "timestamp": "2025-09-12T10:00:00Z",
-  "data": {
-    "requestId": "req_1234567890abcdef",
-    "expectedAmount": "1000000000000000000000",
-    "currency": "USDC-matic",
-    "payeeAddress": "0x0987654321098765432109876543210987654321",
-    "payerAddress": "0x1234567890123456789012345678901234567890",
-    "status": "pending",
-    "createdAt": "2025-09-12T10:00:00Z",
-    "dueDate": "2025-10-12T10:00:00Z",
-    "metadata": {
-      "reason": "Professional Services Q3 2025",
-      "invoiceNumber": "INV-001",
-      "customerInfo": {
-        "name": "Acme Corporation",
-        "email": "billing@acme.com"
-      }
-    }
+  "event": "payment.processing",
+  "requestId": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "subStatus": "sending_fiat",
+  "currency": "USDC",
+  "amount": "100.00",
+  "fiatCurrency": "USD",
+  "fiatAmount": "99.50",
+  "timestamp": "2025-10-03T14:35:00Z"
+}
+```
+
+### Compliance Updated
+```json
+{
+  "event": "compliance.updated",
+  "userId": "user_abc123",
+  "kycStatus": "approved",
+  "agreementStatus": "completed",
+  "timestamp": "2025-10-03T14:30:00Z",
+  "metadata": {
+    "level": "tier2",
+    "documents": ["passport", "proof_of_address"]
   }
 }
 ```
 
-```json Subscription Renewed
-{
-  "eventType": "subscription_renewed",
-  "timestamp": "2025-09-12T10:30:00Z",
-  "data": {
-    "subscriptionId": "sub_1234567890abcdef",
-    "requestId": "req_abcdef1234567890",
-    "paymentReference": "pay_1234567890abcdef",
-    "transactionHash": "0x742d35cc6cf8a8cbeff61cf82c6b8b3b42a67f1d6c1e8a7b9e2f8d5c3a1b0e9f",
-    "amount": "2999000000000000000000", // $29.99
-    "currency": "USD",
-    "renewalPeriod": "monthly",
-    "nextRenewalDate": "2025-10-12T10:30:00Z",
-    "customerId": "cust_1234567890",
-    "subscriptionPlan": {
-      "name": "Pro Plan",
-      "features": ["feature1", "feature2"],
-      "billingCycle": "monthly"
-    }
-  }
-}
-```
-</CodeGroup>
+## Implementation Examples
 
-## Integration Examples
+### Express.js Handler
+```javascript
+import express from "express";
+import crypto from "node:crypto";
 
-### E-commerce Order Processing
+const app = express();
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
-<CodeGroup>
-```javascript Express.js Handler
-app.post('/webhooks/payment-confirmed', async (req, res) => {
+app.use(express.json());
+
+app.post("/webhook/payment", async (req, res) => {
   try {
-    // Verify webhook signature
-    if (!verifyWebhookSignature(req)) {
-      return res.status(401).send('Unauthorized');
+    // Verify signature
+    const signature = req.headers["x-request-network-signature"];
+    const expectedSignature = crypto
+      .createHmac("sha256", WEBHOOK_SECRET)
+      .update(JSON.stringify(req.body))
+      .digest("hex");
+
+    if (signature !== expectedSignature) {
+      return res.status(401).json({ error: "Invalid signature" });
     }
+
+    // Check for test webhook
+    const isTest = req.headers["x-request-network-test"] === "true";
     
-    const { eventType, data } = req.body;
+    // Process webhook based on event type
+    const { event, requestId } = req.body;
     
-    if (eventType === 'payment_confirmed') {
-      const orderId = data.metadata.orderId;
-      
-      // Update order status
-      await updateOrder(orderId, {
-        status: 'paid',
-        paymentHash: data.transactionHash,
-        paidAt: data.timestamp,
-        paymentMethod: 'crypto'
-      });
-      
-      // Send confirmation email
-      await sendOrderConfirmation(orderId);
-      
-      // Trigger fulfillment
-      await triggerOrderFulfillment(orderId);
-      
-      console.log(`Order ${orderId} marked as paid`);
+    switch (event) {
+      case "payment.confirmed":
+        await handlePaymentConfirmed(req.body);
+        break;
+      case "payment.processing":
+        await handlePaymentProcessing(req.body);
+        break;
+      case "compliance.updated":
+        await handleComplianceUpdate(req.body);
+        break;
+      default:
+        console.log(`Unhandled event: ${event}`);
     }
-    
-    res.status(200).send('OK');
+
+    return res.status(200).json({ success: true });
     
   } catch (error) {
-    console.error('Webhook error:', error);
-    res.status(500).send('Error processing webhook');
+    console.error("Webhook processing error:", error);
+    return res.status(500).json({ error: "Processing failed" });
   }
 });
 ```
 
-```javascript SaaS Subscription Handler
-app.post('/webhooks/subscription-events', async (req, res) => {
+### Next.js API Route
+```javascript
+// app/api/webhook/route.ts
+import crypto from "node:crypto";
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
   try {
-    const { eventType, data } = req.body;
+    const body = await request.json();
     
-    switch (eventType) {
-      case 'subscription_renewed':
-        // Extend subscription period
-        await extendSubscription(data.customerId, data.renewalPeriod);
-        
-        // Send renewal confirmation
-        await sendRenewalConfirmation(data.customerId);
-        break;
-        
-      case 'subscription_failed':
-        // Handle failed payment
-        await handleFailedSubscriptionPayment(data.customerId);
-        
-        // Send payment failure notification
-        await sendPaymentFailureNotification(data.customerId);
-        break;
-        
-      case 'subscription_cancelled':
-        // Deactivate subscription
-        await deactivateSubscription(data.customerId);
-        break;
+    // Verify signature
+    const signature = request.headers.get("x-request-network-signature");
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.WEBHOOK_SECRET!)
+      .update(JSON.stringify(body))
+      .digest("hex");
+
+    if (signature !== expectedSignature) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
+
+    // Process webhook
+    const { event, requestId } = body;
     
-    res.status(200).send('OK');
+    // Your business logic here
+    await processWebhookEvent(event, body);
+
+    return NextResponse.json({ success: true }, { status: 200 });
     
   } catch (error) {
-    console.error('Subscription webhook error:', error);
-    res.status(500).send('Error processing subscription webhook');
+    console.error("Webhook error:", error);
+    
+    if (error instanceof ResourceNotFoundError) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    
+    return NextResponse.json(
+      { error: "Internal server error" }, 
+      { status: 500 }
+    );
   }
-});
-```
-</CodeGroup>
-
-### Database Integration
-
-<CodeGroup>
-```sql Payment Tracking
--- Create table for payment tracking
-CREATE TABLE payment_events (
-  id SERIAL PRIMARY KEY,
-  request_id VARCHAR(255) NOT NULL,
-  event_type VARCHAR(50) NOT NULL,
-  transaction_hash VARCHAR(66),
-  block_number INTEGER,
-  amount DECIMAL(36, 18),
-  currency VARCHAR(20),
-  payer_address VARCHAR(42),
-  payee_address VARCHAR(42),
-  metadata JSONB,
-  created_at TIMESTAMP DEFAULT NOW(),
-  processed_at TIMESTAMP,
-  INDEX idx_request_id (request_id),
-  INDEX idx_event_type (event_type),
-  INDEX idx_created_at (created_at)
-);
-```
-
-```javascript Database Handler
-async function savePaymentEvent(eventData) {
-  const {
-    requestId,
-    eventType,
-    transactionHash,
-    blockNumber,
-    amount,
-    currency,
-    payerAddress,
-    payeeAddress,
-    metadata
-  } = eventData;
-  
-  // Insert payment event
-  const result = await db.query(`
-    INSERT INTO payment_events (
-      request_id, event_type, transaction_hash, block_number,
-      amount, currency, payer_address, payee_address, metadata
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING id
-  `, [
-    requestId, eventType, transactionHash, blockNumber,
-    amount, currency, payerAddress, payeeAddress, JSON.stringify(metadata)
-  ]);
-  
-  return result.rows[0].id;
 }
 ```
-</CodeGroup>
 
-## Testing Webhooks
+## Testing
 
-### Webhook Testing Tools
+### Portal Testing
+1. Go to **Settings → Webhooks** in Request Portal
+2. Click **Send test webhooks**
+3. Select event types to test
+4. Monitor your endpoint logs for test requests
+
+### Test Webhook Identification
+Test webhooks include the `x-request-network-test: true` header:
+
+```javascript
+app.post("/webhook", (req, res) => {
+  const isTest = req.headers["x-request-network-test"] === "true";
+  
+  if (isTest) {
+    console.log("Received test webhook");
+    // Handle test scenario
+  }
+  
+  // Process normally...
+});
+```
+
+### Local Development Setup
+```bash
+# Terminal 1: Start your application
+npm run dev
+
+# Terminal 2: Expose localhost to internet
+ngrok http 3000
+
+# Use the HTTPS URL in Portal webhook settings
+# Example: https://abc123.ngrok.io/api/webhook
+```
+
+## Best Practices
+
+### Error Handling
+- **Implement idempotency:** Use delivery IDs to prevent duplicate processing
+- **Graceful degradation:** Handle unknown event types without errors
+- **Comprehensive logging:** Log all webhook events for debugging
+- **Database transactions:** Ensure atomic updates when processing events
+
+### Performance
+- **Async processing:** Queue heavy operations, respond quickly
+- **Timeout management:** Complete processing within 5 seconds
+- **Resource limits:** Handle high-volume webhook bursts appropriately
+
+### Security
+- **Rate limiting:** Protect your webhook endpoints from abuse
+- **IP allowlisting:** Consider restricting to Request Network IPs if needed
+- **Audit trails:** Log all webhook processing for compliance
+
+## Troubleshooting
+
+### Common Issues
+
+**Signature verification fails:**
+- Check your signing secret matches Portal configuration
+- Ensure you're using the raw request body for signature calculation
+- Verify HMAC SHA-256 implementation
+
+**Webhooks not received:**
+- Confirm endpoint URL is accessible via HTTPS
+- Check firewall and network restrictions
+- Verify endpoint returns 2xx status codes
+
+**Duplicate events:**
+- Implement idempotency using delivery IDs
+- Check for multiple webhook endpoints configured
+- Review retry logic in your error handling
+
+### Debugging Tips
+- Use ngrok request inspector to see raw webhook data
+- Check Portal webhook logs for delivery status
+- Monitor retry counts in headers to identify issues
+- Test with Portal's "Send test webhooks" feature
+
+## Related Documentation
 
 <CardGroup cols={2}>
-  <Card title="ngrok" icon="globe">
-    **Local Development:**
-    - Expose local server to internet
-    - Test webhooks during development
-    - Secure tunnels with authentication
-    
-    ```bash
-    # Install ngrok
-    npm install -g ngrok
-    
-    # Expose local server
-    ngrok http 3000
-    
-    # Use ngrok URL as webhook endpoint
-    # https://abc123.ngrok.io/webhooks/request-network
-    ```
+  <Card title="Webhooks & Events" href="/api-features/webhooks-events">
+    High-level webhook concepts and workflow
   </Card>
   
-  <Card title="Webhook.site" icon="test-tube">
-    **Quick Testing:**
-    - Temporary webhook endpoints
-    - Inspect webhook payloads
-    - No setup required
-    
-    **Process:**
-    1. Go to webhook.site
-    2. Copy the unique URL
-    3. Use as webhook endpoint
-    4. View received webhooks in browser
-  </Card>
-</CardGroup>
-
-### Test Event Simulation
-
-<Info>
-**Test Webhooks in Request Portal**
-
-Use the Request Portal to send test webhook events to your endpoint for development and testing.
-</Info>
-
-## What's Next?
-
-<CardGroup cols={3}>
-  <Card 
-    title="🔐 Authentication" 
-    href="/api-reference/authentication"
-    icon="key"
-  >
-    Secure your API and webhook endpoints
+  <Card title="EasyInvoice Demo" href="/use-cases/invoicing">
+    Complete webhook implementation example
   </Card>
   
-  <Card 
-    title="⚙️ Advanced Features" 
-    href="/api-features/advanced-features"
-    icon="cog"
-  >
-    Learn more about webhook event types and handling
+  <Card title="Authentication" href="/api-reference/authentication">
+    API key setup and webhook security
   </Card>
   
-  <Card 
-    title="🛠️ Integration Patterns" 
-    href="/api-features/integration-patterns"
-    icon="puzzle-piece"
-  >
-    Common webhook integration patterns and best practices
+  <Card title="Payment Processing" href="/api-features/payment-processing">
+    Understanding payment lifecycle events
   </Card>
 </CardGroup>
