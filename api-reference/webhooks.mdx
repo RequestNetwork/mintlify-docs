@@ -10,14 +10,14 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 ## Webhook Configuration
 
 ### Setup in Portal
-1. Navigate to **Settings → Webhooks** in Request Portal
-2. Add your HTTPS endpoint URL
-3. Copy your **Signing Secret** for signature verification
-4. Select event types to receive
-5. Test with **Send test webhooks** feature
+1. Navigate to **Platform Settings → Webhooks** in Request Portal
+2. Click **Add webhook**
+3. Enter URL and click **Create webhook**
+4. Click copy button to copy **Signing Secret** to clipboard
+5. Enable/disable or delete webhooks as needed
 
 ### Local Development
-Use ngrok to receive webhooks locally:
+Use [ngrok](https://ngrok.com/docs/traffic-policy/getting-started/agent-endpoints/cli) to receive webhooks locally:
 ```bash
 ngrok http 3000
 # Use the HTTPS URL (e.g., https://abc123.ngrok.io/webhook) in Portal
@@ -27,7 +27,7 @@ ngrok http 3000
 
 ### Payment Events
 <CardGroup cols={2}>
-  <Card title="payment.confirmed" icon="check-circle">
+  <Card title="payment.confirmed" icon="circle-check">
     Payment fully completed and settled
     
     **Timing:** After blockchain confirmation
@@ -41,14 +41,14 @@ ngrok http 3000
     **Use:** Update balance, allow additional payments
   </Card>
   
-  <Card title="payment.failed" icon="x-circle">
+  <Card title="payment.failed" icon="circle-x">
     Payment transaction failed or reverted
     
     **Triggers:** Failed TX, insufficient funds
     **Use:** Notify failure, reset order status
   </Card>
   
-  <Card title="payment.refunded" icon="undo">
+  <Card title="payment.refunded" icon="arrow-uturn-left">
     Payment has been refunded to payer
     
     **Context:** Crypto-to-fiat transactions
@@ -162,6 +162,7 @@ res.status(200).json({ success: true });
 res.status(201).json({ created: true });
 
 // ❌ Error - triggers retry
+res.status(401).json({ error: "Unauthorized" });
 res.status(404).json({ error: "Resource not found" });
 res.status(500).json({ error: "Internal server error" });
 ```
@@ -179,16 +180,28 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "payment.confirmed",
-  "requestId": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-  "paymentNetwork": "erc20-fee-proxy-contract",
-  "currency": "USDC",
-  "amount": "100.00",
-  "txHash": "0x1234567890abcdef...",
+  "requestId": "req_test123456789abcdef",
+  "requestID": "req_test123456789abcdef",
+  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
+  "explorer": "https://scan.request.network/request/req_test123456789abcdef",
+  "amount": "100.0",
+  "totalAmountPaid": "100.0",
+  "expectedAmount": "100.0",
   "timestamp": "2025-10-03T14:30:00Z",
-  "metadata": {
-    "orderId": "ORDER-123",
-    "customField": "value"
-  }
+  "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "network": "ethereum",
+  "currency": "USDC",
+  "paymentCurrency": "USDC",
+  "isCryptoToFiat": false,
+  "subStatus": "",
+  "paymentProcessor": "request_network",
+  "fees": [
+    {
+      "type": "network",
+      "amount": "0.02",
+      "currency": "ETH"
+    }
+  ]
 }
 ```
 
@@ -196,13 +209,52 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "payment.processing",
-  "requestId": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-  "subStatus": "sending_fiat",
+  "requestId": "req_test123456789abcdef",
+  "requestID": "req_test123456789abcdef",
+  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
+  "offrampId": "offramp_test123456789",
+  "timestamp": "2025-10-03T14:35:00Z",
+  "subStatus": "processing",
+  "paymentProcessor": "request_tech",
+  "rawPayload": {
+    "status": "processing",
+    "providerId": "provider_test123"
+  }
+}
+```
+
+### Payment Partial
+```json
+{
+  "event": "payment.partial",
+  "requestId": "req_test123456789abcdef",
+  "requestID": "req_test123456789abcdef",
+  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
+  "explorer": "https://scan.request.network/request/req_test123456789abcdef",
+  "amount": "50.0",
+  "totalAmountPaid": "50.0",
+  "expectedAmount": "100.0",
+  "timestamp": "2025-10-03T14:30:00Z",
+  "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "network": "ethereum",
   "currency": "USDC",
-  "amount": "100.00",
-  "fiatCurrency": "USD",
-  "fiatAmount": "99.50",
-  "timestamp": "2025-10-03T14:35:00Z"
+  "paymentCurrency": "USDC",
+  "isCryptoToFiat": false,
+  "subStatus": "",
+  "paymentProcessor": "request_network",
+  "fees": []
+}
+```
+
+### Payment Failed
+```json
+{
+  "event": "payment.failed",
+  "requestId": "req_test123456789abcdef",
+  "requestID": "req_test123456789abcdef",
+  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
+  "subStatus": "insufficient_funds",
+  "paymentProcessor": "request_network"
 }
 ```
 
@@ -210,20 +262,22 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "compliance.updated",
-  "userId": "user_abc123",
+  "clientUserId": "user_test123456789",
   "kycStatus": "approved",
-  "agreementStatus": "completed",
+  "agreementStatus": "signed",
+  "isCompliant": true,
   "timestamp": "2025-10-03T14:30:00Z",
-  "metadata": {
-    "level": "tier2",
-    "documents": ["passport", "proof_of_address"]
+  "rawPayload": {
+    "verificationLevel": "full",
+    "documents": "verified"
   }
 }
 ```
 
 ## Implementation Examples
 
-### Express.js Handler
+<Tabs>
+<Tab title="Express.js">
 ```javascript
 import express from "express";
 import crypto from "node:crypto";
@@ -274,8 +328,9 @@ app.post("/webhook/payment", async (req, res) => {
   }
 });
 ```
+</Tab>
 
-### Next.js API Route
+<Tab title="Next.js">
 ```javascript
 // app/api/webhook/route.ts
 import crypto from "node:crypto";
@@ -318,13 +373,15 @@ export async function POST(request: Request) {
   }
 }
 ```
+</Tab>
+</Tabs>
 
 ## Testing
 
 ### Portal Testing
-1. Go to **Settings → Webhooks** in Request Portal
-2. Click **Send test webhooks**
-3. Select event types to test
+1. Go to **Platform Settings → Webhooks** in Request Portal
+2. Create a webhook if you haven't already
+3. Select the webhook event type and click **Send test event**
 4. Monitor your endpoint logs for test requests
 
 ### Test Webhook Identification
