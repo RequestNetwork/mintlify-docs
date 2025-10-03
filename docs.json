@@ -75,7 +75,7 @@
                 ]
               },
               {
-                "group": "Payment Types",
+                "group": "Payments",
                 "pages": [
                   "api-features/payment-types-overview",
                   "api-features/standard-payments",
