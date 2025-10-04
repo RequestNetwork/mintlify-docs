@@ -134,10 +134,10 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "payment.confirmed",
-  "requestId": "req_test123456789abcdef",
-  "requestID": "req_test123456789abcdef",
-  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
-  "explorer": "https://scan.request.network/request/req_test123456789abcdef",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "paymentReference": "0x2c3366941274c34c",
+  "explorer": "https://scan.request.network/request/0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "amount": "100.0",
   "totalAmountPaid": "100.0",
   "expectedAmount": "100.0",
@@ -163,15 +163,15 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "payment.processing",
-  "requestId": "req_test123456789abcdef",
-  "requestID": "req_test123456789abcdef",
-  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "paymentReference": "0x2c3366941274c34c",
   "offrampId": "offramp_test123456789",
   "timestamp": "2025-10-03T14:35:00Z",
-  "subStatus": "processing",
+  "subStatus": "ongoing_checks",
   "paymentProcessor": "request_tech",
   "rawPayload": {
-    "status": "processing",
+    "status": "ongoing_checks",
     "providerId": "provider_test123"
   }
 }
@@ -181,10 +181,10 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "payment.partial",
-  "requestId": "req_test123456789abcdef",
-  "requestID": "req_test123456789abcdef",
-  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
-  "explorer": "https://scan.request.network/request/req_test123456789abcdef",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "paymentReference": "0x2c3366941274c34c",
+  "explorer": "https://scan.request.network/request/0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "amount": "50.0",
   "totalAmountPaid": "50.0",
   "expectedAmount": "100.0",
@@ -204,9 +204,9 @@ Request API logs all webhook delivery failures with:
 ```json
 {
   "event": "payment.failed",
-  "requestId": "req_test123456789abcdef",
-  "requestID": "req_test123456789abcdef",
-  "paymentReference": "0x1234567890abcdef1234567890abcdef12345678",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "paymentReference": "0x2c3366941274c34c",
   "subStatus": "insufficient_funds",
   "paymentProcessor": "request_network"
 }
@@ -218,7 +218,7 @@ Request API logs all webhook delivery failures with:
   "event": "compliance.updated",
   "clientUserId": "user_test123456789",
   "kycStatus": "approved",
-  "agreementStatus": "signed",
+  "agreementStatus": "completed",
   "isCompliant": true,
   "timestamp": "2025-10-03T14:30:00Z",
   "rawPayload": {
@@ -371,18 +371,9 @@ ngrok http 3000
 ### Error Handling
 - **Implement idempotency:** Use delivery IDs to prevent duplicate processing
 - **Graceful degradation:** Handle unknown event types without errors
-- **Comprehensive logging:** Log all webhook events for debugging
-- **Database transactions:** Ensure atomic updates when processing events
 
-### Performance
-- **Async processing:** Queue heavy operations, respond quickly
+### Performance  
 - **Timeout management:** Complete processing within 5 seconds
-- **Resource limits:** Handle high-volume webhook bursts appropriately
-
-### Security
-- **Rate limiting:** Protect your webhook endpoints from abuse
-- **IP allowlisting:** Consider restricting to Request Network IPs if needed
-- **Audit trails:** Log all webhook processing for compliance
 
 ## Troubleshooting
 
@@ -395,17 +386,10 @@ ngrok http 3000
 
 **Webhooks not received:**
 - Confirm endpoint URL is accessible via HTTPS
-- Check firewall and network restrictions
 - Verify endpoint returns 2xx status codes
-
-**Duplicate events:**
-- Implement idempotency using delivery IDs
-- Check for multiple webhook endpoints configured
-- Review retry logic in your error handling
 
 ### Debugging Tips
 - Use ngrok request inspector to see raw webhook data
-- Check Portal webhook logs for delivery status
 - Monitor retry counts in headers to identify issues
 - Test with Portal's "Send test webhooks" feature
 
