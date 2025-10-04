@@ -11,19 +11,27 @@ Webhooks provide real-time notifications when payment and request events occur, 
 
 <CardGroup cols={2}>
   <Card title="Payment Events" icon="credit-card">
-    Payment confirmation, processing, failures
+    **Core events:** confirmed, partial, failed, refunded
+
+    Immediate notification when payments are processed or fail
+  </Card>
+
+  <Card title="Processing Events" icon="spinner">
+    **Crypto-to-fiat:** payment.processing with detailed subStatus
+
+    Track multi-step fiat conversion progress
   </Card>
 
   <Card title="Request Events" icon="file-invoice">
-    Recurring request generation
+    **Recurring:** request.recurring
+
+    Automatic subscription renewal generation
   </Card>
 
   <Card title="Compliance Events" icon="shield-check">
-    KYC status and bank account verification
-  </Card>
+    **KYC & verification:** compliance.updated, payment_detail.updated
 
-  <Card title="Crypto-to-fiat Events" icon="exchange-alt">
-    Offramp processing and settlement
+    User verification and bank account status changes
   </Card>
 </CardGroup>
 
@@ -31,44 +39,58 @@ Webhooks provide real-time notifications when payment and request events occur, 
 
 ```mermaid
 graph LR
-    A[Payment/Request Event] --> B[Webhook Triggered]
-    B --> C[HMAC Signature]
-    C --> D[HTTP POST to Your Endpoint]
-    D --> E[Signature Verification]
-    E --> F[Process Event]
-    F --> G[Return 200 OK]
+    A[Event Occurs] --> B[HMAC Signed POST]
+    B --> C[Your Endpoint]
+    C --> D[Verify & Process]
+    D --> E[Return 200 OK]
 ```
 
 **Process:**
 1. **Event occurs:** Payment confirmed, request created, compliance updated
-2. **Secure delivery:** HMAC-signed POST to your configured endpoint
-3. **Your processing:** Verify signature, update application state
-4. **Reliable delivery:** Automatic retries with exponential backoff
+2. **Secure delivery:** HMAC SHA-256 signed POST to your configured endpoint
+3. **Your processing:** Verify `x-request-network-signature`, update application state
+4. **Reliable delivery:** 3 retries (1s, 5s, 15s delays) with 5-second timeout
 
-## Development Setup
+## Key Features
 
-### Local Testing
-- **Portal testing:** Send test webhooks from Request Portal
+### Reliability
+- **Idempotency support:** Use `x-request-network-delivery` header for duplicate detection
+- **Delivery confirmation:** Monitor `x-request-network-retry-count` header to track attempts
+
+### Security
+- **HMAC SHA-256 signatures:** Every webhook includes `x-request-network-signature` header
+- **HTTPS required:** Production endpoints must use secure connections
+- **Test webhook identification:** `x-request-network-test` header for development
+
+### Development Tools
+- **Portal testing:** Send test webhooks from [Request Portal](https://portal.request.network)
 - **ngrok integration:** Receive webhooks locally during development
-- **Signature verification:** Always validate `x-request-network-signature` header
+- **Comprehensive logging:** Request API logs all delivery failures with attempt details
 
-### Security Requirements
-- **HTTPS endpoints only** for production webhook URLs
-- **SHA-256 HMAC verification** using your webhook signing secret
-- **Return 2xx status code** for successful processing (200, 201, etc.)
+## Common Use Cases
 
-## Used In
+- **Invoice systems:** Automatically mark invoices as paid when `payment.confirmed` received
+- **Order fulfillment:** Release goods or services immediately after payment confirmation
+- **Subscription management:** Handle `request.recurring` for automatic billing renewals
+- **Compliance workflows:** Update user permissions when `compliance.updated` shows KYC approval
+- **Real-time dashboards:** Display live payment status using `payment.processing` subStatus values
+
+## Implementation
 
 <CardGroup cols={2}>
-  <Card title="EasyInvoice Demo" href="/use-cases/invoicing">
-    Complete webhook implementation example
+  <Card title="Webhook Reference" href="/api-reference/webhooks">
+    Complete technical documentation with setup, payloads, and code examples
   </Card>
-  
-  <Card title="Real-time Dashboards" href="/use-cases/checkout">
-    Instant payment status updates
+
+  <Card title="EasyInvoice Demo" href="/use-cases/invoicing">
+    Working webhook implementation example with Express.js
+  </Card>
+
+  <Card title="Request Portal" href="https://portal.request.network" icon="browser">
+    Configure webhooks and test delivery
+  </Card>
+
+  <Card title="Request Scan" href="https://scan.request.network" icon="magnifying-glass">
+    Explore payment transactions and request details
   </Card>
 </CardGroup>
-
-## Implementation Details
-
-See [API Reference - Webhooks](/api-reference/webhooks) for complete technical documentation, payload schemas, and signature verification examples.
