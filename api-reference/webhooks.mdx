@@ -12,7 +12,7 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 ### Setup in Portal
 1. Navigate to **Platform Settings → Webhooks** in Request Portal
 2. Click **Add webhook**
-3. Enter URL and click **Create webhook**
+3. In the dialog that opens, enter URL and click **Create webhook**
 4. Click copy button to copy **Signing Secret** to clipboard
 5. Enable/disable or delete webhooks as needed
 
@@ -26,35 +26,32 @@ ngrok http 3000
 ## Event Types
 
 ### Payment Events
-<CardGroup cols={2}>
-  <Card title="payment.confirmed" icon="circle-check">
-    Payment fully completed and settled
-    
-    **Timing:** After blockchain confirmation
-    **Use:** Complete fulfillment, release goods
-  </Card>
-  
-  <Card title="payment.partial" icon="clock">
-    Partial payment received for request
-    
-    **Scenarios:** Installments, partial orders
-    **Use:** Update balance, allow additional payments
-  </Card>
-  
-  <Card title="payment.failed" icon="circle-x">
-    Payment transaction failed or reverted
-    
-    **Triggers:** Failed TX, insufficient funds
-    **Use:** Notify failure, reset order status
-  </Card>
-  
-  <Card title="payment.refunded" icon="arrow-uturn-left">
-    Payment has been refunded to payer
-    
-    **Context:** Crypto-to-fiat transactions
-    **Use:** Update order status, notify customer
-  </Card>
-</CardGroup>
+
+| Event | Description | Context | Primary Use |
+|-------|-------------|---------|-------------|
+| `payment.confirmed` | Payment fully completed and settled | After blockchain confirmation | Complete fulfillment, release goods |
+| `payment.partial` | Partial payment received for request | Installments, partial orders | Update balance, allow additional payments |
+| `payment.failed` | Payment transaction failed or reverted | Failed TX, insufficient funds | Notify failure, reset order status |
+| `payment.refunded` | Payment has been refunded to payer | Crypto-to-fiat transactions | Update order status, notify customer |
+
+### Processing Events
+
+| Event | Description | Context | Primary Use |
+|-------|-------------|---------|-------------|
+| `payment.processing` | Crypto-to-fiat conversion in progress | Stages: initiated, pending_assessment, ongoing_checks, sending_fiat, fiat_sent | Track conversion status, update UI |
+
+### Request Events
+
+| Event | Description | Context | Primary Use |
+|-------|-------------|---------|-------------|
+| `request.recurring` | New recurring request generated | Subscription renewals, scheduled payments | Send renewal notifications, update billing |
+
+### Compliance Events
+
+| Event | Description | Context | Primary Use |
+|-------|-------------|---------|-------------|
+| `compliance.updated` | KYC or agreement status changed | **KYC:** initiated, pending, approved, rejected, failed<br/>**Agreement:** not_started, pending, completed, rejected, failed | Update user permissions, notify status |
+| `payment_detail.updated` | Bank account verification status updated | States: approved, failed, pending | Enable fiat payments, update profiles |
 
 ### Processing Events
 <CardGroup cols={2}>
