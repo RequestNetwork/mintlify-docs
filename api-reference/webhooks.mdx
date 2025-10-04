@@ -10,10 +10,10 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 ## Webhook Configuration
 
 ### Setup in Portal
-1. Navigate to **Platform Settings → Webhooks** in Request Portal
+1. Navigate to **Platform Settings → Webhooks** in [Request Portal](https://portal.request.network)
 2. Click **Add webhook**
 3. In the dialog that opens, enter URL and click **Create webhook**
-4. Click copy button to copy **Signing Secret** to clipboard
+4. Click copy button to copy **Signing Secret** to clipboard (see [Authentication](/api-reference/authentication) for API key setup)
 5. Enable/disable or delete webhooks as needed
 
 ### Local Development
@@ -24,6 +24,10 @@ ngrok http 3000
 ```
 
 ## Event Types
+
+<Info>
+See [Payload Examples](#payload-examples) below for detailed webhook structures.
+</Info>
 
 ### Payment Events
 
@@ -130,6 +134,14 @@ Request API logs all webhook delivery failures with:
 
 ## Payload Examples
 
+All payment events include an `explorer` field linking to [Request Scan](https://scan.request.network) for transaction details.
+
+**Common Fields:**
+- `requestId` / `requestID`: Unique identifier for the payment request
+- `paymentReference`: Short reference, also unique to a request, used to link payments to the request
+- `timestamp`: ISO 8601 formatted event timestamp
+- `paymentProcessor`: Either `request-network` (crypto) or `request-tech` (fiat)
+
 ### Payment Confirmed
 ```json
 {
@@ -148,7 +160,7 @@ Request API logs all webhook delivery failures with:
   "paymentCurrency": "USDC",
   "isCryptoToFiat": false,
   "subStatus": "",
-  "paymentProcessor": "request_network",
+  "paymentProcessor": "request-network",
   "fees": [
     {
       "type": "network",
@@ -169,7 +181,7 @@ Request API logs all webhook delivery failures with:
   "offrampId": "offramp_test123456789",
   "timestamp": "2025-10-03T14:35:00Z",
   "subStatus": "ongoing_checks",
-  "paymentProcessor": "request_tech",
+  "paymentProcessor": "request-tech",
   "rawPayload": {
     "status": "ongoing_checks",
     "providerId": "provider_test123"
@@ -195,7 +207,7 @@ Request API logs all webhook delivery failures with:
   "paymentCurrency": "USDC",
   "isCryptoToFiat": false,
   "subStatus": "",
-  "paymentProcessor": "request_network",
+  "paymentProcessor": "request-network",
   "fees": []
 }
 ```
@@ -208,7 +220,7 @@ Request API logs all webhook delivery failures with:
   "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "paymentReference": "0x2c3366941274c34c",
   "subStatus": "insufficient_funds",
-  "paymentProcessor": "request_network"
+  "paymentProcessor": "request-network"
 }
 ```
 
@@ -229,6 +241,8 @@ Request API logs all webhook delivery failures with:
 ```
 
 ## Implementation Examples
+
+For a complete working example, see the [EasyInvoice demo](/use-cases/invoicing) which implements webhook handling for payment notifications.
 
 <Tabs>
 <Tab title="Express.js">
@@ -354,18 +368,6 @@ app.post("/webhook", (req, res) => {
 });
 ```
 
-### Local Development Setup
-```bash
-# Terminal 1: Start your application
-npm run dev
-
-# Terminal 2: Expose localhost to internet
-ngrok http 3000
-
-# Use the HTTPS URL in Portal webhook settings
-# Example: https://abc123.ngrok.io/api/webhook
-```
-
 ## Best Practices
 
 ### Error Handling
@@ -399,16 +401,24 @@ ngrok http 3000
   <Card title="Webhooks & Events" href="/api-features/webhooks-events">
     High-level webhook concepts and workflow
   </Card>
-  
+
   <Card title="EasyInvoice Demo" href="/use-cases/invoicing">
     Complete webhook implementation example
   </Card>
-  
+
   <Card title="Authentication" href="/api-reference/authentication">
     API key setup and webhook security
   </Card>
-  
+
   <Card title="Payment Processing" href="/api-features/payment-processing">
     Understanding payment lifecycle events
+  </Card>
+
+  <Card title="Request Portal" href="https://portal.request.network" icon="browser">
+    Configure webhooks and manage API keys
+  </Card>
+
+  <Card title="Request Scan" href="https://scan.request.network" icon="magnifying-glass">
+    Explore transactions and request details
   </Card>
 </CardGroup>
