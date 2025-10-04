@@ -31,14 +31,14 @@ ngrok http 3000
 |-------|-------------|---------|-------------|
 | `payment.confirmed` | Payment fully completed and settled | After blockchain confirmation | Complete fulfillment, release goods |
 | `payment.partial` | Partial payment received for request | Installments, partial orders | Update balance, allow additional payments |
-| `payment.failed` | Payment transaction failed or reverted | Failed TX, insufficient funds | Notify failure, reset order status |
-| `payment.refunded` | Payment has been refunded to payer | Crypto-to-fiat transactions | Update order status, notify customer |
+| `payment.failed` | Payment execution failed | Recurring payments, cross-chain transfers | Notify failure, retry logic, pause subscriptions |
+| `payment.refunded` | Payment has been refunded to payer | Cross-chain payment failures, refund scenarios | Update order status, notify customer |
 
 ### Processing Events
 
 | Event | Description | Context | Primary Use |
 |-------|-------------|---------|-------------|
-| `payment.processing` | Crypto-to-fiat conversion in progress | Stages: initiated, pending_assessment, ongoing_checks, sending_fiat, fiat_sent | Track conversion status, update UI |
+| `payment.processing` | Crypto-to-fiat payment in progress | **subStatus values:** initiated, pending_internal_assessment, ongoing_checks, sending_fiat, fiat_sent, bounced | Track crypto-to-fiat payment status, update UI |
 
 ### Request Events
 
@@ -50,51 +50,8 @@ ngrok http 3000
 
 | Event | Description | Context | Primary Use |
 |-------|-------------|---------|-------------|
-| `compliance.updated` | KYC or agreement status changed | **KYC:** initiated, pending, approved, rejected, failed<br/>**Agreement:** not_started, pending, completed, rejected, failed | Update user permissions, notify status |
+| `compliance.updated` | KYC or agreement status changed | **kycStatus values:** not_started, pending, approved, rejected, retry_required<br/>**agreementStatus values:** not_started, pending, completed, rejected, failed | Update user permissions, notify status |
 | `payment_detail.updated` | Bank account verification status updated | States: approved, failed, pending | Enable fiat payments, update profiles |
-
-### Processing Events
-<CardGroup cols={2}>
-  <Card title="payment.processing" icon="spinner">
-    Crypto-to-fiat conversion in progress
-    
-    **Stages:** initiated, pending_assessment, ongoing_checks, sending_fiat, fiat_sent
-    **Use:** Track conversion status, update UI
-  </Card>
-</CardGroup>
-
-### Request Events
-<CardGroup cols={2}>
-  <Card title="request.recurring" icon="repeat">
-    New recurring request generated
-    
-    **Context:** Subscription renewals, scheduled payments
-    **Use:** Send renewal notifications, update billing
-  </Card>
-</CardGroup>
-
-### Compliance Events
-<CardGroup cols={2}>
-  <Card title="compliance.updated" icon="shield-check">
-    KYC or agreement status changed
-    
-    **KYC States:** initiated, pending, approved, rejected, failed
-    **Agreement States:** not_started, pending, completed, rejected, failed
-    **Use:** Update user permissions, notify status
-  </Card>
-  
-  <Card title="payment_detail.updated" icon="building-columns">
-    Bank account verification status updated
-    
-    **States:** approved, failed, pending
-    **Use:** Enable fiat payments, update profiles
-    - Updated fields
-    - Previous values
-    - Change timestamp
-    
-    **Use Cases:** Audit trails, status synchronization
-  </Card>
-</CardGroup>
 
 ## Security Implementation
 
