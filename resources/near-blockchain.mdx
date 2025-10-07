@@ -1,0 +1,168 @@
+---
+title: "NEAR"
+description: "Request Network's support for NEAR including native and fungible token payments"
+---
+
+import { CopyButton, ExternalLinkButton } from "/snippets/contract-buttons.jsx"
+
+## Overview
+
+Request Network supports payments on NEAR, a sharded, proof-of-stake blockchain that offers unique capabilities compared to EVM-compatible chains. NEAR's architecture enables more complex smart contract interactions through asynchronous callbacks and cross-contract calls.
+
+<Note>
+NEAR support is currently available through the **Request Network SDK only**. The Request Network API does not support NEAR blockchain interactions.
+</Note>
+
+## Key Differences from EVM Chains
+
+NEAR has several important architectural differences that affect how payments work:
+
+<CardGroup cols={2}>
+  <Card title="Asynchronous Callbacks" icon="arrows-rotate">
+    Unlike EVM chains where transactions are atomic, NEAR supports **asynchronous callbacks** that can span multiple transactions or blocks. This enables more complex payment flows but requires different handling.
+  </Card>
+  
+  <Card title="Account-Based System" icon="user">
+    NEAR uses human-readable account names (like `alice.near`) instead of hex addresses. Smart contracts are deployed to named accounts and can be upgraded by their owners.
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="Storage Deposits" icon="database">
+    To receive NEP-141 fungible tokens, accounts must first register with the token contract and pay a small storage deposit (~0.00125 NEAR) to cover storage costs.
+  </Card>
+  
+  <Card title="Gas Model" icon="gas-pump">
+    NEAR uses a different gas model with TGas (TeraGas) units. Gas costs are predictable and much lower than Ethereum mainnet.
+  </Card>
+</CardGroup>
+
+## Supported Payment Types
+
+### Native NEAR Payments
+
+Direct payments using NEAR's native token through the payment proxy smart contract.
+
+**Features:**
+- ✅ Direct NEAR token transfers with payment references
+- ✅ Fee collection support
+- ✅ Payment detection and indexing
+
+### Fungible Token Payments (NEP-141)
+
+Payments using NEAR's fungible token standard (NEP-141) equivalent to ERC-20 on Ethereum.
+
+**Features:**
+- ✅ Support for all NEP-141 compliant tokens
+- ✅ Fee collection in the same token
+- ✅ Payment detection and indexing
+- ⚠️ Requires storage deposit registration
+
+### Native Token Conversion Payments
+
+Payments for requests denominated in one currency (typically fiat like USD) but paid in NEAR native tokens. On-chain oracles provide real-time price feeds to calculate the correct NEAR amount.
+
+**Features:**
+- ✅ Conversion payments denominated in USD, settled in NEAR
+- ✅ Price conversion at the moment of payment, using onchain price feeds
+- ✅ Payment detection and indexing
+
+## Smart Contract Addresses
+
+### Mainnet (near)
+
+| Payment Type | Contract Address | Actions | Description |
+|--------------|------------------|---------|-------------|
+| **Native NEAR Payments** | `requestnetwork.near` | <div className="flex gap-1"><CopyButton text="requestnetwork.near" /><ExternalLinkButton href="https://nearblocks.io/address/requestnetwork.near" /></div> | Direct NEAR token payments with references |
+| **Fungible Token Payments** | `pay.reqnetwork.near` | <div className="flex gap-1"><CopyButton text="pay.reqnetwork.near" /><ExternalLinkButton href="https://nearblocks.io/address/pay.reqnetwork.near" /></div> | NEP-141 token payments with fees |
+| **Native Conversion Payments** | `native.conversion.reqnetwork.near` | <div className="flex gap-1"><CopyButton text="native.conversion.reqnetwork.near" /><ExternalLinkButton href="https://nearblocks.io/address/native.conversion.reqnetwork.near" /></div> | Fiat/token to NEAR conversions |
+
+### Testnet (near-testnet)
+
+| Payment Type | Contract Address | Actions | Description |
+|--------------|------------------|---------|-------------|
+| **Native NEAR Payments** | `dev-1631521265288-35171138540673` | <div className="flex gap-1"><CopyButton text="dev-1631521265288-35171138540673" /><ExternalLinkButton href="https://testnet.nearblocks.io/address/dev-1631521265288-35171138540673" /></div> | Direct NEAR token payments with references |
+| **Fungible Token Payments** | `pay.reqnetwork.testnet` | <div className="flex gap-1"><CopyButton text="pay.reqnetwork.testnet" /><ExternalLinkButton href="https://testnet.nearblocks.io/address/pay.reqnetwork.testnet" /></div> | NEP-141 token payments with fees |
+| **Native Conversion Payments** | `native.conversion.reqnetwork.testnet` | <div className="flex gap-1"><CopyButton text="native.conversion.reqnetwork.testnet" /><ExternalLinkButton href="https://testnet.nearblocks.io/address/native.conversion.reqnetwork.testnet" /></div> | Fiat/token to NEAR conversions |
+
+## Payment Detection
+
+Payment detection for NEAR transactions is handled through dedicated subgraphs:
+
+- **NEAR Mainnet**: [Request Payments Near Subgraph](https://thegraph.com/explorer/subgraphs/9yEg3h46CZiv4VuSqo1erMMBx5sHxRuW5Ai2V8goSpQL?view=Query&chain=arbitrum-one)
+- **NEAR Testnet**: [Request Payments Near Testnet Subgraph](https://thegraph.com/explorer/subgraphs/AusVyfndonsMVFrVzckuENLqx8t6kcXuxn6C6VbSGd7M?view=Query&chain=arbitrum-one)
+
+These subgraphs index payment events and transaction data to enable efficient payment detection and status tracking.
+
+## Technical Considerations
+
+### Asynchronous Callbacks
+
+NEAR's asynchronous architecture means payment transactions may require multiple blockchain interactions:
+
+```javascript
+// Example: Fungible token payment flow
+1. Call ft_transfer_call on token contract
+2. Token contract calls proxy contract 
+3. Proxy processes payment and logs event
+4. Callback confirms or reverts transaction
+```
+
+This differs from EVM chains where the entire payment happens in a single atomic transaction.
+
+### Storage Deposits
+
+Before receiving NEP-141 tokens, accounts must register with the token contract:
+
+<Warning>
+**Important**: Payment addresses must have sufficient storage deposit registered with the token contract. The SDK automatically checks for this requirement and will throw an error if the recipient is not properly registered.
+</Warning>
+
+**Minimum Storage Deposit**: ~0.00125 NEAR per token contract
+
+### Gas Considerations
+
+<Tip>
+NEAR uses a TGas (TeraGas) unit system and gas costs are predictable and much lower than Ethereum mainnet, typically costing fractions of a cent in USD terms.
+</Tip>
+
+## Integration Guide
+
+### Prerequisites
+
+1. **NEAR Wallet Connection**: Applications need to integrate with NEAR wallet providers
+2. **SDK Installation**: Use `@requestnetwork/request-client.js` with NEAR support
+3. **Account Registration**: Ensure payment recipients are registered for token contracts
+
+### Basic Payment Flow
+
+```javascript
+import { RequestNetwork } from '@requestnetwork/request-client.js';
+
+// Create request for NEAR native payment
+const request = await requestNetwork.createRequest({
+  currency: {
+    type: 'ETH', // NEAR native uses ETH type
+    value: 'NEAR',
+    network: 'near'
+  },
+  expectedAmount: '1000000000000000000000000', // 1 NEAR in yoctoNEAR
+  paymentAddress: 'recipient.near'
+});
+```
+
+## Limitations
+
+<Warning>
+**Current Limitations:**
+- NEAR support is SDK-only (not available in Request Network API)
+- Crosschain payments to/from NEAR are not supported
+- Advanced payment types like batch payments are not implemented
+</Warning>
+
+## Developer Resources
+
+- [NEAR Documentation](https://docs.near.org/)
+- [NEP-141 Fungible Token Standard](https://nomicon.io/Standards/Tokens/FungibleToken/Core)
+- [NEAR Smart Contract Source Code](https://github.com/RequestNetwork/near-contracts)
+- [Request Network SDK Documentation](https://docs.request.network/advanced/request-network-sdk)
