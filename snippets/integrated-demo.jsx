@@ -61,6 +61,21 @@ export const IntegratedDemo = () => {
     </svg>
   );
 
+  const UserIcon = ({ className = "h-4 w-4" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  );
+
+  const WalletIcon = ({ className = "h-4 w-4" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+    </svg>
+  );
+
   const CryptoIcon = ({ currency, className = "w-4 h-4" }) => {
     const iconMap = {
       USDC: "/logo/icons/usdc.png",
@@ -101,8 +116,58 @@ export const IntegratedDemo = () => {
     );
   };
 
+  // Tooltip component
+  const Tooltip = ({ children, content }) => {
+    const [show, setShow] = React.useState(false);
+    const [position, setPosition] = React.useState('top');
+    const tooltipRef = React.useRef(null);
+    const triggerRef = React.useRef(null);
+    
+    React.useEffect(() => {
+      if (show && triggerRef.current) {
+        const rect = triggerRef.current.getBoundingClientRect();
+        const spaceAbove = rect.top;
+        const spaceBelow = window.innerHeight - rect.bottom;
+        
+        // If there's less than 120px above and more space below, show tooltip below
+        if (spaceAbove < 120 && spaceBelow > spaceAbove) {
+          setPosition('bottom');
+        } else {
+          setPosition('top');
+        }
+      }
+    }, [show]);
+    
+    return (
+      <div className="relative inline-block">
+        <div 
+          ref={triggerRef}
+          onMouseEnter={() => setShow(true)} 
+          onMouseLeave={() => setShow(false)}
+        >
+          {children}
+        </div>
+        {show && (
+          <div 
+            ref={tooltipRef}
+            className={`absolute left-1/2 transform -translate-x-1/2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-normal max-w-xs z-[100] shadow-lg ${
+              position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+            }`}
+          >
+            {content}
+            <div className={`absolute left-1/2 transform -translate-x-1/2 border-4 border-transparent ${
+              position === 'top' 
+                ? 'top-full border-t-gray-900 dark:border-t-gray-700' 
+                : 'bottom-full border-b-gray-900 dark:border-b-gray-700'
+            }`} />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Simple Button component
-  const Button = ({ children, onClick, disabled, variant = "default", size = "md", className = "" }) => {
+  const Button = ({ children, onClick, disabled, variant = "default", size = "md", className = "", pulse = false }) => {
     const variantClasses = {
       default: "bg-primary-600 hover:bg-primary-700 text-white",
       outline: "bg-transparent border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
@@ -117,7 +182,7 @@ export const IntegratedDemo = () => {
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+        className={`inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${pulse ? 'animate-ring-pulse' : ''} ${className}`}
         style={{ backgroundColor: variant === 'default' ? '#01B089' : undefined }}
       >
         {children}
@@ -128,6 +193,17 @@ export const IntegratedDemo = () => {
           button:focus {
             ring-color: #01B089;
           }
+          @keyframes ringPulse {
+            0%, 100% { 
+              box-shadow: 0 0 0 0 rgba(1, 176, 137, 0.6); 
+            }
+            50% { 
+              box-shadow: 0 0 0 12px rgba(1, 176, 137, 0); 
+            }
+          }
+          .animate-ring-pulse {
+            animation: ringPulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          }
         `}</style>
       </button>
     );
@@ -135,6 +211,7 @@ export const IntegratedDemo = () => {
 
   // Component state
   const rightCardRef = useRef(null);
+  const leftCardRef = useRef(null);
   const leftScrollRef = useRef(null);
   const rightScrollRef = useRef(null);
   const demoContainerRef = useRef(null);
@@ -149,6 +226,8 @@ export const IntegratedDemo = () => {
   const [paymentCount, setPaymentCount] = useState(0);
   const [requestCount, setRequestCount] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [isShaking, setIsShaking] = useState(false);
+  const [hasPrePopulated, setHasPrePopulated] = useState(false);
 
   // Sync scrolling
   useEffect(() => {
@@ -193,6 +272,76 @@ export const IntegratedDemo = () => {
   const handleStartDemo = () => {
     setHasStarted(true);
     setShowDialog(false);
+    
+    // Only pre-populate on first start
+    if (!hasPrePopulated) {
+      setHasPrePopulated(true);
+      
+      // Randomly select which 2 of 3 requests will have collision
+      const collisionPairs = [[0, 1], [0, 2], [1, 2]];
+      const selectedPair = collisionPairs[Math.floor(Math.random() * collisionPairs.length)];
+      
+      // Generate collision amount that will be shared by 2 requests
+      const collisionAmountData = generateAmount();
+      const collisionAmount = collisionAmountData.amount;
+      const collisionCurrency = collisionAmountData.currency;
+      
+      // Get 3 different customers for the 3 requests
+      const shuffledCustomers = [...CUSTOMER_DATA].sort(() => Math.random() - 0.5);
+      
+      // Create 3 requests
+      const newRequests = [];
+      const newPlaceholders = [];
+      
+      for (let i = 0; i < 3; i++) {
+        const timestamp = new Date(Date.now() + i); // Slight offset for unique timestamps
+        const id = `request-${Date.now()}-${i}`;
+        
+        // Determine if this request should be part of the collision pair
+        const isCollisionRequest = selectedPair.includes(i);
+        
+        // Use collision amount for collision pair, random amount for the third request
+        let amount, currency;
+        if (isCollisionRequest) {
+          amount = collisionAmount;
+          currency = collisionCurrency;
+        } else {
+          const uniqueAmount = generateAmount();
+          amount = uniqueAmount.amount;
+          currency = uniqueAmount.currency;
+        }
+        
+        const newRequest = {
+          id,
+          amount,
+          currency,
+          customer: shuffledCustomers[i].name,
+          status: "awaiting_payment",
+          timestamp,
+          isNew: true,
+        };
+        
+        const placeholder = {
+          id: `placeholder-${id}`,
+          amount,
+          currency,
+          from: "",
+          timestamp,
+          status: "possibly_reconciled",
+          requestId: id,
+          txHash: "",
+          isNew: true,
+          isPlaceholder: true,
+        };
+        
+        newRequests.push(newRequest);
+        newPlaceholders.push(placeholder);
+      }
+      
+      setRightRequests(newRequests);
+      setLeftPayments(newPlaceholders);
+      setRequestCount(3);
+    }
   };
 
   const handleCreateRequest = () => {
@@ -326,11 +475,16 @@ export const IntegratedDemo = () => {
     }, 100);
 
     if (hasCollision) {
+      // Trigger shake animation
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      
+      // Show collision explainer dialog only on first collision (after shake completes)
       if (!hasSeenCollisionExplainer) {
         setTimeout(() => {
           setShowCollisionExplainer(true);
           setHasSeenCollisionExplainer(true);
-        }, 1000);
+        }, 600); // After shake animation (500ms + 100ms buffer)
       }
     }
 
@@ -376,6 +530,7 @@ export const IntegratedDemo = () => {
     setHasStarted(false);
     setPaymentCount(0);
     setRequestCount(0);
+    setHasPrePopulated(false);
 
     setRightRequests([]);
     setLeftPayments([]);
@@ -387,40 +542,45 @@ export const IntegratedDemo = () => {
   const canSimulatePayment = awaitingCount > 0;
   const canCreateRequest = awaitingCount < 3;
   const hasContent = leftPayments.length > 0 || rightRequests.length > 0;
+  const shouldCreateRequestPulse = rightRequests.length === 0 || rightRequests.every(r => r.status === 'paid_reconciled');
 
   return (
-    <div className="relative" ref={demoContainerRef}>
-      <div className="relative w-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
+    <div className="relative overflow-hidden" ref={demoContainerRef}>
+      <div className="relative w-full bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
         {showDialog && !hasStarted && (
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-10 flex items-start justify-center p-4"
             onClick={handleStartDemo}
           >
             <div
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-8 max-w-2xl w-full mx-4"
+              className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-8 max-w-2xl w-full mx-4"
               onClick={(e) => e.stopPropagation()}
               style={{
                 position: 'sticky',
-                top: '135px'
+                top: '150px'
               }}
             >
               <div className="text-center mb-6">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                  Request Network: Identify Every Payment
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+                  Identify Every Payment
                 </h2>
-                <div className="text-sm md:text-base lg:text-lg space-y-3">
-                  <div className="flex items-start gap-3 text-left">
-                    <XIcon className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                    <p className="text-red-600 dark:text-red-400">
-                      Traditional blockchain payments are anonymous and hard to reconcile.
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-4xl mx-auto">
+                  <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <XIcon className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                      <p className="text-sm md:text-base text-red-600 dark:text-red-400">
+                        Traditional blockchain payments are anonymous and hard to reconcile.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-3 text-left">
-                    <CheckIcon className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-                    <p className="text-green-600 dark:text-green-400">
-                      Request Network adds identifiers that uniquely tie every payment to a request, making
-                      reconciliation <strong>instant, automatic, and 100% accurate</strong>.
-                    </p>
+                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <CheckIcon className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                      <p className="text-sm md:text-base text-green-600 dark:text-green-400">
+                        Request Network adds identifiers that uniquely tie every payment to a request, making
+                        reconciliation <strong>instant, automatic, and 100% automated</strong>.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -434,57 +594,65 @@ export const IntegratedDemo = () => {
         )}
 
         {showCollisionExplainer && (
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-20 flex items-start justify-center p-4"
-            onClick={() => setShowCollisionExplainer(false)}
-          >
-            <div
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-8 max-w-2xl w-full mx-4"
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                position: 'sticky',
-                top: '135px'
-              }}
-            >
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <AlertCircleIcon className="h-6 w-6 md:h-8 md:w-8 text-red-600 dark:text-red-400" />
-                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    Payment Collision Detected
-                  </h2>
-                </div>
-                <div className="text-sm md:text-base lg:text-lg space-y-4 text-left">
-                  <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <XIcon className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-red-700 dark:text-red-300 mb-1">On the Left:</p>
-                        <p className="text-red-600 dark:text-red-400">
-                          Two payments have the same amount and currency. Which payment belongs to which customer?
-                          Manual review required.
-                        </p>
+          <div className="absolute inset-0 pointer-events-none rounded-xl z-20 flex items-start justify-start p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full pointer-events-none">
+              {/* Left panel overlay */}
+              <div className="relative pointer-events-auto">
+                <div 
+                  className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl"
+                  onClick={() => setShowCollisionExplainer(false)}
+                />
+                <div
+                  className="relative bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-6 mx-auto"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    marginTop: '60px',
+                    maxWidth: '600px'
+                  }}
+                >
+                  <div className="mb-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <AlertCircleIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
+                      <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
+                        Payment Collision Detected
+                      </h3>
+                    </div>
+                    <div className="space-y-3 text-sm md:text-base">
+                      <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <XIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-semibold text-red-700 dark:text-red-300 mb-1.5">The Problem:</p>
+                            <p className="text-red-600 dark:text-red-400 text-sm">
+                              Two payments have the same amount and currency. Which payment belongs to which customer?
+                              Manual review required.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-semibold text-green-700 dark:text-green-300 mb-1.5">Request Network Solution:</p>
+                            <p className="text-green-600 dark:text-green-400 text-sm">
+                              Each payment is automatically matched to its correct request using onchain identifiers. No
+                              ambiguity, no manual work.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <CheckIcon className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-green-700 dark:text-green-300 mb-1">On the Right:</p>
-                        <p className="text-green-600 dark:text-green-400">
-                          Each payment is automatically matched to its correct request using onchain identifiers. No
-                          ambiguity, no manual work.
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex justify-center">
+                    <Button onClick={() => setShowCollisionExplainer(false)} size="lg">
+                      Got it
+                    </Button>
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center">
-                <Button onClick={() => setShowCollisionExplainer(false)} size="lg">
-                  Got it
-                </Button>
-              </div>
+              {/* Right panel - no overlay */}
+              <div className="pointer-events-none" />
             </div>
           </div>
         )}
@@ -502,6 +670,7 @@ export const IntegratedDemo = () => {
             size="lg"
             variant="outline"
             disabled={isProcessing || !canCreateRequest}
+            pulse={shouldCreateRequestPulse && canCreateRequest && !isProcessing}
           >
             <SendIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
             Create Request
@@ -511,6 +680,7 @@ export const IntegratedDemo = () => {
             onClick={handleSimulatePayment}
             size="lg"
             disabled={isProcessing || !canSimulatePayment}
+            pulse={canSimulatePayment && !isProcessing}
           >
             <SendIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
             {isProcessing ? "Processing..." : "Simulate Payment"}
@@ -528,13 +698,14 @@ export const IntegratedDemo = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
           {/* Left side - Traditional Payments */}
-          <div className="space-y-4">
+          <div ref={leftCardRef} className="space-y-4">
             <div className="lg:hidden flex justify-center items-center gap-2 flex-wrap">
               <Button
                 onClick={handleCreateRequest}
                 size="lg"
                 variant="outline"
                 disabled={isProcessing || !canCreateRequest}
+                pulse={shouldCreateRequestPulse && canCreateRequest && !isProcessing}
               >
                 <SendIcon className="h-4 w-4 mr-2" />
                 Create Request
@@ -544,6 +715,7 @@ export const IntegratedDemo = () => {
                 onClick={handleSimulatePayment}
                 size="lg"
                 disabled={isProcessing || !canSimulatePayment}
+                pulse={canSimulatePayment && !isProcessing}
               >
                 <SendIcon className="h-4 w-4 mr-2" />
                 {isProcessing ? "Processing..." : "Simulate Payment"}
@@ -559,7 +731,7 @@ export const IntegratedDemo = () => {
               </Button>
             </div>
 
-            <div className="border-2 border-red-300 dark:border-red-700 bg-red-50/30 dark:bg-red-900/20 rounded-lg">
+            <div className={`border-2 border-red-300 dark:border-red-700 bg-red-50/30 dark:bg-red-900/20 rounded-lg ${isShaking ? 'animate-shake' : ''}`}>
               <div className="p-4 pb-3 md:pb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                   <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-300">
@@ -615,18 +787,25 @@ export const IntegratedDemo = () => {
                               {getCurrencyDisplay(payment.amount, payment.currency)}
                             </div>
                             {isCollision ? (
-                              <Badge variant="destructive" className="text-[10px] md:text-xs shrink-0">
-                                Needs Review
-                              </Badge>
+                              <Tooltip content="Multiple payments with same amount and currency detected - manual review required">
+                                <Badge className="text-[10px] md:text-xs shrink-0 bg-red-600 text-white dark:bg-red-700 dark:text-white border-0">
+                                  Needs Review
+                                </Badge>
+                              </Tooltip>
                             ) : (
-                              <Badge variant="secondary" className="text-[10px] md:text-xs shrink-0">
-                                Possibly Reconciled
-                              </Badge>
+                              <Tooltip content="Payment likely matches an invoice or receipt, but requires manual verification">
+                                <Badge variant="secondary" className="text-[10px] md:text-xs shrink-0">
+                                  Possibly Reconciled
+                                </Badge>
+                              </Tooltip>
                             )}
                           </div>
                           <div className="flex items-end justify-between mt-2 gap-2 md:gap-4">
                             <div className="flex flex-col min-w-0">
-                              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">From</span>
+                              <div className="flex items-center gap-1 mb-0.5">
+                                <WalletIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">From</span>
+                              </div>
                               <p className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate">
                                 {payment.from.slice(0, 10)}...{payment.from.slice(-8)}
                               </p>
@@ -669,6 +848,7 @@ export const IntegratedDemo = () => {
                 onClick={handleSimulatePayment}
                 size="lg"
                 disabled={isProcessing || !canSimulatePayment}
+                pulse={canSimulatePayment && !isProcessing}
               >
                 <SendIcon className="h-4 w-4 mr-2" />
                 {isProcessing ? "Processing..." : "Simulate Payment"}
@@ -730,9 +910,11 @@ export const IntegratedDemo = () => {
                               {getCurrencyDisplay(request.amount, request.currency)}
                             </div>
                             {isPaid ? (
-                              <Badge variant="success" className="text-[10px] md:text-xs shrink-0">
-                                Paid, Reconciled
-                              </Badge>
+                              <Tooltip content="Payment received and automatically reconciled with a request">
+                                <Badge variant="success" className="text-[10px] md:text-xs shrink-0">
+                                  Paid, Reconciled
+                                </Badge>
+                              </Tooltip>
                             ) : (
                               <Badge variant="default" className="text-[10px] md:text-xs shrink-0">
                                 Awaiting Payment
@@ -741,7 +923,10 @@ export const IntegratedDemo = () => {
                           </div>
                           <div className="flex items-end justify-between mt-2 gap-2 md:gap-4">
                             <div className="flex flex-col min-w-0">
-                              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Customer</span>
+                              <div className="flex items-center gap-1 mb-0.5">
+                                <UserIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Customer</span>
+                              </div>
                               <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{request.customer}</p>
                             </div>
                             {isPaid && request.txHash && (
@@ -782,6 +967,14 @@ export const IntegratedDemo = () => {
         }
         .animate-in {
           animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .animate-shake {
+          animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
         }
         /* Hide scrollbar but keep functionality */
         .overflow-y-auto::-webkit-scrollbar {
