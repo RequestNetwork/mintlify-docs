@@ -15,7 +15,7 @@ export const ComparisonTable = () => {
       accuracyDisplay: "< 100%",
       implementation: "Hard",
       linesOfCode: 50,
-      userExperience: "Okay",
+      userExperience: "Compromised",
       notes: "Requires amount and currency matching",
     },
     {
@@ -24,7 +24,7 @@ export const ComparisonTable = () => {
       accuracyDisplay: "< 100%",
       implementation: "Very Hard",
       linesOfCode: 150,
-      userExperience: "Okay",
+      userExperience: "Compromised",
       notes: "Poor performance, requires polling",
     },
     {
@@ -69,8 +69,8 @@ export const ComparisonTable = () => {
     switch (ux) {
       case "Good":
         return <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400" />;
-      case "Okay":
-        return <AlertCircleIcon className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
+      case "Compromised":
+        return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />;
       case "Poor":
         return <XIcon className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
@@ -82,8 +82,8 @@ export const ComparisonTable = () => {
     switch (ux) {
       case "Good":
         return "text-green-700 dark:text-green-300";
-      case "Okay":
-        return "text-yellow-700 dark:text-yellow-300";
+      case "Compromised":
+        return "text-orange-700 dark:text-orange-300";
       case "Poor":
         return "text-red-700 dark:text-red-300";
       default:
