@@ -749,11 +749,11 @@ export const IntegratedDemo = () => {
 
             <div className={`border-2 border-red-300 dark:border-red-700 bg-red-50/30 dark:bg-red-900/20 rounded-lg ${isShaking ? 'animate-shake' : ''}`}>
               <div className="p-4 pb-3 md:pb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 min-h-[56px] sm:min-h-[40px]">
-                  <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-300">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                  <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-300 sm:min-h-[64px]">
                     Traditional Blockchain Payments
                   </h3>
-                  <div className="flex items-center gap-1.5 bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-700 rounded-full px-3 py-1 w-fit">
+                  <div className="flex items-center gap-1.5 bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-700 rounded-full px-3 py-1 w-fit shrink-0">
                     <AlertCircleIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
                     <span className="text-xs md:text-sm font-semibold text-red-700 dark:text-red-300 whitespace-nowrap">
                       Reconciled: {calculateLeftAccuracy()}
@@ -886,11 +886,11 @@ export const IntegratedDemo = () => {
               className="border-2 border-green-300 dark:border-green-700 bg-green-50/30 dark:bg-green-950/20 rounded-lg"
             >
               <div className="p-4 pb-3 md:pb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 min-h-[56px] sm:min-h-[40px]">
-                  <h3 className="text-lg md:text-xl font-semibold text-green-700 dark:text-green-300">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                  <h3 className="text-lg md:text-xl font-semibold text-green-700 dark:text-green-300 sm:min-h-[64px]">
                     Request Network Payments
                   </h3>
-                  <div className="flex items-center gap-1.5 bg-green-100 dark:bg-green-950/50 border border-green-300 dark:border-green-700 rounded-full px-3 py-1 w-fit">
+                  <div className="flex items-center gap-1.5 bg-green-100 dark:bg-green-950/50 border border-green-300 dark:border-green-700 rounded-full px-3 py-1 w-fit shrink-0">
                     <CheckCircle2Icon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
                     <span className="text-xs md:text-sm font-semibold text-green-700 dark:text-green-300 whitespace-nowrap">
                       Reconciled: 100%
