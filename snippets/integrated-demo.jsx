@@ -119,7 +119,7 @@ export const IntegratedDemo = () => {
   // Tooltip component
   const Tooltip = ({ children, content }) => {
     const [show, setShow] = React.useState(false);
-    const [position, setPosition] = React.useState('top');
+    const [position, setPosition] = React.useState({ top: 0, left: 0, placement: 'top' });
     const tooltipRef = React.useRef(null);
     const triggerRef = React.useRef(null);
     
@@ -129,12 +129,14 @@ export const IntegratedDemo = () => {
         const spaceAbove = rect.top;
         const spaceBelow = window.innerHeight - rect.bottom;
         
-        // If there's less than 120px above and more space below, show tooltip below
-        if (spaceAbove < 120 && spaceBelow > spaceAbove) {
-          setPosition('bottom');
-        } else {
-          setPosition('top');
-        }
+        const placement = (spaceAbove < 100 && spaceBelow > spaceAbove) ? 'bottom' : 'top';
+        
+        const left = rect.left + rect.width / 2;
+        const top = placement === 'top' 
+          ? rect.top - 8  // Position above trigger with gap
+          : rect.bottom + 8;  // Position below trigger with gap
+        
+        setPosition({ top, left, placement });
       }
     }, [show]);
     
@@ -150,13 +152,17 @@ export const IntegratedDemo = () => {
         {show && (
           <div 
             ref={tooltipRef}
-            className={`absolute left-1/2 transform -translate-x-1/2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-normal max-w-xs z-[100] shadow-lg ${
-              position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+            className={`fixed transform -translate-x-1/2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap z-[100] shadow-lg ${
+              position.placement === 'top' ? '-translate-y-full' : ''
             }`}
+            style={{
+              top: `${position.top}px`,
+              left: `${position.left}px`
+            }}
           >
             {content}
             <div className={`absolute left-1/2 transform -translate-x-1/2 border-4 border-transparent ${
-              position === 'top' 
+              position.placement === 'top' 
                 ? 'top-full border-t-gray-900 dark:border-t-gray-700' 
                 : 'bottom-full border-b-gray-900 dark:border-b-gray-700'
             }`} />
@@ -177,12 +183,14 @@ export const IntegratedDemo = () => {
       md: "px-4 py-2 text-sm",
       lg: "px-6 py-3 text-base",
     };
+    
+    const pulseAnimation = variant === 'outline' ? 'animate-ring-pulse-outline' : 'animate-ring-pulse';
 
     return (
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${pulse ? 'animate-ring-pulse' : ''} ${className}`}
+        className={`inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${pulse ? pulseAnimation : ''} ${className}`}
         style={{ backgroundColor: variant === 'default' ? '#01B089' : undefined }}
       >
         {children}
@@ -201,8 +209,19 @@ export const IntegratedDemo = () => {
               box-shadow: 0 0 0 12px rgba(1, 176, 137, 0); 
             }
           }
+          @keyframes ringPulseOutline {
+            0%, 100% { 
+              box-shadow: 0 0 0 0 rgba(107, 114, 128, 0.4); 
+            }
+            50% { 
+              box-shadow: 0 0 0 12px rgba(107, 114, 128, 0); 
+            }
+          }
           .animate-ring-pulse {
-            animation: ringPulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: ringPulse 1.5s ease-out infinite;
+          }
+          .animate-ring-pulse-outline {
+            animation: ringPulseOutline 1.5s ease-out infinite;
           }
         `}</style>
       </button>
@@ -545,7 +564,7 @@ export const IntegratedDemo = () => {
   const shouldCreateRequestPulse = rightRequests.length === 0 || rightRequests.every(r => r.status === 'paid_reconciled');
 
   return (
-    <div className="relative overflow-hidden" ref={demoContainerRef}>
+    <div className="relative" ref={demoContainerRef}>
       <div className="relative w-full bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
         {showDialog && !hasStarted && (
           <div
@@ -594,22 +613,18 @@ export const IntegratedDemo = () => {
         )}
 
         {showCollisionExplainer && (
-          <div className="absolute inset-0 pointer-events-none rounded-xl z-20 flex items-start justify-start p-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full pointer-events-none">
-              {/* Left panel overlay */}
-              <div className="relative pointer-events-auto">
-                <div 
-                  className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl"
-                  onClick={() => setShowCollisionExplainer(false)}
-                />
-                <div
-                  className="relative bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-6 mx-auto"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    marginTop: '60px',
-                    maxWidth: '600px'
-                  }}
-                >
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-20 flex items-start justify-center p-4"
+            onClick={() => setShowCollisionExplainer(false)}
+          >
+            <div
+              className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-6 max-w-2xl w-full mx-4"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'sticky',
+                top: '150px'
+              }}
+            >
                   <div className="mb-4">
                     <div className="flex items-center gap-3 mb-4">
                       <AlertCircleIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -649,10 +664,6 @@ export const IntegratedDemo = () => {
                       Got it
                     </Button>
                   </div>
-                </div>
-              </div>
-              {/* Right panel - no overlay */}
-              <div className="pointer-events-none" />
             </div>
           </div>
         )}
@@ -839,6 +850,7 @@ export const IntegratedDemo = () => {
                 size="lg"
                 variant="outline"
                 disabled={isProcessing || !canCreateRequest}
+                pulse={shouldCreateRequestPulse && canCreateRequest && !isProcessing}
               >
                 <SendIcon className="h-4 w-4 mr-2" />
                 Create Request
@@ -912,7 +924,7 @@ export const IntegratedDemo = () => {
                             {isPaid ? (
                               <Tooltip content="Payment received and automatically reconciled with a request">
                                 <Badge variant="success" className="text-[10px] md:text-xs shrink-0">
-                                  Paid, Reconciled
+                                  Reconciled
                                 </Badge>
                               </Tooltip>
                             ) : (
