@@ -587,18 +587,23 @@ export const IntegratedDemo = () => {
                   <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <XIcon className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                      <p className="text-sm md:text-base text-red-600 dark:text-red-400">
-                        Traditional blockchain payments are anonymous and hard to reconcile.
-                      </p>
+                      <div>
+                        <p className="font-semibold text-red-700 dark:text-red-300 mb-1.5 text-sm md:text-base">Anonymous Transactions: </p>
+                        <p className="text-red-600 dark:text-red-400 text-sm">
+                          Traditional blockchain payments lack business context or payment identifiers.
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <CheckIcon className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-                      <p className="text-sm md:text-base text-green-600 dark:text-green-400">
-                        Request Network adds identifiers that uniquely tie every payment to a request, making
-                        reconciliation <strong>instant, automatic, and 100% automated</strong>.
-                      </p>
+                      <div>
+                        <p className="font-semibold text-green-700 dark:text-green-300 mb-1.5 text-sm md:text-base">Unique Identifiers: </p>
+                        <p className="text-green-600 dark:text-green-400 text-sm">
+                          Request Network adds unique identifiers to every payment, enabling instant, automatic, and 100% automated reconciliation.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -632,12 +637,12 @@ export const IntegratedDemo = () => {
                         Payment Collision Detected
                       </h3>
                     </div>
-                    <div className="space-y-3 text-sm md:text-base">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
                       <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-3">
                         <div className="flex items-start gap-2">
                           <XIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-red-700 dark:text-red-300 mb-1.5">The Problem:</p>
+                            <p className="font-semibold text-red-700 dark:text-red-300 mb-1.5">The Problem: </p>
                             <p className="text-red-600 dark:text-red-400 text-sm">
                               Two payments have the same amount and currency. Which payment belongs to which customer?
                               Manual review required.
@@ -649,7 +654,7 @@ export const IntegratedDemo = () => {
                         <div className="flex items-start gap-2">
                           <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-green-700 dark:text-green-300 mb-1.5">Request Network Solution:</p>
+                            <p className="font-semibold text-green-700 dark:text-green-300 mb-1.5">Request Network Solution: </p>
                             <p className="text-green-600 dark:text-green-400 text-sm">
                               Each payment is automatically matched to its correct request using onchain identifiers. No
                               ambiguity, no manual work.
@@ -744,13 +749,13 @@ export const IntegratedDemo = () => {
 
             <div className={`border-2 border-red-300 dark:border-red-700 bg-red-50/30 dark:bg-red-900/20 rounded-lg ${isShaking ? 'animate-shake' : ''}`}>
               <div className="p-4 pb-3 md:pb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 min-h-[56px] sm:min-h-[40px]">
                   <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-300">
                     Traditional Blockchain Payments
                   </h3>
                   <div className="flex items-center gap-1.5 bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-700 rounded-full px-3 py-1 w-fit">
-                    <AlertCircleIcon className="h-4 w-4 text-red-600 dark:text-red-400" />
-                    <span className="text-xs md:text-sm font-semibold text-red-700 dark:text-red-300">
+                    <AlertCircleIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                    <span className="text-xs md:text-sm font-semibold text-red-700 dark:text-red-300 whitespace-nowrap">
                       Reconciled: {calculateLeftAccuracy()}
                     </span>
                   </div>
@@ -881,13 +886,13 @@ export const IntegratedDemo = () => {
               className="border-2 border-green-300 dark:border-green-700 bg-green-50/30 dark:bg-green-950/20 rounded-lg"
             >
               <div className="p-4 pb-3 md:pb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 min-h-[56px] sm:min-h-[40px]">
                   <h3 className="text-lg md:text-xl font-semibold text-green-700 dark:text-green-300">
                     Request Network Payments
                   </h3>
                   <div className="flex items-center gap-1.5 bg-green-100 dark:bg-green-950/50 border border-green-300 dark:border-green-700 rounded-full px-3 py-1 w-fit">
-                    <CheckCircle2Icon className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    <span className="text-xs md:text-sm font-semibold text-green-700 dark:text-green-300">
+                    <CheckCircle2Icon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                    <span className="text-xs md:text-sm font-semibold text-green-700 dark:text-green-300 whitespace-nowrap">
                       Reconciled: 100%
                     </span>
                   </div>
