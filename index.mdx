@@ -35,6 +35,14 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   <div style={{ marginBottom: '0.5rem' }}>
     <CardGroup cols={3}>
       <Card 
+        title="🚀 Quick Start" 
+        href="/quickstart"
+        icon="rocket"
+      >
+        See how Request Network works in 60 seconds. Interactive demo showing the Request ID concept.
+      </Card>
+
+      <Card 
         title="Use Cases" 
         href="/use-cases/invoicing"
         icon="briefcase"
@@ -49,7 +57,11 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
       >
         The easiest way to integrate. Payment types, webhooks, and developer tools.
       </Card>
-      
+    </CardGroup>
+  </div>
+
+  <div style={{ marginBottom: '3rem' }}>
+    <CardGroup cols={3}>
       <Card 
         title="🌐 Resources" 
         href="/resources/supported-chains-and-currencies"
@@ -57,11 +69,7 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
       >
         Supported chains, currencies, smart contracts, and community resources
       </Card>
-    </CardGroup>
-  </div>
 
-  <div style={{ marginBottom: '3rem' }}>
-    <CardGroup cols={2}>
       <Card 
         title="SDK (Legacy)" 
         href="/sdk-legacy/migration-guide"

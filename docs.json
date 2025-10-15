@@ -41,6 +41,10 @@
         "pages": ["index"]
       },
       {
+        "tab": "Quick Start",
+        "pages": ["quickstart"]
+      },
+      {
         "tab": "Use Cases",
         "groups": [
           {

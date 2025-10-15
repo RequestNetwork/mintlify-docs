@@ -1,0 +1,69 @@
+---
+title: "Quick Start: Create Your First Request"
+description: "See how Request Network gives every payment a unique ID for perfect tracking. Create and pay a request in seconds."
+sidebarTitle: "Quick Start"
+mode: "custom"
+---
+
+import { RequestLifecycleDemo } from '/snippets/request-lifecycle-demo.jsx'
+import { PaymentProcessorQA } from '/snippets/payment-processor-qa.jsx'
+
+<RequestLifecycleDemo />
+
+<div className="mt-12">
+  <PaymentProcessorQA />
+</div>
+
+<div style={{ padding: '0 2rem', maxWidth: '1400px', margin: '0 auto' }}>
+  <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem', color: 'var(--text-primary)' }}>What's Next?</h2>
+  
+  <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+    Now that you understand the core concept, explore how Request Network powers specific business use cases:
+  </p>
+
+  <div style={{ marginBottom: '0.5rem' }}>
+    <CardGroup cols={3}>
+      <Card 
+        title="📄 Invoicing" 
+        href="/use-cases/invoicing"
+        icon="file-invoice"
+      >
+        Create professional invoices with payment terms, line items, and automatic payment detection
+      </Card>
+      
+      <Card 
+        title="💸 Payouts" 
+        href="/use-cases/payouts"
+        icon="money-bill-transfer"
+      >
+        Send batch payments to multiple recipients with one click and automatic tracking
+      </Card>
+
+      <Card 
+        title="💰 Payroll" 
+        href="/use-cases/payroll"
+        icon="users"
+      >
+        Pay your team in crypto with automated payroll runs and instant reconciliation
+      </Card>
+    </CardGroup>
+  </div>
+
+  <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem', color: 'var(--text-primary)' }}>Ready to Build?</h2>
+  
+  <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+    Get your API key and start creating requests in production
+  </p>
+
+  <div style={{ marginBottom: '3rem' }}>
+    <CardGroup cols={2}>
+      <Card title="Get Started with API" icon="rocket" href="/api-setup/getting-started">
+        Start building with the Request Network API
+      </Card>
+      
+      <Card title="View Portal" icon="arrow-up-right-from-square" href="https://portal.request.network">
+        Manage your requests in the web portal
+      </Card>
+    </CardGroup>
+  </div>
+</div>
