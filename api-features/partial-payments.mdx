@@ -7,6 +7,10 @@ description: "Split payments across multiple transactions and funding sources"
 
 Partial payments allow requests to be fulfilled through multiple transactions, enabling split payments, installment plans, and flexible funding approaches.
 
+<Tip>
+**Flexible invoice payments:** Enable customers to pay invoices in installments or from multiple wallets. Combine with [conversion payments](/api-features/conversion-payments) for fiat-denominated installment plans. See examples in our [Invoicing use case](/use-cases/invoicing).
+</Tip>
+
 ## How It Works
 
 ```mermaid
@@ -47,16 +51,16 @@ Works with all payment types except Crypto-to-fiat payments:
 ## Used In
 
 <CardGroup cols={3}>
-  <Card title="Invoicing" href="/use-cases/invoicing">
-    Large invoice installments
+  <Card title="Invoicing" href="/use-cases/invoicing" icon="file-invoice">
+    Enable installment plans for large invoices
   </Card>
   
-  <Card title="Checkout" href="/use-cases/checkout">
-    Flexible payment options
+  <Card title="Checkout" href="/use-cases/checkout" icon="cart-shopping">
+    Flexible payment options for e-commerce
   </Card>
   
-  <Card title="Subscriptions" href="/use-cases/subscriptions">
-    Partial subscription payments
+  <Card title="Subscriptions" href="/use-cases/subscriptions" icon="repeat">
+    Allow partial subscription payments
   </Card>
 </CardGroup>
 
