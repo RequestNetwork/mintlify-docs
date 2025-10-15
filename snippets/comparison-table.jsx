@@ -91,6 +91,32 @@ export const ComparisonTable = () => {
     }
   };
 
+  const getImplementationIcon = (difficulty) => {
+    switch (difficulty) {
+      case "Easy":
+        return <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400" />;
+      case "Hard":
+        return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />;
+      case "Very Hard":
+        return <XIcon className="h-4 w-4 text-red-600 dark:text-red-400" />;
+      default:
+        return null;
+    }
+  };
+
+  const getImplementationColor = (difficulty) => {
+    switch (difficulty) {
+      case "Easy":
+        return "text-green-700 dark:text-green-300";
+      case "Hard":
+        return "text-orange-700 dark:text-orange-300";
+      case "Very Hard":
+        return "text-red-700 dark:text-red-300";
+      default:
+        return "text-gray-700 dark:text-gray-300";
+    }
+  };
+
   return (
     <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
       <div className="text-center mb-6 md:mb-8">
@@ -140,51 +166,36 @@ export const ComparisonTable = () => {
 
                 {/* Accuracy */}
                 <div className="flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <span
-                      className={`text-xl md:text-2xl font-bold ${
-                        row.accuracy === 100 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {row.accuracyDisplay || `${row.accuracy}%`}
-                    </span>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 w-12 md:w-16">
-                      <div
-                        className={`h-full rounded-full ${row.accuracy === 100 ? "bg-green-600 dark:bg-green-500" : "bg-red-600 dark:bg-red-500"}`}
-                        style={{ width: `${row.accuracy}%` }}
-                      />
-                    </div>
-                  </div>
+                  <span
+                    className={`text-xl md:text-2xl font-bold ${
+                      row.accuracy === 100 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {row.accuracyDisplay || `${row.accuracy}%`}
+                  </span>
                 </div>
 
                 {/* Implementation Difficulty */}
                 <div className="flex items-center justify-center">
-                  <Badge
-                    className={`text-[10px] md:text-xs border ${
-                      row.implementation === "Easy"
-                        ? "bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-200 border-green-300 dark:border-green-700"
-                        : row.implementation === "Hard"
-                          ? "bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-200 border-orange-300 dark:border-orange-700"
-                          : "bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border-red-300 dark:border-red-700"
-                    }`}
-                  >
-                    {row.implementation}
-                  </Badge>
+                  <div className={`flex items-center gap-2 ${getImplementationColor(row.implementation)}`}>
+                    {getImplementationIcon(row.implementation)}
+                    <span className="text-xs md:text-sm font-medium">{row.implementation}</span>
+                  </div>
                 </div>
 
                 {/* Lines of Code */}
                 <div className="flex items-center justify-center">
-                  <div
-                    className={`rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-bold text-xs md:text-sm border-2 ${
+                  <span
+                    className={`font-bold text-sm md:text-base ${
                       row.linesOfCode <= 10
-                        ? "bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700"
-                        : row.linesOfCode <= 20
-                          ? "bg-yellow-100 dark:bg-yellow-950/50 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700"
-                          : "bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700"
+                        ? "text-green-600 dark:text-green-400"
+                        : row.linesOfCode <= 50
+                          ? "text-orange-600 dark:text-orange-400"
+                          : "text-red-600 dark:text-red-400"
                     }`}
                   >
-                    {row.linesOfCode}
-                  </div>
+                    ~{row.linesOfCode}
+                  </span>
                 </div>
 
                 {/* User Experience */}
