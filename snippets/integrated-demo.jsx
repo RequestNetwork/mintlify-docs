@@ -76,6 +76,13 @@ export const IntegratedDemo = () => {
     </svg>
   );
 
+  const TxIcon = ({ className = "h-3 w-3" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="16 18 22 12 16 6"></polyline>
+      <polyline points="8 6 2 12 8 18"></polyline>
+    </svg>
+  );
+
   const CryptoIcon = ({ currency, className = "w-4 h-4" }) => {
     const iconMap = {
       USDC: "/logo/icons/usdc.png",
@@ -152,7 +159,7 @@ export const IntegratedDemo = () => {
         {show && (
           <div 
             ref={tooltipRef}
-            className={`fixed transform -translate-x-1/2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap z-[100] shadow-lg ${
+            className={`fixed transform -translate-x-1/2 px-3 py-2 bg-gray-500 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap z-[100] shadow-lg ${
               position.placement === 'top' ? '-translate-y-full' : ''
             }`}
             style={{
@@ -163,8 +170,8 @@ export const IntegratedDemo = () => {
             {content}
             <div className={`absolute left-1/2 transform -translate-x-1/2 border-4 border-transparent ${
               position.placement === 'top' 
-                ? 'top-full border-t-gray-900 dark:border-t-gray-700' 
-                : 'bottom-full border-b-gray-900 dark:border-b-gray-700'
+                ? 'top-full border-t-gray-500 dark:border-t-gray-700' 
+                : 'bottom-full border-b-gray-500 dark:border-b-gray-700'
             }`} />
           </div>
         )}
@@ -314,7 +321,8 @@ export const IntegratedDemo = () => {
       
       for (let i = 0; i < 3; i++) {
         const timestamp = new Date(Date.now() + i); // Slight offset for unique timestamps
-        const id = `request-${Date.now()}-${i}`;
+        // Generate a realistic Request ID (64 character hex string like the example)
+        const id = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
         
         // Determine if this request should be part of the collision pair
         const isCollisionRequest = selectedPair.includes(i);
@@ -335,6 +343,7 @@ export const IntegratedDemo = () => {
           amount,
           currency,
           customer: shuffledCustomers[i].name,
+          customerAddress: `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
           status: "awaiting_payment",
           timestamp,
           isNew: true,
@@ -360,7 +369,99 @@ export const IntegratedDemo = () => {
       setRightRequests(newRequests);
       setLeftPayments(newPlaceholders);
       setRequestCount(3);
+      
+      // Auto-simulate the first three payments after a short delay
+      setTimeout(() => {
+        autoSimulatePayments(newRequests);
+      }, 1500); // 1.5s delay before first payment
     }
+  };
+
+  const autoSimulatePayments = async (requests) => {
+    // Simulate payments for all three requests with delays between each
+    for (let i = 0; i < requests.length; i++) {
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5s delay between payments
+      }
+      await simulatePaymentForRequest(requests[i]);
+    }
+  };
+
+  const simulatePaymentForRequest = async (selectedRequest) => {
+    return new Promise((resolve) => {
+      const paymentAmount = selectedRequest.amount;
+      const paymentCurrency = selectedRequest.currency;
+
+      // Use the customer's address from the request (for consistency between left and right)
+      const randomAddress = selectedRequest.customerAddress;
+      // Generate valid 64-character tx hash (32 bytes in hex)
+      const txHash = `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+
+      setLeftPayments((prev) => {
+        const matchingPayments = prev.filter(
+          (p) => !p.isPlaceholder && p.amount === paymentAmount && p.currency === paymentCurrency,
+        );
+
+        const hasCollision = matchingPayments.length > 0;
+
+        const newPayment = {
+          id: `payment-${Date.now()}`,
+          amount: paymentAmount,
+          currency: paymentCurrency,
+          from: randomAddress,
+          timestamp: new Date(),
+          status: hasCollision ? "payment_collision" : "possibly_reconciled",
+          requestId: selectedRequest.id,
+          txHash,
+          isNew: true,
+        };
+
+        const placeholderIndex = prev.findIndex((p) => p.isPlaceholder && p.requestId === selectedRequest.id);
+
+        if (placeholderIndex !== -1) {
+          const updated = [...prev];
+          updated[placeholderIndex] = newPayment;
+
+          if (hasCollision) {
+            const collisionUpdated = updated.map((p) =>
+              !p.isPlaceholder && p.amount === paymentAmount && p.currency === paymentCurrency
+                ? { ...p, status: "payment_collision" }
+                : p,
+            );
+            
+            // Trigger collision effects
+            setTimeout(() => {
+              setIsShaking(true);
+              setTimeout(() => setIsShaking(false), 500);
+              
+              if (!hasSeenCollisionExplainer) {
+                setTimeout(() => {
+                  setShowCollisionExplainer(true);
+                  setHasSeenCollisionExplainer(true);
+                }, 600);
+              }
+            }, 100);
+            
+            return collisionUpdated;
+          }
+
+          return updated;
+        }
+
+        return [newPayment, ...prev];
+      });
+
+      setRightRequests((prev) =>
+        prev.map((r) =>
+          r.id === selectedRequest.id ? { ...r, status: "paid_reconciled", txHash, isNew: true } : r,
+        ),
+      );
+
+      setTimeout(() => {
+        triggerConfetti();
+        resolve();
+      }, 100);
+    });
   };
 
   const handleCreateRequest = () => {
@@ -382,13 +483,15 @@ export const IntegratedDemo = () => {
       }
 
       const timestamp = new Date();
-      const id = `request-${Date.now()}`;
+      // Generate a realistic Request ID (64 character hex string)
+      const id = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
       const newRequest = {
         id,
         amount,
         currency,
         customer: randomCustomer.name,
+        customerAddress: `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
         status: "awaiting_payment",
         timestamp,
         isNew: true,
@@ -753,12 +856,14 @@ export const IntegratedDemo = () => {
                   <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-300 sm:min-h-[64px]">
                     Traditional Blockchain Payments
                   </h3>
-                  <div className="flex items-center gap-1.5 bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-700 rounded-full px-3 py-1 w-fit shrink-0">
-                    <AlertCircleIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
-                    <span className="text-xs md:text-sm font-semibold text-red-700 dark:text-red-300 whitespace-nowrap">
-                      Reconciled: {calculateLeftAccuracy()}
-                    </span>
-                  </div>
+                  <Tooltip content="Manual reconciliation required - payments lack identifiers to link them to specific customers">
+                    <div className="flex items-center gap-1.5 bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-700 rounded-full px-3 py-1 w-fit shrink-0 cursor-help">
+                      <AlertCircleIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                      <span className="text-xs md:text-sm font-semibold text-red-700 dark:text-red-300 whitespace-nowrap">
+                        Reconciled: {calculateLeftAccuracy()}
+                      </span>
+                    </div>
+                  </Tooltip>
                 </div>
                 <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                   Anonymous transactions without business context
@@ -822,20 +927,27 @@ export const IntegratedDemo = () => {
                                 <WalletIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                                 <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">From</span>
                               </div>
-                              <p className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate">
-                                {payment.from.slice(0, 10)}...{payment.from.slice(-8)}
-                              </p>
+                              <Tooltip content={payment.from}>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate cursor-help">
+                                  {payment.from.slice(0, 10)}...{payment.from.slice(-8)}
+                                </p>
+                              </Tooltip>
                             </div>
                             <div className="flex flex-col items-start shrink-0">
-                              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Tx</span>
-                              <a
-                                href="#"
-                                className="text-xs text-gray-600 dark:text-gray-300 font-mono hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                {payment.txHash.slice(0, 8)}...{payment.txHash.slice(-6)}
-                                <ExternalLinkIcon />
-                              </a>
+                              <div className="flex items-center gap-1 mb-0.5">
+                                <TxIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Tx ID</span>
+                              </div>
+                              <Tooltip content={payment.txHash}>
+                                <a
+                                  href="#"
+                                  className="text-xs text-gray-600 dark:text-gray-300 font-mono hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1 cursor-help"
+                                  onClick={(e) => e.preventDefault()}
+                                >
+                                  {payment.txHash.slice(0, 8)}...{payment.txHash.slice(-6)}
+                                  <ExternalLinkIcon />
+                                </a>
+                              </Tooltip>
                             </div>
                           </div>
                         </div>
@@ -890,12 +1002,14 @@ export const IntegratedDemo = () => {
                   <h3 className="text-lg md:text-xl font-semibold text-green-700 dark:text-green-300 sm:min-h-[64px]">
                     Request Network Payments
                   </h3>
-                  <div className="flex items-center gap-1.5 bg-green-100 dark:bg-green-950/50 border border-green-300 dark:border-green-700 rounded-full px-3 py-1 w-fit shrink-0">
-                    <CheckCircle2Icon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
-                    <span className="text-xs md:text-sm font-semibold text-green-700 dark:text-green-300 whitespace-nowrap">
-                      Reconciled: 100%
-                    </span>
-                  </div>
+                  <Tooltip content="100% automated reconciliation - Request IDs uniquely identify every payment">
+                    <div className="flex items-center gap-1.5 bg-green-100 dark:bg-green-950/50 border border-green-300 dark:border-green-700 rounded-full px-3 py-1 w-fit shrink-0 cursor-help">
+                      <CheckCircle2Icon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                      <span className="text-xs md:text-sm font-semibold text-green-700 dark:text-green-300 whitespace-nowrap">
+                        Reconciled: 100%
+                      </span>
+                    </div>
+                  </Tooltip>
                 </div>
                 <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                   Payments with unique IDs for instant reconciliation
@@ -922,7 +1036,7 @@ export const IntegratedDemo = () => {
                               : "border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900"
                           }`}
                         >
-                          <div className="flex items-start justify-between mb-auto gap-2">
+                          <div className="flex items-start justify-between mb-2 gap-2">
                             <div className="font-semibold text-xs md:text-sm text-gray-900 dark:text-gray-100">
                               {getCurrencyDisplay(request.amount, request.currency)}
                             </div>
@@ -938,27 +1052,63 @@ export const IntegratedDemo = () => {
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-end justify-between mt-2 gap-2 md:gap-4">
-                            <div className="flex flex-col min-w-0">
+                          <div className="flex items-end justify-between mt-auto gap-2 md:gap-4">
+                            <div className="flex flex-col min-w-0" style={{ width: '30%' }}>
                               <div className="flex items-center gap-1 mb-0.5">
                                 <UserIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                                 <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Customer</span>
                               </div>
-                              <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{request.customer}</p>
+                              <Tooltip content={request.customerAddress}>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 truncate cursor-help">{request.customer}</p>
+                              </Tooltip>
                             </div>
-                            {isPaid && request.txHash && (
-                              <div className="flex flex-col items-start shrink-0">
-                                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Tx</span>
-                                <a
-                                  href="#"
-                                  className="text-xs text-gray-600 dark:text-gray-300 font-mono hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1"
-                                  onClick={(e) => e.preventDefault()}
-                                >
-                                  {request.txHash.slice(0, 8)}...{request.txHash.slice(-6)}
-                                  <ExternalLinkIcon />
-                                </a>
+                            <div className="flex flex-col min-w-0" style={{ width: '45%' }}>
+                              <div className="flex items-center gap-1 mb-0.5">
+                                <svg className="h-3 w-3 text-gray-500 dark:text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                  <polyline points="14 2 14 8 20 8"></polyline>
+                                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                                  <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Request ID</span>
                               </div>
-                            )}
+                              <Tooltip content={request.id}>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate cursor-help">
+                                  {request.id.slice(0, 10)}...{request.id.slice(-6)}
+                                </p>
+                              </Tooltip>
+                            </div>
+                            <div className="flex flex-col items-start shrink-0" style={{ width: '25%' }}>
+                              {isPaid && request.txHash ? (
+                                <>
+                                  <div className="flex items-center gap-1 mb-0.5">
+                                    <TxIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Tx ID</span>
+                                  </div>
+                                  <Tooltip content={request.txHash}>
+                                    <a
+                                      href="#"
+                                      className="text-xs text-gray-600 dark:text-gray-300 font-mono hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1 cursor-help"
+                                      onClick={(e) => e.preventDefault()}
+                                    >
+                                      {request.txHash.slice(0, 8)}...{request.txHash.slice(-6)}
+                                      <ExternalLinkIcon />
+                                    </a>
+                                  </Tooltip>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="flex items-center gap-1 mb-0.5 opacity-0">
+                                    <TxIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Tx</span>
+                                  </div>
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono opacity-0">
+                                    0x000000...000000
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
