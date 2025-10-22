@@ -255,6 +255,20 @@ export const IntegratedDemo = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [hasPrePopulated, setHasPrePopulated] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [shouldScrollToTop, setShouldScrollToTop] = useState(0);
+
+  // Auto-scroll to top when needed
+  useEffect(() => {
+    if (shouldScrollToTop > 0 && leftScrollRef.current && rightScrollRef.current) {
+      // Use instant scroll to ensure it works
+      setTimeout(() => {
+        if (leftScrollRef.current && rightScrollRef.current) {
+          leftScrollRef.current.scrollTop = 0;
+          rightScrollRef.current.scrollTop = 0;
+        }
+      }, 50);
+    }
+  }, [shouldScrollToTop]);
 
   // Sync scrolling
   useEffect(() => {
@@ -459,6 +473,9 @@ export const IntegratedDemo = () => {
         ),
       );
 
+      // Trigger scroll to top via useEffect
+      setShouldScrollToTop(prev => prev + 1);
+
       setTimeout(() => {
         triggerConfetti();
         resolve();
@@ -517,6 +534,9 @@ export const IntegratedDemo = () => {
       
       return newCount;
     });
+
+    // Trigger scroll to top via useEffect
+    setShouldScrollToTop(prev => prev + 1);
   };
 
   const calculateLeftAccuracy = () => {
@@ -593,6 +613,9 @@ export const IntegratedDemo = () => {
         r.id === selectedRequest.id ? { ...r, status: "paid_reconciled", txHash, isNew: true } : r,
       ),
     );
+
+    // Trigger scroll to top via useEffect
+    setShouldScrollToTop(prev => prev + 1);
 
     setTimeout(() => {
       triggerConfetti();
@@ -873,7 +896,7 @@ export const IntegratedDemo = () => {
                 </p>
               </div>
               <div className="px-4 pb-4">
-                <div ref={leftScrollRef} className="space-y-3 h-[300px] md:h-[388px] overflow-y-auto">
+                <div ref={leftScrollRef} className="space-y-3 h-[300px] md:h-[388px] overflow-y-auto no-scrollbar">
                   {leftPayments.length === 0 ? (
                     <div className="h-full flex items-center justify-center">
                       <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">Click "Create Request" to begin</p>
@@ -1019,7 +1042,7 @@ export const IntegratedDemo = () => {
                 </p>
               </div>
               <div className="px-4 pb-4">
-                <div ref={rightScrollRef} className="space-y-3 h-[300px] md:h-[388px] overflow-y-auto">
+                <div ref={rightScrollRef} className="space-y-3 h-[300px] md:h-[388px] overflow-y-auto no-scrollbar">
                   {rightRequests.length === 0 ? (
                     <div className="h-full flex items-center justify-center">
                       <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">Click "Create Request" to begin</p>
@@ -1147,9 +1170,12 @@ export const IntegratedDemo = () => {
           animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
         }
         /* Hide scrollbar but keep functionality */
-        .overflow-y-auto::-webkit-scrollbar {
-          width: 0px;
-          background: transparent;
+        .no-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari, Brave, and other WebKit browsers */
         }
       `}</style>
     </div>
