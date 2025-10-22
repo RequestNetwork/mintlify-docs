@@ -1127,10 +1127,11 @@ export const IntegratedDemo = () => {
                                 <>
                                   <div className="flex items-center gap-1 mb-0.5 opacity-0">
                                     <TxIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
-                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Tx</span>
+                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Tx ID</span>
                                   </div>
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono opacity-0">
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono opacity-0 flex items-center gap-1">
                                     0x000000...000000
+                                    <ExternalLinkIcon />
                                   </span>
                                 </>
                               )}
