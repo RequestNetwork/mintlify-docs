@@ -254,6 +254,7 @@ export const IntegratedDemo = () => {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isShaking, setIsShaking] = useState(false);
   const [hasPrePopulated, setHasPrePopulated] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
 
   // Sync scrolling
   useEffect(() => {
@@ -303,11 +304,10 @@ export const IntegratedDemo = () => {
     if (!hasPrePopulated) {
       setHasPrePopulated(true);
       
-      // Randomly select which 2 of 3 requests will have collision
-      const collisionPairs = [[0, 1], [0, 2], [1, 2]];
-      const selectedPair = collisionPairs[Math.floor(Math.random() * collisionPairs.length)];
+      // For initial auto-play: collision always happens on 3rd payment (indices 1 and 2)
+      const collisionPair = [1, 2];
       
-      // Generate collision amount that will be shared by 2 requests
+      // Generate collision amount that will be shared by 2nd and 3rd requests
       const collisionAmountData = generateAmount();
       const collisionAmount = collisionAmountData.amount;
       const collisionCurrency = collisionAmountData.currency;
@@ -325,9 +325,9 @@ export const IntegratedDemo = () => {
         const id = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
         
         // Determine if this request should be part of the collision pair
-        const isCollisionRequest = selectedPair.includes(i);
+        const isCollisionRequest = collisionPair.includes(i);
         
-        // Use collision amount for collision pair, random amount for the third request
+        // Use collision amount for collision pair, random amount for the first request
         let amount, currency;
         if (isCollisionRequest) {
           amount = collisionAmount;
@@ -370,7 +370,8 @@ export const IntegratedDemo = () => {
       setLeftPayments(newPlaceholders);
       setRequestCount(3);
       
-      // Auto-simulate the first three payments after a short delay
+      // Set auto-playing state and start auto-simulation
+      setIsAutoPlaying(true);
       setTimeout(() => {
         autoSimulatePayments(newRequests);
       }, 1500); // 1.5s delay before first payment
@@ -438,7 +439,8 @@ export const IntegratedDemo = () => {
                 setTimeout(() => {
                   setShowCollisionExplainer(true);
                   setHasSeenCollisionExplainer(true);
-                }, 600);
+                  setIsAutoPlaying(false); // Re-enable buttons when dialog appears
+                }, 1500); // Increased delay to 1.5s after shake
               }
             }, 100);
             
@@ -653,6 +655,7 @@ export const IntegratedDemo = () => {
     setPaymentCount(0);
     setRequestCount(0);
     setHasPrePopulated(false);
+    setIsAutoPlaying(false);
 
     setRightRequests([]);
     setLeftPayments([]);
@@ -661,8 +664,8 @@ export const IntegratedDemo = () => {
   };
 
   const awaitingCount = rightRequests.filter((r) => r.status === "awaiting_payment").length;
-  const canSimulatePayment = awaitingCount > 0;
-  const canCreateRequest = awaitingCount < 3;
+  const canSimulatePayment = awaitingCount > 0 && !isAutoPlaying;
+  const canCreateRequest = awaitingCount < 3 && !isAutoPlaying;
   const hasContent = leftPayments.length > 0 || rightRequests.length > 0;
   const shouldCreateRequestPulse = rightRequests.length === 0 || rightRequests.every(r => r.status === 'paid_reconciled');
 
@@ -809,7 +812,7 @@ export const IntegratedDemo = () => {
             onClick={handleClearTables}
             variant="outline"
             size="lg"
-            disabled={!hasContent}
+            disabled={!hasContent || isAutoPlaying}
           >
             Clear
           </Button>
@@ -844,7 +847,7 @@ export const IntegratedDemo = () => {
                 onClick={handleClearTables}
                 variant="outline"
                 size="lg"
-                disabled={!hasContent}
+                disabled={!hasContent || isAutoPlaying}
               >
                 Clear
               </Button>
@@ -987,7 +990,7 @@ export const IntegratedDemo = () => {
                 onClick={handleClearTables}
                 variant="outline"
                 size="lg"
-                disabled={!hasContent}
+                disabled={!hasContent || isAutoPlaying}
               >
                 Clear
               </Button>
