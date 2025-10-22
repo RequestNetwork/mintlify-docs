@@ -1052,8 +1052,8 @@ export const IntegratedDemo = () => {
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-end justify-between mt-auto gap-2 md:gap-4">
-                            <div className="flex flex-col min-w-0" style={{ width: '30%' }}>
+                          <div className="flex items-end justify-between mt-auto gap-1 md:gap-2 lg:gap-4">
+                            <div className="flex flex-col min-w-0 flex-1">
                               <div className="flex items-center gap-1 mb-0.5">
                                 <UserIcon className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                                 <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Customer</span>
@@ -1062,7 +1062,7 @@ export const IntegratedDemo = () => {
                                 <p className="text-xs text-gray-600 dark:text-gray-300 truncate cursor-help">{request.customer}</p>
                               </Tooltip>
                             </div>
-                            <div className="flex flex-col min-w-0" style={{ width: '45%' }}>
+                            <div className="hidden md:flex flex-col min-w-0 flex-1">
                               <div className="flex items-center gap-1 mb-0.5">
                                 <svg className="h-3 w-3 text-gray-500 dark:text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -1079,7 +1079,7 @@ export const IntegratedDemo = () => {
                                 </p>
                               </Tooltip>
                             </div>
-                            <div className="flex flex-col items-start shrink-0" style={{ width: '25%' }}>
+                            <div className="flex flex-col items-start shrink-0">
                               {isPaid && request.txHash ? (
                                 <>
                                   <div className="flex items-center gap-1 mb-0.5">
