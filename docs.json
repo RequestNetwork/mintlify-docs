@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "aspen",
   "name": "Request Network Docs",
   "colors": {
     "primary": "#01B089",
@@ -37,10 +37,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Welcome",
-        "pages": ["index"]
-      },
-      {
         "tab": "Quick Start",
         "pages": ["quickstart"]
       },
@@ -48,7 +44,13 @@
         "tab": "Use Cases",
         "groups": [
           {
-            "group": "📄 Primary Use Cases",
+            "group": "🚀 Get Started",
+            "pages": [
+              "use-cases/welcome"
+            ]
+          },
+          {
+            "group": "🎯 Use Cases",
             "pages": [
               "use-cases/invoicing",
               "use-cases/payouts",
