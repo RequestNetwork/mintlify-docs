@@ -37,16 +37,13 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Quick Start",
-        "pages": ["quickstart"]
-      },
-      {
         "tab": "Use Cases",
         "groups": [
           {
             "group": "🚀 Get Started",
             "pages": [
-              "use-cases/welcome"
+              "use-cases/welcome",
+              "quickstart"
             ]
           },
           {
