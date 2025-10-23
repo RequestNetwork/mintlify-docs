@@ -808,13 +808,6 @@ export const IntegratedDemo = () => {
           </div>
         )}
 
-        <div className="text-center mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Identify Every Payment</h2>
-          <p className="text-base md:text-lg text-gray-600 dark:text-gray-400">
-            See the difference between anonymous payments and identified payments
-          </p>
-        </div>
-
         <div className="hidden lg:flex justify-center items-center gap-2 md:gap-4 mb-6 flex-wrap">
           <Button
             onClick={handleCreateRequest}

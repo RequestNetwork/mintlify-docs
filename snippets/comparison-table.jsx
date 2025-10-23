@@ -119,15 +119,6 @@ export const ComparisonTable = () => {
 
   return (
     <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
-      <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          Blockchain Payment Detection Methods Compared
-        </h2>
-        <p className="text-base md:text-lg text-gray-600 dark:text-gray-400">
-          Other methods require manual reconciliation or sacrifice implementation simplicity or user experience
-        </p>
-      </div>
-
       <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
         <div className="min-w-[800px]">
           {/* Table Header */}
