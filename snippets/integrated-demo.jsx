@@ -548,6 +548,15 @@ export const IntegratedDemo = () => {
     return `${percentage}%`;
   };
 
+  // Helper function to count left-side payment matches (excluding placeholders)
+  const getLeftSideMatchCount = (amount, currency) => {
+    return leftPayments.filter(p => 
+      !p.isPlaceholder && 
+      p.amount === amount && 
+      p.currency === currency
+    ).length;
+  };
+
   const handleSimulatePayment = async () => {
     setIsProcessing(true);
 
@@ -708,28 +717,28 @@ export const IntegratedDemo = () => {
                 top: '150px'
               }}
             >
-              <div className="text-center mb-6">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+              <div className="mb-6">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
                   Identify Every Payment
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-4xl mx-auto">
-                  <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                  <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
                     <div className="flex items-start gap-3">
-                      <XIcon className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                      <XIcon className="h-5 w-5 md:h-6 md:w-6 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-semibold text-red-700 dark:text-red-300 mb-1.5 text-sm md:text-base">Anonymous Transactions: </p>
-                        <p className="text-red-600 dark:text-red-400 text-sm">
+                        <h3 className="font-bold text-sm md:text-base text-red-700 dark:text-red-300 mb-2">Anonymous Transactions</h3>
+                        <p className="text-xs md:text-sm text-red-600 dark:text-red-400">
                           Traditional blockchain payments lack business context or payment identifiers.
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
                     <div className="flex items-start gap-3">
-                      <CheckIcon className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                      <CheckIcon className="h-5 w-5 md:h-6 md:w-6 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-semibold text-green-700 dark:text-green-300 mb-1.5 text-sm md:text-base">Unique Identifiers: </p>
-                        <p className="text-green-600 dark:text-green-400 text-sm">
+                        <h3 className="font-bold text-sm md:text-base text-green-700 dark:text-green-300 mb-2">Unique Identifiers</h3>
+                        <p className="text-xs md:text-sm text-green-600 dark:text-green-400">
                           Request Network adds unique identifiers to every payment, enabling instant, automatic, and 100% automated reconciliation.
                         </p>
                       </div>
@@ -760,31 +769,28 @@ export const IntegratedDemo = () => {
               }}
             >
                   <div className="mb-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <AlertCircleIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
-                      <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
-                        Payment Collision Detected
-                      </h3>
-                    </div>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 text-center">
+                      Payment Collision Detected
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
-                      <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-3">
-                        <div className="flex items-start gap-2">
-                          <XIcon className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                      <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
+                        <div className="flex items-start gap-3">
+                          <XIcon className="h-5 w-5 md:h-6 md:w-6 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-red-700 dark:text-red-300 mb-1.5">The Problem: </p>
-                            <p className="text-red-600 dark:text-red-400 text-sm">
+                            <h4 className="font-bold text-sm md:text-base text-red-700 dark:text-red-300 mb-2">The Problem</h4>
+                            <p className="text-xs md:text-sm text-red-600 dark:text-red-400">
                               Two payments have the same amount and currency. Which payment belongs to which customer?
                               Manual review required.
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-3">
-                        <div className="flex items-start gap-2">
-                          <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                      <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
+                        <div className="flex items-start gap-3">
+                          <CheckIcon className="h-5 w-5 md:h-6 md:w-6 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-green-700 dark:text-green-300 mb-1.5">Request Network Solution: </p>
-                            <p className="text-green-600 dark:text-green-400 text-sm">
+                            <h4 className="font-bold text-sm md:text-base text-green-700 dark:text-green-300 mb-2">Request Network Solution</h4>
+                            <p className="text-xs md:text-sm text-green-600 dark:text-green-400">
                               Each payment is automatically matched to its correct request using onchain identifiers. No
                               ambiguity, no manual work.
                             </p>
@@ -917,11 +923,13 @@ export const IntegratedDemo = () => {
                       }
 
                       const isCollision = payment.status === "payment_collision";
+                      const matchCount = getLeftSideMatchCount(payment.amount, payment.currency);
+                      const showWarning = matchCount >= 2;
 
                       return (
                         <div
                           key={payment.id}
-                          className={`p-3 rounded border text-xs min-h-[88px] flex flex-col transition-all duration-500 ${
+                          className={`p-3 rounded border text-xs min-h-[88px] flex flex-col transition-all duration-200 ${
                             payment.isNew ? "animate-in fade-in slide-in-from-top-2" : ""
                           } ${
                             isCollision
@@ -930,8 +938,15 @@ export const IntegratedDemo = () => {
                           }`}
                         >
                           <div className="flex items-start justify-between mb-auto gap-2">
-                            <div className="font-semibold text-xs md:text-sm text-gray-900 dark:text-gray-100">
-                              {getCurrencyDisplay(payment.amount, payment.currency)}
+                            <div className="flex items-center gap-2">
+                              <div className="font-semibold text-xs md:text-sm text-gray-900 dark:text-gray-100">
+                                {getCurrencyDisplay(payment.amount, payment.currency)}
+                              </div>
+                              {showWarning && (
+                                <span className="text-yellow-600 dark:text-yellow-500 text-[10px] md:text-xs flex items-center gap-0.5 whitespace-nowrap">
+                                  ⚠️ {matchCount} matches
+                                </span>
+                              )}
                             </div>
                             {isCollision ? (
                               <Tooltip content="Multiple payments with same amount and currency detected - manual review required">
@@ -1054,7 +1069,7 @@ export const IntegratedDemo = () => {
                       return (
                         <div
                           key={request.id}
-                          className={`p-3 rounded border text-xs min-h-[88px] flex flex-col transition-all duration-500 ${
+                          className={`p-3 rounded border text-xs min-h-[88px] flex flex-col transition-all duration-200 ${
                             request.isNew ? "animate-in fade-in slide-in-from-top-2" : ""
                           } ${
                             isPaid
