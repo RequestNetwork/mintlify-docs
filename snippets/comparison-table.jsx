@@ -266,6 +266,20 @@ export const ComparisonTable = () => {
       {/* Summary Section */}
       <div className="mt-6 md:mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
+            <div className="flex items-start gap-3 mb-3">
+              <XIcon className="h-5 w-5 md:h-6 md:w-6 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-bold text-sm md:text-base text-red-700 dark:text-red-300 mb-2">
+                  Alternative Trade-offs
+                </h3>
+                <p className="text-xs md:text-sm text-red-600 dark:text-red-400">
+                  Other methods sacrifice automated reconciliation (requiring manual review), burden users with poor UX, or require complex implementations.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
             <div className="flex items-start gap-3 mb-3">
               <CheckIcon className="h-5 w-5 md:h-6 md:w-6 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
@@ -276,20 +290,6 @@ export const ComparisonTable = () => {
                 <p className="text-xs md:text-sm text-green-600 dark:text-green-400">
                   The only solution that combines 100% automated reconciliation with easy implementation and great user
                   experience. Built-in payment metadata eliminates guesswork entirely.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4 md:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-default">
-            <div className="flex items-start gap-3 mb-3">
-              <XIcon className="h-5 w-5 md:h-6 md:w-6 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm md:text-base text-red-700 dark:text-red-300 mb-2">
-                  Alternative Trade-offs
-                </h3>
-                <p className="text-xs md:text-sm text-red-600 dark:text-red-400">
-                  Other methods sacrifice automated reconciliation (requiring manual review), burden users with poor UX, or require complex implementations.
                 </p>
               </div>
             </div>
