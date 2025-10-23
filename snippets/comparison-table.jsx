@@ -1,4 +1,26 @@
+import { useEffect, useState } from 'react';
+
 export const ComparisonTable = () => {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Check initial theme
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkTheme();
+    
+    // Watch for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+
   const comparisonData = [
     {
       method: "Request Network",
@@ -70,7 +92,7 @@ export const ComparisonTable = () => {
       case "Good":
         return <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400" />;
       case "Compromised":
-        return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />;
+        return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-300" />;
       case "Poor":
         return <XIcon className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
@@ -81,13 +103,13 @@ export const ComparisonTable = () => {
   const getUXColor = (ux) => {
     switch (ux) {
       case "Good":
-        return "text-green-700 dark:text-green-300";
+        return { color: isDark ? "#4ade80" : "#15803d" }; // dark: green-400, light: green-700
       case "Compromised":
-        return "text-orange-700 dark:text-orange-300";
+        return { color: isDark ? "#fb923c" : "#c2410c" }; // dark: orange-400, light: orange-700
       case "Poor":
-        return "text-red-700 dark:text-red-300";
+        return { color: isDark ? "#f87171" : "#b91c1c" }; // dark: red-400, light: red-700
       default:
-        return "text-gray-700 dark:text-gray-300";
+        return { color: isDark ? "#9ca3af" : "#4b5563" }; // dark: gray-400, light: gray-600
     }
   };
 
@@ -96,7 +118,7 @@ export const ComparisonTable = () => {
       case "Easy":
         return <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400" />;
       case "Hard":
-        return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />;
+        return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-300" />;
       case "Very Hard":
         return <XIcon className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
@@ -107,18 +129,38 @@ export const ComparisonTable = () => {
   const getImplementationColor = (difficulty) => {
     switch (difficulty) {
       case "Easy":
-        return "text-green-700 dark:text-green-300";
+        return { color: isDark ? "#4ade80" : "#15803d" }; // dark: green-400, light: green-700
       case "Hard":
-        return "text-orange-700 dark:text-orange-300";
+        return { color: isDark ? "#fb923c" : "#c2410c" }; // dark: orange-400, light: orange-700
       case "Very Hard":
-        return "text-red-700 dark:text-red-300";
+        return { color: isDark ? "#f87171" : "#b91c1c" }; // dark: red-400, light: red-700
       default:
-        return "text-gray-700 dark:text-gray-300";
+        return { color: isDark ? "#9ca3af" : "#4b5563" }; // dark: gray-400, light: gray-600
+    }
+  };
+
+  const getLinesOfCodeIcon = (linesOfCode) => {
+    if (linesOfCode <= 10) {
+      return <CheckIcon className="h-4 w-4 text-green-600 dark:text-green-400" />;
+    } else if (linesOfCode <= 50) {
+      return <AlertCircleIcon className="h-4 w-4 text-orange-600 dark:text-orange-300" />;
+    } else {
+      return <XIcon className="h-4 w-4 text-red-600 dark:text-red-400" />;
+    }
+  };
+
+  const getLinesOfCodeColor = (linesOfCode) => {
+    if (linesOfCode <= 10) {
+      return { color: isDark ? "#4ade80" : "#15803d" }; // dark: green-400, light: green-700
+    } else if (linesOfCode <= 50) {
+      return { color: isDark ? "#fb923c" : "#c2410c" }; // dark: orange-400, light: orange-700
+    } else {
+      return { color: isDark ? "#f87171" : "#b91c1c" }; // dark: red-400, light: red-700
     }
   };
 
   return (
-    <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
+    <div className="w-full bg-gray-50 dark:bg-[#002920] rounded-xl border border-gray-200 dark:border-[#014d3d] shadow-lg p-4 md:p-8">
       <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
         <div className="min-w-[800px]">
           {/* Table Header */}
@@ -140,8 +182,8 @@ export const ComparisonTable = () => {
                 key={row.method}
                 className={`grid grid-cols-6 gap-3 p-3 md:p-4 rounded-lg border-2 transition-all duration-200 ${
                   row.isHighlighted
-                    ? "bg-green-50/50 dark:bg-green-950/20 border-green-300 dark:border-green-700 hover:bg-green-100/60 dark:hover:bg-green-950/30 hover:shadow-lg dark:hover:shadow-green-900/50 hover:border-green-400 dark:hover:border-green-600"
-                    : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/60 hover:shadow-lg dark:hover:shadow-gray-900/50 hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "bg-green-50/50 dark:bg-green-900/40 border-green-300 dark:border-green-600 hover:bg-green-100/60 dark:hover:bg-green-900/50 hover:shadow-lg dark:hover:shadow-green-900/50 hover:border-green-400 dark:hover:border-green-500"
+                    : "bg-white dark:bg-[#001410]/50 border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-[#001410]/70 hover:shadow-lg dark:hover:shadow-gray-900/50 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 {/* Method Name */}
@@ -168,32 +210,46 @@ export const ComparisonTable = () => {
 
                 {/* Implementation Difficulty */}
                 <div className="flex items-center justify-center">
-                  <div className={`flex items-center gap-2 ${getImplementationColor(row.implementation)}`}>
+                  <div className="flex items-center gap-2">
                     {getImplementationIcon(row.implementation)}
-                    <span className="text-xs md:text-sm font-medium">{row.implementation}</span>
+                    <span 
+                      className="text-xs md:text-sm font-medium"
+                      style={row.isHighlighted && row.implementation === "Easy" 
+                        ? { color: isDark ? "#4ade80" : "#15803d" } 
+                        : getImplementationColor(row.implementation)}
+                    >
+                      {row.implementation}
+                    </span>
                   </div>
                 </div>
 
                 {/* Lines of Code */}
                 <div className="flex items-center justify-center">
-                  <span
-                    className={`font-bold text-sm md:text-base ${
-                      row.linesOfCode <= 10
-                        ? "text-green-600 dark:text-green-400"
-                        : row.linesOfCode <= 50
-                          ? "text-orange-600 dark:text-orange-400"
-                          : "text-red-600 dark:text-red-400"
-                    }`}
-                  >
-                    ~{row.linesOfCode}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {getLinesOfCodeIcon(row.linesOfCode)}
+                    <span 
+                      className="text-xs md:text-sm font-medium"
+                      style={row.isHighlighted && row.linesOfCode <= 10 
+                        ? { color: isDark ? "#4ade80" : "#15803d" } 
+                        : getLinesOfCodeColor(row.linesOfCode)}
+                    >
+                      ~{row.linesOfCode}
+                    </span>
+                  </div>
                 </div>
 
                 {/* User Experience */}
                 <div className="flex items-center justify-center">
-                  <div className={`flex items-center gap-2 ${getUXColor(row.userExperience)}`}>
+                  <div className="flex items-center gap-2">
                     {getUXIcon(row.userExperience)}
-                    <span className="text-xs md:text-sm font-medium">{row.userExperience}</span>
+                    <span 
+                      className="text-xs md:text-sm font-medium"
+                      style={row.isHighlighted && row.userExperience === "Good" 
+                        ? { color: isDark ? "#4ade80" : "#15803d" } 
+                        : getUXColor(row.userExperience)}
+                    >
+                      {row.userExperience}
+                    </span>
                   </div>
                 </div>
 
