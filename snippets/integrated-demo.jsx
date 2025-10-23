@@ -703,14 +703,14 @@ export const IntegratedDemo = () => {
 
   return (
     <div className="relative" ref={demoContainerRef}>
-      <div className="relative w-full bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
+      <div className="relative w-full bg-gray-50 dark:bg-[#002920] rounded-xl border border-gray-200 dark:border-[#014d3d] shadow-lg p-4 md:p-8">
         {showDialog && !hasStarted && (
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-10 flex items-start justify-center p-4"
             onClick={handleStartDemo}
           >
             <div
-              className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-8 max-w-2xl w-full mx-4"
+              className="bg-white dark:bg-[#002920] border-2 border-gray-200 dark:border-[#014d3d] shadow-2xl rounded-lg p-4 md:p-8 max-w-2xl w-full mx-4"
               onClick={(e) => e.stopPropagation()}
               style={{
                 position: 'sticky',
@@ -761,7 +761,7 @@ export const IntegratedDemo = () => {
             onClick={() => setShowCollisionExplainer(false)}
           >
             <div
-              className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg p-4 md:p-6 max-w-2xl w-full mx-4"
+              className="bg-white dark:bg-[#002920] border-2 border-gray-200 dark:border-[#014d3d] shadow-2xl rounded-lg p-4 md:p-6 max-w-2xl w-full mx-4"
               onClick={(e) => e.stopPropagation()}
               style={{
                 position: 'sticky',
@@ -875,10 +875,10 @@ export const IntegratedDemo = () => {
               </Button>
             </div>
 
-            <div className={`border-2 border-red-300 dark:border-red-700 bg-red-50/30 dark:bg-red-900/20 rounded-lg ${isShaking ? 'animate-shake' : ''}`}>
+            <div className={`border-2 border-red-300/60 dark:border-red-800/60 bg-red-50/20 dark:bg-red-950/10 rounded-lg ${isShaking ? 'animate-shake' : ''}`}>
               <div className="p-4 pb-3 md:pb-4">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                  <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-300 sm:min-h-[64px]">
+                  <h3 className="text-lg md:text-xl font-semibold text-red-700 dark:text-red-400 sm:min-h-[64px]">
                     Traditional Blockchain Payments
                   </h3>
                   <Tooltip content="Manual reconciliation required - payments lack identifiers to link them to specific customers">
@@ -1029,7 +1029,7 @@ export const IntegratedDemo = () => {
 
             <div
               ref={rightCardRef}
-              className="border-2 border-green-300 dark:border-green-700 bg-green-50/30 dark:bg-green-950/20 rounded-lg"
+              className="border-2 border-green-400 dark:border-green-600 bg-green-50/40 dark:bg-green-900/30 rounded-lg"
             >
               <div className="p-4 pb-3 md:pb-4">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">

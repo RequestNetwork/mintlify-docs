@@ -12,7 +12,7 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   <div style={{ marginBottom: '2rem' }}>
     <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Request Network Docs</h1>
     <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
-      A protocol for requests, payments, and <strong className="text-zinc-950 dark:text-white">100% automated reconciliation</strong>. Requests add business context to payments, eliminating manual accounting with cryptographic certainty. See how unique Request IDs prevent payment collisions:
+      A protocol for requests, payments, and <strong className="text-zinc-950 dark:text-white">100% automated reconciliation</strong>.
     </p>
   </div>
 
@@ -20,13 +20,21 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
     Identify Every Payment
   </h2>
 
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
+    Requests add business context to payments, eliminating manual accounting with cryptographic certainty. See how unique Request IDs prevent payment collisions:
+  </p>
+
   <div style={{ marginBottom: '4rem' }}>
     <IntegratedDemo />
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
-    How does Request Network compare to other approaches?
+    Blockchain Payment Detection Comparison
   </h2>
+
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
+    How does Request Network compare to other approaches?
+  </p>
 
   <div style={{ marginBottom: '4rem' }}>
     <ComparisonTable />
@@ -36,9 +44,7 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
 <div style={{ padding: '0 2rem', maxWidth: '1400px', margin: '0 auto' }}>
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Get Started</h2>
   
-  <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-    Choose your path based on what you want to build:
-  </p>  <div style={{ marginBottom: '0.5rem' }}>
+  <div style={{ marginBottom: '0.5rem' }}>
     <CardGroup cols={3}>
       <Card 
         title="Use Cases" 
