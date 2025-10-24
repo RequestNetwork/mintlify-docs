@@ -658,25 +658,6 @@ export const RequestLifecycleDemo = () => {
           </div>
         )}
       </div>
-
-      {/* Key concept callout */}
-      <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4 md:p-6 shadow-lg">
-        <div className="flex gap-3">
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">💡</span>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              The Power of Request IDs
-            </h4>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              Every Request Network request gets a unique ID stored permanently on-chain. This ID connects the request to its business context (amount, recipient, reason). Payments reference this Request ID with cryptographic certainty—enabling 100% automated reconciliation without manual matching.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

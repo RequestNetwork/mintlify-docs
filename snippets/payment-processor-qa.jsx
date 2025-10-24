@@ -292,24 +292,6 @@ export const PaymentProcessorQA = () => {
           ))}
         </div>
       </div>
-
-      <div className="w-full max-w-5xl mx-auto px-4 mt-6 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4 md:p-6 shadow-lg">
-        <div className="flex gap-3">
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">💡</span>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              The Bottom Line
-            </h4>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              Request Network combines the <strong>reconciliation capabilities of traditional processors</strong> with the <strong>cost-efficiency and non-custodial nature of crypto</strong>. You get automated payment tracking without the high fees, custody risk, or chargeback exposure.
-            </p>
-          </div>
-        </div>
-      </div>
     </>
   );
 };
