@@ -1,6 +1,6 @@
 ---
 title: "Quick Start: Create Your First Request"
-description: "See how Request Network gives every payment a unique ID for perfect tracking. Create and pay a request in seconds."
+description: "Learn how Request IDs link payments to business context. Create a request, make a payment, and see automatic reconciliation in action."
 sidebarTitle: "Quick Start"
 mode: "frame"
 ---
@@ -13,7 +13,7 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
   <div style={{ marginBottom: '2rem' }}>
     <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>How Request IDs Work</h1>
     <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
-      Every payment gets a <strong className="text-zinc-950 dark:text-white">unique Request ID</strong> that links the transaction to its business context—amount, recipient, invoice details. This eliminates manual payment matching and enables automated reconciliation.
+      Every request gets a <strong className="text-zinc-950 dark:text-white">unique Request ID</strong> that links it to its business context—amount, recipient, invoice details. Payments are then tied to this Request ID, eliminating manual payment matching and enabling automated reconciliation.
     </p>
   </div>
 
@@ -22,7 +22,7 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
   </h2>
 
   <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Create a request, get a unique ID, and see how the payment is automatically tracked on-chain:
+    Create a request, get a unique ID, and see how payments are automatically tracked against that request:
   </p>
 
   <div style={{ marginBottom: '4rem' }}>

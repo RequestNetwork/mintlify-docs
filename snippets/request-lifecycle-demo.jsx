@@ -672,7 +672,7 @@ export const RequestLifecycleDemo = () => {
               The Power of Request IDs
             </h4>
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              Every Request Network payment gets a unique ID stored permanently on-chain. This ID connects the payment to its business context (amount, recipient, reason) with cryptographic certainty—enabling 100% automated reconciliation without manual matching.
+              Every Request Network request gets a unique ID stored permanently on-chain. This ID connects the request to its business context (amount, recipient, reason). Payments reference this Request ID with cryptographic certainty—enabling 100% automated reconciliation without manual matching.
             </p>
           </div>
         </div>
