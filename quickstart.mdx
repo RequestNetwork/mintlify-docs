@@ -7,17 +7,49 @@ mode: "frame"
 
 import { RequestLifecycleDemo } from '/snippets/request-lifecycle-demo.jsx'
 import { PaymentProcessorQA } from '/snippets/payment-processor-qa.jsx'
+import { DemoContainer } from '/snippets/demo-container.jsx'
 
-<RequestLifecycleDemo />
+<div style={{ padding: '2rem 2rem 0', maxWidth: '1400px', margin: '0 auto' }}>
+  <div style={{ marginBottom: '2rem' }}>
+    <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Quick Start: Create Your First Request</h1>
+    <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
+      See how Request Network gives every payment a <strong className="text-zinc-950 dark:text-white">unique ID for perfect tracking</strong>. Create and pay a request in seconds.
+    </p>
+  </div>
 
-<div className="mt-12">
-  <PaymentProcessorQA />
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
+    Try It Yourself
+  </h2>
+
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
+    Experience the Request ID concept in action. Create a request, get a unique ID, and see how payments are tracked automatically:
+  </p>
+
+  <div style={{ marginBottom: '4rem' }}>
+    <DemoContainer>
+      <RequestLifecycleDemo />
+    </DemoContainer>
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
+    How Request Network Compares
+  </h2>
+
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
+    Understanding how Request Network differs from traditional payment processors:
+  </p>
+
+  <div style={{ marginBottom: '4rem' }}>
+    <DemoContainer>
+      <PaymentProcessorQA />
+    </DemoContainer>
+  </div>
 </div>
 
 <div style={{ padding: '0 2rem', maxWidth: '1400px', margin: '0 auto' }}>
-  <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem', color: 'var(--text-primary)' }}>What's Next?</h2>
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>What's Next?</h2>
   
-  <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
     Now that you understand the core concept, explore how Request Network powers specific business use cases:
   </p>
 
@@ -49,9 +81,9 @@ import { PaymentProcessorQA } from '/snippets/payment-processor-qa.jsx'
     </CardGroup>
   </div>
 
-  <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem', color: 'var(--text-primary)' }}>Ready to Build?</h2>
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Ready to Build?</h2>
   
-  <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
     Get your API key and start creating requests in production
   </p>
 

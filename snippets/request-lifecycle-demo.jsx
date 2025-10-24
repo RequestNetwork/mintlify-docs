@@ -246,7 +246,19 @@ export const RequestLifecycleDemo = () => {
       </div>
 
       {/* Main demo area */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8 mb-6 min-h-[600px] flex items-center">
+      <div 
+        style={{
+          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(249, 250, 251, 0.9))',
+          borderRadius: '0.75rem',
+          border: '1px solid rgba(229, 231, 235, 1)',
+          padding: '2rem',
+          marginBottom: '1.5rem',
+          minHeight: '600px',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+        className="dark:bg-gradient-to-b dark:from-[rgba(17,24,39,0.5)] dark:to-[rgba(31,41,55,0.7)] dark:border-gray-700"
+      >
         
         {/* Step 1: Create */}
         {currentStep === 1 && (
