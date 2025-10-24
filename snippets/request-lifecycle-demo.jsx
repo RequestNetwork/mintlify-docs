@@ -212,13 +212,20 @@ export const RequestLifecycleDemo = () => {
           {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex items-center gap-2 md:gap-4">
               <div className="flex flex-col items-center">
-                <div className={`
-                  w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-base font-semibold transition-all duration-300
-                  ${currentStep >= step 
-                    ? 'bg-primary-600 text-white border-2 border-primary-600' 
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600'
-                  }
-                `}>
+                <div 
+                  className={`
+                    w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-base font-semibold transition-all duration-300
+                    ${currentStep >= step 
+                      ? 'border-2' 
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600'
+                    }
+                  `}
+                  style={currentStep >= step ? {
+                    backgroundColor: '#01B089',
+                    borderColor: '#01B089',
+                    color: 'white'
+                  } : {}}
+                >
                   {currentStep > step ? <CheckIcon className="h-4 w-4 md:h-5 md:w-5" /> : step}
                 </div>
                 <span className={`
@@ -232,13 +239,18 @@ export const RequestLifecycleDemo = () => {
                 </span>
               </div>
               {step < 4 && (
-                <div className={`
-                  w-8 md:w-16 h-0.5 transition-all duration-300
-                  ${currentStep > step 
-                    ? 'bg-primary-600' 
-                    : 'bg-gray-300 dark:bg-gray-600'
-                  }
-                `} />
+                <div 
+                  className={`
+                    w-8 md:w-16 h-0.5 transition-all duration-300
+                    ${currentStep <= step 
+                      ? 'bg-gray-300 dark:bg-gray-600' 
+                      : ''
+                    }
+                  `}
+                  style={currentStep > step ? {
+                    backgroundColor: '#01B089'
+                  } : {}}
+                />
               )}
             </div>
           ))}
@@ -248,16 +260,16 @@ export const RequestLifecycleDemo = () => {
       {/* Main demo area */}
       <div 
         style={{
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(249, 250, 251, 0.9))',
+          background: 'linear-gradient(to bottom, rgba(1, 176, 137, 0.04), rgba(1, 176, 137, 0.08))',
           borderRadius: '0.75rem',
-          border: '1px solid rgba(229, 231, 235, 1)',
+          border: '1px solid rgba(1, 176, 137, 0.2)',
           padding: '2rem',
           marginBottom: '1.5rem',
           minHeight: '600px',
           display: 'flex',
           alignItems: 'center'
         }}
-        className="dark:bg-gradient-to-b dark:from-[rgba(17,24,39,0.5)] dark:to-[rgba(31,41,55,0.7)] dark:border-gray-700"
+        className="dark:bg-gradient-to-b dark:from-[#002419] dark:to-[#003326] dark:border-[rgba(1,176,137,0.4)]"
       >
         
         {/* Step 1: Create */}
