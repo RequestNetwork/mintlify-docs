@@ -196,16 +196,6 @@ export const RequestLifecycleDemo = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
-      {/* Header */}
-      <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          Understanding Request Network: The Request ID Concept
-        </h2>
-        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Every payment gets a unique ID for perfect tracking. See how simple it is.
-        </p>
-      </div>
-
       {/* Progress indicator */}
       <div className="flex items-center justify-center mb-6 md:mb-8">
         <div className="flex items-center gap-2 md:gap-4">

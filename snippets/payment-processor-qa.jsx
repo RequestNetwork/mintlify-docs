@@ -14,7 +14,13 @@ export const PaymentProcessorQA = () => {
           <p>
             Traditional processors like Stripe and PayPal charge <strong>2.9% + $0.30</strong> per transaction.
           </p>
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div 
+            style={{
+              background: 'linear-gradient(to bottom, rgba(1, 176, 137, 0.05), rgba(1, 176, 137, 0.08))',
+              borderColor: 'rgba(1, 176, 137, 0.2)'
+            }}
+            className="rounded-lg p-4 border dark:bg-gradient-to-b dark:from-[#002419] dark:to-[#003326] dark:border-[rgba(1,176,137,0.3)]"
+          >
             <p className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Example: On a $10,000 payment
             </p>
@@ -102,7 +108,13 @@ export const PaymentProcessorQA = () => {
                 </li>
               </ul>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div 
+              style={{
+                background: 'linear-gradient(to bottom, rgba(1, 176, 137, 0.05), rgba(1, 176, 137, 0.08))',
+                borderColor: 'rgba(1, 176, 137, 0.2)'
+              }}
+              className="rounded-lg p-4 border dark:bg-gradient-to-b dark:from-[#002419] dark:to-[#003326] dark:border-[rgba(1,176,137,0.3)]"
+            >
               <p className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 Traditional Processors:
               </p>
@@ -241,21 +253,18 @@ export const PaymentProcessorQA = () => {
 
   return (
     <>
-      <div className="w-full max-w-5xl mx-auto px-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-6">
-        <div className="text-center mb-6">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Request Network vs. Traditional Payment Processors
-          </h2>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            How does Request Network compare to Stripe, PayPal, and other payment processors?
-          </p>
-        </div>
-
+      <div className="w-full max-w-5xl mx-auto px-4">
         <div className="space-y-3">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:border-primary-500 dark:hover:border-primary-500"
+              style={{
+                background: openIndex === index 
+                  ? 'linear-gradient(to bottom, rgba(1, 176, 137, 0.04), rgba(1, 176, 137, 0.06))'
+                  : 'rgba(1, 176, 137, 0.02)',
+                borderColor: openIndex === index ? 'rgba(1, 176, 137, 0.3)' : 'rgba(1, 176, 137, 0.15)'
+              }}
+              className="rounded-lg border overflow-hidden transition-all duration-200 hover:border-[rgba(1,176,137,0.4)] dark:bg-gradient-to-b dark:from-[#002419] dark:to-[#003326] dark:border-[rgba(1,176,137,0.3)]"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
