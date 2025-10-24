@@ -11,18 +11,18 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
 
 <div style={{ padding: '2rem 2rem 0', maxWidth: '1400px', margin: '0 auto' }}>
   <div style={{ marginBottom: '2rem' }}>
-    <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Quick Start: Create Your First Request</h1>
+    <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>How Request IDs Work</h1>
     <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
-      See how Request Network gives every payment a <strong className="text-zinc-950 dark:text-white">unique ID for perfect tracking</strong>. Create and pay a request in seconds.
+      Every payment gets a <strong className="text-zinc-950 dark:text-white">unique Request ID</strong> that links the transaction to its business context—amount, recipient, invoice details. This eliminates manual payment matching and enables automated reconciliation.
     </p>
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
-    Try It Yourself
+    Interactive Demo
   </h2>
 
   <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Experience the Request ID concept in action. Create a request, get a unique ID, and see how payments are tracked automatically:
+    Create a request, get a unique ID, and see how the payment is automatically tracked on-chain:
   </p>
 
   <div style={{ marginBottom: '4rem' }}>
@@ -32,11 +32,11 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
-    How Request Network Compares
+    Comparison with Traditional Processors
   </h2>
 
   <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Understanding how Request Network differs from traditional payment processors:
+    How Request Network differs from Stripe, PayPal, and other payment processors:
   </p>
 
   <div style={{ marginBottom: '4rem' }}>
@@ -47,10 +47,10 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
 </div>
 
 <div style={{ padding: '0 2rem', maxWidth: '1400px', margin: '0 auto' }}>
-  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>What's Next?</h2>
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Explore Use Cases</h2>
   
   <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Now that you understand the core concept, explore how Request Network powers specific business use cases:
+    See how Request Network powers specific business scenarios:
   </p>
 
   <div style={{ marginBottom: '0.5rem' }}>
@@ -60,7 +60,7 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
         href="/use-cases/invoicing"
         icon="file-invoice"
       >
-        Create professional invoices with payment terms, line items, and automatic payment detection
+        Turn invoices into trackable on-chain requests with automatic payment detection and reconciliation
       </Card>
       
       <Card 
@@ -68,7 +68,7 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
         href="/use-cases/payouts"
         icon="money-bill-transfer"
       >
-        Send batch payments to multiple recipients with one click and automatic tracking
+        Send batch payments to multiple recipients in a single transaction with automatic tracking
       </Card>
 
       <Card 
@@ -81,20 +81,20 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
     </CardGroup>
   </div>
 
-  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Ready to Build?</h2>
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Start Building</h2>
   
   <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Get your API key and start creating requests in production
+    Get your API key and start integrating Request Network into your application:
   </p>
 
   <div style={{ marginBottom: '3rem' }}>
     <CardGroup cols={2}>
       <Card title="Get Started with API" icon="rocket" href="/api-setup/getting-started">
-        Start building with the Request Network API
+        Set up authentication and create your first request with the API
       </Card>
       
       <Card title="View Portal" icon="arrow-up-right-from-square" href="https://portal.request.network">
-        Manage your requests in the web portal
+        Manage API keys, view requests, and configure webhooks in the web portal
       </Card>
     </CardGroup>
   </div>
