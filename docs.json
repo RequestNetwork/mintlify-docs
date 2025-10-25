@@ -49,6 +49,7 @@
           {
             "group": "🎯 Use Cases",
             "pages": [
+              "use-cases/payment-detection",
               "use-cases/invoicing",
               "use-cases/payouts",
               "use-cases/payroll",
