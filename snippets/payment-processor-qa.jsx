@@ -5,7 +5,7 @@ export const PaymentProcessorQA = () => {
 
   const faqs = [
     {
-      question: "💰 How much cheaper is Request Network?",
+      question: "How much cheaper is Request Network?",
       answer: (
         <div className="space-y-3">
           <p>
@@ -42,7 +42,7 @@ export const PaymentProcessorQA = () => {
       ),
     },
     {
-      question: "🔐 What does 'non-custodial' mean?",
+      question: "What does 'non-custodial' mean?",
       answer: (
         <div className="space-y-3">
           <p>
@@ -78,7 +78,7 @@ export const PaymentProcessorQA = () => {
       ),
     },
     {
-      question: "📊 How does reconciliation compare?",
+      question: "How does reconciliation compare?",
       answer: (
         <div className="space-y-3">
           <p>
@@ -142,7 +142,7 @@ export const PaymentProcessorQA = () => {
       ),
     },
     {
-      question: "🌍 Which is better for crypto businesses?",
+      question: "Which is better for crypto businesses?",
       answer: (
         <div className="space-y-3">
           <p>

@@ -9,21 +9,17 @@ import { RequestLifecycleDemo } from '/snippets/request-lifecycle-demo.jsx'
 import { PaymentProcessorQA } from '/snippets/payment-processor-qa.jsx'
 import { DemoContainer } from '/snippets/demo-container.jsx'
 
-<div style={{ padding: '2rem 2rem 0', maxWidth: '1400px', margin: '0 auto' }}>
+<div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
   <div style={{ marginBottom: '2rem' }}>
     <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>How Request IDs Work</h1>
     <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
-      Every request gets a <strong className="text-zinc-950 dark:text-white">unique Request ID</strong> that links it to its business context—amount, recipient, invoice details. Payments are then tied to this Request ID, eliminating manual payment matching and enabling automated reconciliation.
+      Every request gets a <strong className="text-zinc-950 dark:text-white">unique Request ID</strong>, a permanent identifier that connects payment references and blockchain transactions into a single, auditable record. The API and SDK handle the underlying complexity so you can focus on building.
     </p>
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
     Create and Pay a Request Demo
   </h2>
-
-  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Create a request, get a unique ID, and see how payments are automatically tracked against that request:
-  </p>
 
   <div style={{ marginBottom: '4rem' }}>
     <DemoContainer>
@@ -35,24 +31,14 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
     Comparison with Traditional Processors
   </h2>
 
-  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    How Request Network differs from Stripe, PayPal, and other payment processors:
-  </p>
-
   <div style={{ marginBottom: '4rem' }}>
     <DemoContainer>
       <PaymentProcessorQA />
     </DemoContainer>
   </div>
-</div>
 
-<div style={{ padding: '0 2rem', maxWidth: '1400px', margin: '0 auto' }}>
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Explore Use Cases</h2>
   
-  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    See how Request Network powers specific business scenarios:
-  </p>
-
   <div style={{ marginBottom: '0.5rem' }}>
     <CardGroup cols={3}>
       <Card 
@@ -60,7 +46,7 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
         href="/use-cases/invoicing"
         icon="file-invoice"
       >
-        Turn invoices into trackable on-chain requests with automatic payment detection and reconciliation
+        Turn invoices into trackable on-chain requests with automatic payment detection
       </Card>
       
       <Card 
@@ -68,7 +54,7 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
         href="/use-cases/payouts"
         icon="money-bill-transfer"
       >
-        Send batch payments to multiple recipients in a single transaction with automatic tracking
+        Send batch payments to multiple recipients with automatic tracking
       </Card>
 
       <Card 
@@ -76,25 +62,21 @@ import { DemoContainer } from '/snippets/demo-container.jsx'
         href="/use-cases/payroll"
         icon="users"
       >
-        Pay your team in crypto with automated payroll runs and instant reconciliation
+        Pay your team in crypto with automated payroll runs
       </Card>
     </CardGroup>
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Start Building</h2>
   
-  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
-    Get your API key and start integrating Request Network into your application:
-  </p>
-
   <div style={{ marginBottom: '3rem' }}>
     <CardGroup cols={2}>
-      <Card title="Get Started with API" icon="rocket" href="/api-setup/getting-started">
-        Set up authentication and create your first request with the API
+      <Card title="Get Started with the API" icon="rocket" href="/api-setup/getting-started">
+        Set up authentication and create your first request
       </Card>
       
       <Card title="View Portal" icon="arrow-up-right-from-square" href="https://portal.request.network">
-        Manage API keys, view requests, and configure webhooks in the web portal
+        Manage API keys, view requests, and configure webhooks
       </Card>
     </CardGroup>
   </div>
