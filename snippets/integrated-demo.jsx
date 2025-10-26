@@ -575,8 +575,10 @@ export const IntegratedDemo = () => {
     const paymentAmount = selectedRequest.amount;
     const paymentCurrency = selectedRequest.currency;
 
-    const randomAddress = `0x${Math.random().toString(16).substr(2, 40)}`;
-    const txHash = `0x${Math.random().toString(16).substr(2, 16)}`;
+    // Generate valid 40-character wallet address (20 bytes in hex)
+    const randomAddress = `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    // Generate valid 64-character tx hash (32 bytes in hex)
+    const txHash = `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
 
     const matchingPayments = leftPayments.filter(
       (p) => !p.isPlaceholder && p.amount === paymentAmount && p.currency === paymentCurrency,
