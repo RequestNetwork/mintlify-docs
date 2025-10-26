@@ -43,7 +43,7 @@
             "group": "🚀 Get Started",
             "pages": [
               "use-cases/welcome",
-              "payment-processing-demo"
+              "use-cases/payment-processing-demo"
             ]
           },
           {
