@@ -1,0 +1,83 @@
+---
+title: "Payment Processing Demo"
+description: "Experience Request Network's payment processing: create requests, process payments, and see how we compare to traditional processors."
+sidebarTitle: "Payment Demo"
+mode: "frame"
+---
+
+import { RequestLifecycleDemo } from '/snippets/request-lifecycle-demo.jsx'
+import { PaymentProcessorQA } from '/snippets/payment-processor-qa.jsx'
+import { DemoContainer } from '/snippets/demo-container.jsx'
+
+<div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+  <div style={{ marginBottom: '2rem' }}>
+    <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Payment Processing with Request Network</h1>
+    <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
+      Experience the complete payment lifecycle: create a request, process payment, and get automatic confirmation. Every request gets a <strong className="text-zinc-950 dark:text-white">unique Request ID</strong> that links the payment to your business context—no manual reconciliation needed.
+    </p>
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
+    Create and Pay a Request Demo
+  </h2>
+
+  <div style={{ marginBottom: '4rem' }}>
+    <DemoContainer>
+      <RequestLifecycleDemo />
+    </DemoContainer>
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
+    Comparison with Traditional Processors
+  </h2>
+
+  <div style={{ marginBottom: '4rem' }}>
+    <DemoContainer>
+      <PaymentProcessorQA />
+    </DemoContainer>
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Explore Use Cases</h2>
+  
+  <div style={{ marginBottom: '0.5rem' }}>
+    <CardGroup cols={3}>
+      <Card 
+        title="📄 Invoicing" 
+        href="/use-cases/invoicing"
+        icon="file-invoice"
+      >
+        Turn invoices into trackable on-chain requests with automatic payment detection
+      </Card>
+      
+      <Card 
+        title="💸 Payouts" 
+        href="/use-cases/payouts"
+        icon="money-bill-transfer"
+      >
+        Send batch payments to multiple recipients with automatic tracking
+      </Card>
+
+      <Card 
+        title="💰 Payroll" 
+        href="/use-cases/payroll"
+        icon="users"
+      >
+        Pay your team in crypto with automated payroll runs
+      </Card>
+    </CardGroup>
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Start Building</h2>
+  
+  <div style={{ marginBottom: '3rem' }}>
+    <CardGroup cols={2}>
+      <Card title="Get Started with the API" icon="rocket" href="/api-setup/getting-started">
+        Set up authentication and create your first request
+      </Card>
+      
+      <Card title="View Portal" icon="arrow-up-right-from-square" href="https://portal.request.network">
+        Manage API keys, view requests, and configure webhooks
+      </Card>
+    </CardGroup>
+  </div>
+</div>
