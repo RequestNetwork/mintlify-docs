@@ -196,29 +196,26 @@ export const RequestLifecycleDemo = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
-      {/* Header */}
-      <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          Understanding Request Network: The Request ID Concept
-        </h2>
-        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Every payment gets a unique ID for perfect tracking. See how simple it is.
-        </p>
-      </div>
-
       {/* Progress indicator */}
       <div className="flex items-center justify-center mb-6 md:mb-8">
         <div className="flex items-center gap-2 md:gap-4">
           {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex items-center gap-2 md:gap-4">
               <div className="flex flex-col items-center">
-                <div className={`
-                  w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-base font-semibold transition-all duration-300
-                  ${currentStep >= step 
-                    ? 'bg-primary-600 text-white border-2 border-primary-600' 
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600'
-                  }
-                `}>
+                <div 
+                  className={`
+                    w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-base font-semibold transition-all duration-300
+                    ${currentStep >= step 
+                      ? 'border-2' 
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600'
+                    }
+                  `}
+                  style={currentStep >= step ? {
+                    backgroundColor: '#01B089',
+                    borderColor: '#01B089',
+                    color: 'white'
+                  } : {}}
+                >
                   {currentStep > step ? <CheckIcon className="h-4 w-4 md:h-5 md:w-5" /> : step}
                 </div>
                 <span className={`
@@ -232,13 +229,18 @@ export const RequestLifecycleDemo = () => {
                 </span>
               </div>
               {step < 4 && (
-                <div className={`
-                  w-8 md:w-16 h-0.5 transition-all duration-300
-                  ${currentStep > step 
-                    ? 'bg-primary-600' 
-                    : 'bg-gray-300 dark:bg-gray-600'
-                  }
-                `} />
+                <div 
+                  className={`
+                    w-8 md:w-16 h-0.5 transition-all duration-300
+                    ${currentStep <= step 
+                      ? 'bg-gray-300 dark:bg-gray-600' 
+                      : ''
+                    }
+                  `}
+                  style={currentStep > step ? {
+                    backgroundColor: '#01B089'
+                  } : {}}
+                />
               )}
             </div>
           ))}
@@ -246,7 +248,19 @@ export const RequestLifecycleDemo = () => {
       </div>
 
       {/* Main demo area */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8 mb-6 min-h-[600px] flex items-center">
+      <div 
+        style={{
+          background: 'linear-gradient(to bottom, rgba(1, 176, 137, 0.04), rgba(1, 176, 137, 0.08))',
+          borderRadius: '0.75rem',
+          border: '1px solid rgba(1, 176, 137, 0.2)',
+          padding: '2rem',
+          marginBottom: '1.5rem',
+          minHeight: '600px',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+        className="dark:bg-gradient-to-b dark:from-[#002419] dark:to-[#003326] dark:border-[rgba(1,176,137,0.4)]"
+      >
         
         {/* Step 1: Create */}
         {currentStep === 1 && (
@@ -643,25 +657,6 @@ export const RequestLifecycleDemo = () => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Key concept callout */}
-      <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4 md:p-6 shadow-lg">
-        <div className="flex gap-3">
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">💡</span>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              The Power of Request IDs
-            </h4>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              Every Request Network payment gets a unique ID stored permanently on-chain. This ID connects the payment to its business context (amount, recipient, reason) with cryptographic certainty—enabling 100% automated reconciliation without manual matching.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
