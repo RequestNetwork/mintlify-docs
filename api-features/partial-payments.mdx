@@ -1,0 +1,65 @@
+---
+title: "Partial Payments"
+description: "Split payments across multiple transactions and funding sources"
+---
+
+## Overview
+
+Partial payments allow requests to be fulfilled through multiple transactions, enabling split payments, installment plans, and flexible funding approaches.
+
+## How It Works
+
+```mermaid
+graph TD
+    A[Request: $1000] --> B[Payment 1: $400]
+    A --> C[Payment 2: $300] 
+    A --> D[Payment 3: $300]
+    B --> E[Request Fulfilled]
+    C --> E
+    D --> E
+```
+
+**Benefits:**
+- **Flexible Payment Plans:** Installments and split payments
+- **Multiple Funding Sources:** Different wallets, chains, or currencies
+- **Risk Management:** Partial fulfillment tracking
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Installment Plans" icon="calendar">
+    Break large payments into smaller amounts
+  </Card>
+  
+  <Card title="Multiple Funders" icon="users">
+    Group payments or shared expenses
+  </Card>
+</CardGroup>
+
+## Supported Payment Types
+
+Works with all payment types except Crypto-to-fiat payments:
+- Native & ERC20 payments
+- Conversion payments  
+- Crosschain payments
+- Batch payments
+
+## Used In
+
+<CardGroup cols={3}>
+  <Card title="Invoicing" href="/use-cases/invoicing">
+    Large invoice installments
+  </Card>
+  
+  <Card title="Checkout" href="/use-cases/checkout">
+    Flexible payment options
+  </Card>
+  
+  <Card title="Subscriptions" href="/use-cases/subscriptions">
+    Partial subscription payments
+  </Card>
+</CardGroup>
+
+## Implementation Details
+
+See [API Reference - Partial Payments](/api-reference/partial-payments) for complete technical documentation.

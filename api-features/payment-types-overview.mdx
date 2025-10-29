@@ -1,0 +1,54 @@
+---
+title: "Payment Types Overview"
+description: "Understanding Invoice-first vs Payment-first workflows and direct payment types"
+---
+
+## Overview
+
+Request Network supports two primary payment workflows and multiple payment types to accommodate different business needs.
+
+## Payment Workflows
+
+### Invoice-first Workflow
+Create a payment request first, then allow customers to pay at their convenience.
+
+**Use Cases:** Professional invoicing, B2B payments, formal payment collection
+
+### Payment-first Workflow  
+Send payments directly without creating a request first.
+
+**Use Cases:** Vendor payments, contractor payouts, immediate transfers
+
+## Direct Payment Types
+
+**Direct Payments** include Native, ERC20, and Conversion payments - the foundational payment methods that other features build upon.
+
+<CardGroup cols={3}>
+  <Card title="Native & ERC20" href="/api-features/standard-payments">
+    Simple crypto-to-crypto payments
+  </Card>
+  
+  <Card title="Conversion" href="/api-features/conversion-payments">
+    Fiat-denominated, crypto-settled
+  </Card>
+  
+  <Card title="Crosschain" href="/api-features/crosschain-payments">
+    Multi-network payment routing
+  </Card>
+</CardGroup>
+
+## Used In
+
+<CardGroup cols={2}>
+  <Card title="Invoicing" href="/use-cases/invoicing">
+    Invoice-first workflow with payment requests
+  </Card>
+  
+  <Card title="Payouts" href="/use-cases/payouts">
+    Payment-first workflow for direct transfers
+  </Card>
+</CardGroup>
+
+## Implementation Details
+
+See [API Reference - Payment Types](/api-reference/payment-types) for complete technical documentation.

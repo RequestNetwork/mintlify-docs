@@ -68,9 +68,40 @@
           {
             "group": "⚙️ API Features",
             "pages": [
-              "api-features/payment-types",
-              "api-features/advanced-features",
-              "api-features/integration-patterns"
+              {
+                "group": "Requests",
+                "pages": [
+                  "api-features/create-requests-query-status"
+                ]
+              },
+              {
+                "group": "Payment Types",
+                "pages": [
+                  "api-features/payment-types-overview",
+                  "api-features/standard-payments",
+                  "api-features/conversion-payments",
+                  "api-features/crypto-to-fiat-payments",
+                  "api-features/batch-payments",
+                  "api-features/crosschain-payments",
+                  "api-features/partial-payments",
+                  "api-features/recurring-payments"
+                ]
+              },
+              {
+                "group": "Reconciliation",
+                "pages": [
+                  "api-features/payment-detection",
+                  "api-features/query-payments",
+                  "api-features/webhooks-events"
+                ]
+              },
+              {
+                "group": "Fee Structure",
+                "pages": [
+                  "api-features/custom-fees",
+                  "api-features/fee-breakdowns"
+                ]
+              }
             ]
           },
           {

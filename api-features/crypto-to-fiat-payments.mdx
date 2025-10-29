@@ -1,0 +1,61 @@
+---
+title: "Crypto-to-fiat Payments"
+description: "USDC payments settled directly to bank accounts with automatic conversion"
+---
+
+## Overview
+
+Crypto-to-fiat payments enable seamless conversion from cryptocurrency to traditional bank account deposits, combining the speed of crypto with the familiarity of fiat settlement.
+
+## How It Works
+
+```mermaid
+graph LR
+    A[Payer: USDC] --> B[KYC Verification]
+    B --> C[Compliance Check]
+    C --> D[Bank Transfer]
+    D --> E[Payee: USD in Bank]
+```
+
+**Benefits:**
+- **Fiat Settlement:** Receive traditional currency in bank accounts
+- **Regulatory Compliance:** Built-in KYC and compliance workflows
+- **Global Reach:** Support for multiple countries and currencies
+
+## Requirements
+
+<CardGroup cols={2}>
+  <Card title="Payer KYC" icon="shield-check">
+    Identity verification required for compliance
+  </Card>
+  
+  <Card title="Bank Account" icon="building-columns">
+    Valid bank account for settlement
+  </Card>
+</CardGroup>
+
+## Supported Networks
+
+- **Production:** USDC on Ethereum, Polygon, Arbitrum
+- **Sandbox:** USDC on Sepolia (testing)
+
+## Settlement Time
+
+- **Processing:** 1-3 business days
+- **Compliance:** Additional time for KYC verification
+
+## Used In
+
+<CardGroup cols={2}>
+  <Card title="Invoicing" href="/use-cases/invoicing">
+    Traditional business payments
+  </Card>
+  
+  <Card title="Payroll" href="/use-cases/payroll">
+    Employee fiat compensation
+  </Card>
+</CardGroup>
+
+## Implementation Details
+
+See [API Reference - Crypto-to-fiat Payments](/api-reference/crypto-to-fiat-payments) for complete technical documentation.
