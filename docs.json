@@ -128,7 +128,6 @@
             "pages": [
               "resources/supported-chains-and-currencies",
               "resources/token-list",
-              "resources/smart-contracts",
               "resources/community"
             ]
           },
