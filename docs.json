@@ -98,7 +98,7 @@
               {
                 "group": "Fee Structure",
                 "pages": [
-                  "api-features/custom-fees",
+                  "api-features/platform-fees",
                   "api-features/fee-breakdowns"
                 ]
               }
@@ -127,8 +127,22 @@
             "group": "🌐 Developer Resources",
             "pages": [
               "resources/supported-chains-and-currencies",
+              "resources/token-list",
               "resources/smart-contracts",
               "resources/community"
+            ]
+          },
+          {
+            "group": "🛠️ Tools & Examples",
+            "pages": [
+              "request-network-api/easyinvoice-api-demo-app",
+              "resources/request-scan"
+            ]
+          },
+          {
+            "group": "🏗️ Architecture",
+            "pages": [
+              "resources/lifecycle-of-a-request"
             ]
           },
           {
