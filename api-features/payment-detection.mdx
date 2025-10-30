@@ -62,13 +62,13 @@ Payment detection works across all Request Network supported chains:
 ### Testnet Networks
 - Sepolia, Base Sepolia, Arbitrum Sepolia, Optimism Sepolia
 
-## Cross-chain Payment Detection
+## Crosschain Payment Detection
 
-All cross-chain payments using the Request Network API use the **ERC-20 Fee Proxy contract** as the final payment leg, ensuring payment detection works seamlessly across chains.
+All crosschain payments using the Request Network API use the **ERC-20 Fee Proxy contract** as the final payment leg, ensuring payment detection works seamlessly across chains.
 
 **How it works:**
 1. Payer initiates payment on source chain (e.g., Polygon)
-2. Cross-chain bridge transfers funds to destination chain (e.g., Base)
+2. Crosschain bridge transfers funds to destination chain (e.g., Base)
 3. Final payment uses ERC-20 Fee Proxy with payment reference
 4. Payment detection system identifies the transaction
 5. Request status updated automatically
