@@ -9,7 +9,7 @@ If your question is not answered below, please consider posting it to the [Reque
 
 <AccordionGroup>
   <Accordion title="Is Request Network a blockchain, smart contract platform, or L2 scaling solution?">
-    No. Request Network is not a blockchain, smart contract platform, or scaling solution. Rather, it's a protocol for storing payment requests, facilitating on-chain payments, and reconciling those payments with the requests. It stores payment requests in [IPFS](https://www.ipfs.com/) and CID hashes on [Gnosis Chain](https://www.gnosis.io/). It uses [The Graph](https://thegraph.com/) for on-chain event indexing. It processes payments across a variety of [supported payment chains](https://docs.request.network/get-started/supported-chains).
+    No. Request Network is not a blockchain, smart contract platform, or scaling solution. Rather, it's a protocol for storing payment requests, facilitating onchain payments, and reconciling those payments with the requests. It stores payment requests in [IPFS](https://www.ipfs.com/) and CID hashes on [Gnosis Chain](https://www.gnosis.io/). It uses [The Graph](https://thegraph.com/) for onchain event indexing. It processes payments across a variety of [supported payment chains](https://docs.request.network/get-started/supported-chains).
   </Accordion>
 
   <Accordion title="What is the difference between Request Network and Request Finance?">
@@ -32,8 +32,8 @@ If your question is not answered below, please consider posting it to the [Reque
     See [Parties of a Request](https://docs.request.network/glossary#parties-of-a-request) for details.
   </Accordion>
 
-  <Accordion title="Are requests in Request Network stored fully on-chain?">
-    No. Request Network is a hybrid on/off-chain protocol storing the majority of request contents in IPFS. Only the content-addressable ID (CID) is stored on-chain, on Gnosis Chain.
+  <Accordion title="Are requests in Request Network stored fully onchain?">
+    No. Request Network is a hybrid on/off-chain protocol storing the majority of request contents in IPFS. Only the content-addressable ID (CID) is stored onchain, on Gnosis Chain.
   </Accordion>
 
   <Accordion title="Can I make a payment before creating a request?">
@@ -43,7 +43,7 @@ If your question is not answered below, please consider posting it to the [Reque
   <Accordion title="Does Request Network support requests for fiat currency?">
     Yes and No.
 
-    Requests can be *denominated* in fiat currencies like USD, EUR, etc. ([ISO 4217 currencies](https://en.wikipedia.org/wiki/ISO_4217)) but our payment smart contracts only support payments in cryptocurrencies. We call these [Conversion Payment](https://docs.request.network/advanced/request-network-sdk/sdk-guides/payment/conversion-request)s, in which the requested fiat amount is converted to the appropriate cryptocurrency amount using on-chain price feeds at the moment of payment.
+    Requests can be *denominated* in fiat currencies like USD, EUR, etc. ([ISO 4217 currencies](https://en.wikipedia.org/wiki/ISO_4217)) but our payment smart contracts only support payments in cryptocurrencies. We call these [Conversion Payment](https://docs.request.network/advanced/request-network-sdk/sdk-guides/payment/conversion-request)s, in which the requested fiat amount is converted to the appropriate cryptocurrency amount using onchain price feeds at the moment of payment.
 
     It is possible to implement fiat payments using Declarative Requests, where the payer declares that the payment was sent and the payee declares that the payment was received.
   </Accordion>
@@ -56,8 +56,8 @@ If your question is not answered below, please consider posting it to the [Reque
     Yes. See [Single Request Forwarder](https://docs.request.network/advanced/request-network-sdk/sdk-guides/payment/single-request-forwarder)
   </Accordion>
 
-  <Accordion title="Can a Request Node modify a request's contents before persisting it to IPFS and on-chain?">
-    No. A Request Node cannot change a request's contents before persisting it to IPFS and on-chain because doing so would invalidate the signature. This is true for private, encrypted requests as well. The Request Node cannot forge the end-user's signature.
+  <Accordion title="Can a Request Node modify a request's contents before persisting it to IPFS and onchain?">
+    No. A Request Node cannot change a request's contents before persisting it to IPFS and onchain because doing so would invalidate the signature. This is true for private, encrypted requests as well. The Request Node cannot forge the end-user's signature.
   </Accordion>
 
   <Accordion title="Can I create a request via the Request Network SDK without using a Request Node?">
