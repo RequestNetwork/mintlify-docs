@@ -160,8 +160,7 @@
           {
             "group": "🔧 SDK Documentation",
             "pages": [
-              "request-network-api/migrate-to-v2",
-              "sdk-legacy/migration-guide"
+              "request-network-api/migrate-to-v2"
             ]
           }
         ]
