@@ -83,9 +83,9 @@ If your question is not answered below, please consider posting it to the [Reque
   </Accordion>
 
   <Accordion title="Does Request Network support crosschain payments where the payer sends funds on one chain and the payee receives funds on a different chain?">
-    Yes. Request Network supports Crosschain Payments (deployed April 2025). Payers can fund requests using assets on different chains and tokens, and the payee receives the requested asset on the request's chain. For example, you can pay a USDC-on-Base request using USDT from Optimism.
+    Yes, via the **Request Network API only**. Crosschain payments are not supported by the Request Network SDK or protocol directly. When using the API, payers can fund requests using assets on different chains and tokens, and the payee receives the requested asset on the request's chain. For example, you can pay a USDC-on-Base request using USDT from Optimism. 
 
-    See [Crosschain Payments](/api-features/crosschain-payments) for implementation details.
+    See <Card title="Crosschain Payments" icon="link" href="/api-features/crosschain-payments">Learn how to implement crosschain payment flows</Card> for implementation details.
   </Accordion>
 
   <Accordion title="Does Request Network support private requests?">
