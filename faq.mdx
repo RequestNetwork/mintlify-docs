@@ -63,6 +63,15 @@ If your question is not answered below, please consider posting it to the [Reque
   <Accordion title="Can I create a request via the Request Network SDK without using a Request Node?">
     No. Today, a Request Node is required to interact with the Request Network IPFS Network. That said, it is possible to make the end-user pay the protocol fee when creating a request instead of the Request Node. To do this, inject an `HttpMetaMaskDataAccess` into the frontend `RequestNetwork` instance.
 
+    <Warning>
+    ⚠️ **Security Warning**: The code example below uses `process.env.PRIVATE_KEY` for demonstration purposes only. **Never expose private keys in client-side code or commit them to version control.**
+    
+    **For production applications, use one of these secure alternatives:**
+    1. **Web3 wallet signature providers** (MetaMask, WalletConnect) - Let users sign with their own wallets
+    2. **Server-side signing** - Keep private keys on your backend and expose a signing API
+    3. **Hardware wallet integration** - Use Ledger or Trezor for key management
+    </Warning>
+
     ```javascript
     const requestNetwork = new RequestNetworkBase({
       dataAccess: new HttpMetaMaskDataAccess({
