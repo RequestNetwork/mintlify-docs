@@ -1,9 +1,32 @@
 export const CopyButton = ({ text, title = "Copy Address" }) => {
-  const copyToClipboard = () => {
+  const copyToClipboard = (e) => {
+    const button = e.currentTarget;
+    const svgElement = button.querySelector('svg');
+    const originalSVG = svgElement.outerHTML;
+    const originalTitle = button.title;
+    
     navigator.clipboard.writeText(text).then(() => {
-      console.log(`Copied ${text} to clipboard!`);
+      // Show success feedback with checkmark icon
+      svgElement.outerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      `;
+      button.title = "Copied!";
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        const checkmark = button.querySelector('svg');
+        checkmark.outerHTML = originalSVG;
+        button.title = originalTitle;
+      }, 2000);
     }).catch(err => {
       console.error("Failed to copy: ", err);
+      // Show error feedback
+      button.title = "Failed to copy";
+      setTimeout(() => {
+        button.title = originalTitle;
+      }, 2000);
     });
   };
 
