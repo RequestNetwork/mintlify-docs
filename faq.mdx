@@ -68,8 +68,12 @@ If your question is not answered below, please consider posting it to the [Reque
       dataAccess: new HttpMetaMaskDataAccess({
         ethereumProviderUrl: 'https://eth-mainnet.g.alchemy.com/v2/demo',
       }),
-      ...
-    }
+      signatureProvider: new EthereumPrivateKeySignatureProvider({
+        method: Types.SIGNATURE_METHOD.ECDSA,
+        privateKey: process.env.PRIVATE_KEY
+      })
+      // additional config options as needed
+    });
     ```
   </Accordion>
 
