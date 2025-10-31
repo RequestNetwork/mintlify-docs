@@ -1,127 +1,253 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Request Network Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#01B089",
+    "light": "#59F9D6",
+    "dark": "#01513B"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "background": {
+    "decoration": "gradient",
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#001912"
+    }
   },
   "favicon": "/favicon.svg",
+  "fonts": {
+    "heading": {
+      "family": "Montserrat"
+    },
+    "body": {
+      "family": "Montserrat",
+      "weight": 500
+    }
+  },
+  "thumbnails": {
+    "appearance": "dark"
+  },
+  "banner": {
+    "content": "🚀 New: Check out our revamped documentation!",
+    "dismissible": true
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Welcome",
+        "pages": ["index"]
+      },
+      {
+        "tab": "Use Cases",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "📄 Primary Use Cases",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "use-cases/invoicing",
+              "use-cases/payouts",
+              "use-cases/payroll",
+              "use-cases/checkout",
+              "use-cases/subscriptions"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "🔑 API Setup",
             "pages": [
-              "api-reference/introduction"
+              "api-setup/getting-started",
+              "request-network-api/api-portal-manage-api-keys-and-webhooks"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "⚙️ API Features",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              {
+                "group": "Requests",
+                "pages": [
+                  "api-features/create-requests-query-status"
+                ]
+              },
+              {
+                "group": "Payment Types",
+                "pages": [
+                  "api-features/payment-types-overview",
+                  "api-features/standard-payments",
+                  "api-features/conversion-payments",
+                  "api-features/crypto-to-fiat-payments",
+                  "api-features/batch-payments",
+                  "api-features/crosschain-payments",
+                  "api-features/partial-payments",
+                  "api-features/recurring-payments"
+                ]
+              },
+              {
+                "group": "Reconciliation",
+                "pages": [
+                  "api-features/payment-detection",
+                  "api-features/query-payments",
+                  "api-features/webhooks-events"
+                ]
+              },
+              {
+                "group": "Fee Structure",
+                "pages": [
+                  "api-features/platform-fees",
+                  "api-features/fee-breakdowns"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "📚 API Reference",
+            "pages": [
+              "api-reference/authentication",
+              "api-reference/webhooks",
+              {
+                "group": "Endpoints",
+                "openapi": "https://api.request.network/open-api/openapi.json",
+                "pages": [
+                  "request-network-api/create-and-pay-requests"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Resources",
+        "groups": [
+          {
+            "group": "🌐 Developer Resources",
+            "pages": [
+              "resources/supported-chains-and-currencies",
+              "resources/token-list",
+              "resources/community"
+            ]
+          },
+          {
+            "group": "🛠️ Tools & Examples",
+            "pages": [
+              "request-network-api/easyinvoice-api-demo-app",
+              "resources/request-scan"
+            ]
+          },
+          {
+            "group": "🏗️ Architecture",
+            "pages": [
+              "resources/lifecycle-of-a-request"
+            ]
+          },
+          {
+            "group": "📖 Documentation",
+            "pages": [
+              "faq",
+              "glossary"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDK (Legacy)",
+        "groups": [
+          {
+            "group": "🔧 SDK Documentation",
+            "pages": [
+              "request-network-api/migrate-to-v2"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Release Notes",
+        "groups": [
+          {
+            "group": "📋 Release Notes",
+            "pages": [
+              "release-notes/index",
+              "release-notes/request-api",
+              "release-notes/easy-invoice"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://request.network"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "https://github.com/orgs/RequestNetwork/discussions"
       }
     ],
-    "primary": {
+    "primary": 
+    {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get your API Key",
+      "href": "https://portal.request.network"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+      "x": "https://x.com/RequestNetwork",
+      "discord": "https://request.network/discord",
+      "github": "https://github.com/RequestNetwork",
+      "linkedin": "https://www.linkedin.com/company/request-network",
+      "bluesky": "https://bsky.app/profile/requestnetwork.bsky.social"
+    },
+    "links": [
+      {
+        "items": [
+        {
+          "label": "Website",
+          "href": "https://request.network"
+        },
+        {
+          "label": "Community",
+          "href": "https://discord.com/invite/FsVAR3ny3f"
+        },
+        {
+          "label": "Portal",
+          "href": "https://portal.request.network"
+        },
+        {
+          "label": "Scan",
+          "href": "https://scan.request.network"
+        },
+        {
+          "label": "Status",
+          "href": "https://status.request.network"
+        },
+        {
+          "label": "Blog",
+          "href": "https://request.network/blog"
+        }
+        ]
+
+      }
+    ]
   }
 }

@@ -1,0 +1,329 @@
+---
+title: "🔄 Subscriptions"
+description: "Automate recurring payments with flexible billing cycles and transparent subscription management"
+---
+
+## Overview
+
+Build robust subscription businesses with Request Network's recurring payment infrastructure. Automate billing cycles, handle subscription upgrades and downgrades, and provide customers with transparent subscription management—all while maintaining perfect payment records.
+
+## 🚀 Quickstart: Set Up Your First Recurring Subscription
+
+<Info>
+**Set up your first recurring subscription in under 1 minute**
+
+*Interactive quickstart experience coming soon*
+</Info>
+
+<Steps>
+  <Step title="Define Subscription Plan">
+    Set billing amount, frequency, and subscription terms
+  </Step>
+  <Step title="Customer Subscribes">
+    Customer approves recurring payment authorization
+  </Step>
+  <Step title="Automated Billing">
+    Payments are automatically processed according to schedule
+  </Step>
+  <Step title="Manage Subscriptions">
+    Handle upgrades, downgrades, and cancellations transparently
+  </Step>
+</Steps>
+
+## EasyInvoice Demo
+
+Experience subscription management through our demo application:
+
+<CardGroup cols={2}>
+  <Card 
+    title="🎬 Subscription Setup Demo" 
+    icon="play"
+  >
+    Watch UI-driven recurring invoice setup and subscription management
+  </Card>
+  
+  <Card 
+    title="🔗 Try Subscription Management" 
+    href="https://easy-invoice-demo.vercel.app/dashboard/subscriptions" 
+    icon="external-link"
+  >
+    Experience the subscription dashboard and management interface
+  </Card>
+</CardGroup>
+
+**Demo Features:**
+- Subscription plan creation and management
+- Customer subscription dashboard
+- Automated billing cycle processing
+- Upgrade/downgrade workflow
+- Subscription analytics and reporting
+- Payment failure handling and retry logic
+
+## Integration Options
+
+<Tabs>
+  <Tab title="Use EasyInvoice As-Is">
+    **Best for:** Simple subscription management, basic billing needs
+    
+    Simple subscription management interface:
+    - Pre-built subscription dashboard
+    - Basic plan management
+    - Customer self-service portal
+    
+    *Access to subscription dashboard coming soon*
+  </Tab>
+  
+  <Tab title="Fork & Customize">
+    **Best for:** Custom subscription workflows, existing platform integration
+    
+    Integrate with existing subscription platforms:
+    - Custom billing logic and pricing models
+    - Integration with CRM and customer management
+    - Advanced subscription analytics and reporting
+    
+    *Fork repository and integration guide coming soon*
+  </Tab>
+  
+  <Tab title="Custom Implementation">
+    **Best for:** Complex subscription models, enterprise requirements
+    
+    API-driven recurring payment automation:
+    - Advanced subscription lifecycle management
+    - Custom pricing models and billing logic
+    - Integration with existing business systems
+    
+    [Subscription API Documentation →](/api-features/payment-types-overview)
+  </Tab>
+</Tabs>
+
+## Key API Features for Subscriptions
+
+<CardGroup cols={2}>
+  <Card 
+    title="Recurring Payments" 
+    href="/api-features/payment-types-overview"
+    icon="repeat"
+  >
+    Automate billing cycles with flexible scheduling
+  </Card>
+  
+  <Card 
+    title="Automated Invoicing" 
+    href="/api-features/payment-types-overview"
+    icon="file-invoice"
+  >
+    Generate subscription invoices automatically
+  </Card>
+  
+  <Card 
+    title="Webhooks" 
+    href="/api-features/webhooks-events"
+    icon="webhook"
+  >
+    Real-time notifications for billing events and payment updates
+  </Card>
+  
+  <Card 
+    title="Partial Payments" 
+    href="/api-features/payment-types-overview"
+    icon="coins"
+  >
+    Handle pro-rated billing and partial period charges
+  </Card>
+  
+  <Card 
+    title="Payment Retry Logic" 
+    href="/api-features/recurring-payments"
+    icon="refresh"
+  >
+    Automatically retry failed payments with configurable schedules
+  </Card>
+  
+  <Card 
+    title="Custom Metadata" 
+    href="/api-features/create-requests-query-status"
+    icon="tag"
+  >
+    Track subscription plans, customer IDs, and billing periods
+  </Card>
+</CardGroup>
+
+## Subscription Models
+
+<AccordionGroup>
+  <Accordion title="📱 SaaS Applications">
+    Power software-as-a-service billing:
+    - Monthly/annual subscription billing
+    - Usage-based pricing models
+    - Seat-based licensing
+    - Free trial and freemium conversions
+  </Accordion>
+  
+  <Accordion title="📰 Content & Media">
+    Monetize content and media platforms:
+    - Premium content subscriptions
+    - Ad-free viewing tiers
+    - Creator revenue sharing
+    - Multi-tier membership models
+  </Accordion>
+  
+  <Accordion title="🎮 Gaming & Entertainment">
+    Handle gaming and entertainment subscriptions:
+    - Battle pass and season pass billing
+    - Premium game access
+    - In-game currency subscriptions
+    - Tournament and league fees
+  </Accordion>
+  
+  <Accordion title="🏢 B2B Services">
+    Manage business service subscriptions:
+    - Professional service retainers
+    - API access and usage billing
+    - Consulting and support contracts
+    - Enterprise license management
+  </Accordion>
+</AccordionGroup>
+
+## Subscription Lifecycle Management
+
+<Tabs>
+  <Tab title="Plan Management">
+    **Flexible Pricing Models:**
+    - Fixed monthly/annual pricing
+    - Usage-based billing
+    - Tiered pricing structures
+    - Custom enterprise pricing
+  </Tab>
+  
+  <Tab title="Customer Journey">
+    **Seamless Experience:**
+    - Frictionless subscription signup
+    - Transparent billing notifications
+    - Easy upgrade/downgrade processes
+    - Self-service cancellation options
+  </Tab>
+  
+  <Tab title="Business Operations">
+    **Operational Excellence:**
+    - Automated revenue recognition
+    - Churn analysis and prevention
+    - Customer lifetime value tracking
+    - Subscription health monitoring
+  </Tab>
+</Tabs>
+
+## Advanced Subscription Features
+
+<CodeGroup>
+```javascript Subscription Creation
+import { RequestNetwork } from '@requestnetwork/request-client.js';
+
+async function createSubscription(customer, plan) {
+  const subscription = await requestNetwork.createRequest({
+    requestInfo: {
+      currency: plan.currency,
+      expectedAmount: plan.amount,
+      payee: {
+        type: 'ethereumAddress',
+        value: merchantAddress
+      },
+      payer: {
+        type: 'ethereumAddress', 
+        value: customer.address
+      }
+    },
+    contentData: {
+      reason: `${plan.name} Subscription`,
+      dueDate: plan.nextBillingDate,
+      // Note: Verify recurring payment structure in latest SDK documentation
+      recurring: {
+        frequency: plan.billingCycle, // 'monthly', 'yearly'
+        occurrences: plan.maxOccurrences
+      }
+    }
+  });
+  
+  return subscription;
+}
+```
+
+```javascript Webhook Handling
+app.post('/webhook/subscription', (req, res) => {
+  const { eventType, request } = req.body;
+  
+  switch(eventType) {
+    case 'payment.confirmed':
+      // Extend subscription period after successful payment
+      extendSubscription(request.customerId);
+      break;
+      
+    case 'payment.failed':
+      // Handle failed payment and retry logic
+      handleFailedPayment(request.customerId);
+      break;
+  }
+  
+  res.status(200).send('OK');
+});
+```
+</CodeGroup>
+
+## Analytics & Insights
+
+<CardGroup cols={2}>
+  <Card 
+    title="📊 Revenue Metrics" 
+    icon="chart-line"
+  >
+    Track MRR, ARR, churn rate, and customer lifetime value
+  </Card>
+  
+  <Card 
+    title="💳 Payment Analytics" 
+    icon="credit-card"
+  >
+    Monitor payment success rates and failure patterns
+  </Card>
+  
+  <Card 
+    title="👥 Customer Insights" 
+    icon="users"
+  >
+    Analyze subscription behavior and engagement patterns
+  </Card>
+  
+  <Card 
+    title="🔄 Retention Analysis" 
+    icon="repeat"
+  >
+    Identify churn risks and retention opportunities
+  </Card>
+</CardGroup>
+
+## What's Next?
+
+<CardGroup cols={3}>
+  <Card 
+    title="📄 Start with Invoicing" 
+    href="/use-cases/invoicing"
+    icon="receipt"
+  >
+    Begin with one-time invoices before adding subscriptions
+  </Card>
+  
+  <Card 
+    title="⚙️ Recurring Payments" 
+    href="/api-features/payment-types-overview"
+    icon="repeat"
+  >
+    Learn about recurring payment implementation details
+  </Card>
+  
+  <Card 
+    title="🔑 Get Started" 
+    href="/api-setup/getting-started"
+    icon="rocket"
+  >
+    Set up your account for subscription billing
+  </Card>
+</CardGroup>

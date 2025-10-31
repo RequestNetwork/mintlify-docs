@@ -1,0 +1,362 @@
+---
+title: "Getting Started"
+description: "Quick setup guide to get your API keys and start building with Request Network"
+---
+
+## Welcome to Request Network
+
+Get started with Request Network in just a few minutes. This guide will walk you through setting up your account, obtaining API keys, and making your first API call.
+
+## Quick Setup
+
+<Steps>
+  <Step title="Create Account">
+    Sign up for a free Request Network account at [portal.request.network](https://portal.request.network)
+  </Step>
+  <Step title="Get API Keys">
+    Generate your API keys for both testnet (development) and mainnet (production)
+  </Step>
+  <Step title="Choose Integration">
+    Select your integration approach based on your use case
+  </Step>
+  <Step title="Make First Call">
+    Test your setup with a simple API call
+  </Step>
+</Steps>
+
+## Account Setup
+
+### Request Portal Registration
+
+<CardGroup cols={2}>
+  <Card title="Developer Account" icon="code">
+    **For Developers:**
+    - Free account with generous limits
+    - Access to testnet for development
+    - API documentation and tools
+    - Community support
+    
+    [Sign Up →](https://portal.request.network)
+  </Card>
+  
+  <Card title="Enterprise Account" icon="building">
+    **For Enterprises:**
+    - Higher rate limits
+    - Priority support
+    - Custom integrations
+    - SLA guarantees
+    
+    [Contact Sales →](https://request.network/contact)
+  </Card>
+</CardGroup>
+
+### API Key Generation
+
+<Tabs>
+  <Tab title="Testnet Keys">
+    **Development Environment:**
+    1. Log in to Request Portal
+    2. Navigate to "API Keys" section
+    3. Click "Generate New Key"
+    4. Select "Testnet" environment
+    5. Name your key (e.g., "Development")
+    6. Copy and securely store the key
+    
+    <Warning>
+    **Testnet vs Mainnet**
+    
+    Always start development on testnet. Testnet uses test cryptocurrencies with no real value.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Production Keys">
+    **Production Environment:**
+    1. Complete account verification
+    2. Generate new API key
+    3. Select "Mainnet" environment
+    4. Configure production settings
+    5. Set up monitoring and alerts
+    
+    <Info>
+    **Security Best Practices**
+    
+    - Store API keys in environment variables
+    - Never commit keys to version control
+    - Use different keys for different environments
+    - Rotate keys regularly
+    </Info>
+  </Tab>
+</Tabs>
+
+## Choose Your Path
+
+Select the integration approach that best fits your needs:
+
+<CardGroup cols={3}>
+  <Card 
+    title="📄 Invoicing" 
+    href="/use-cases/invoicing"
+    icon="receipt"
+  >
+    **Best for:** Professional invoicing, B2B payments
+    
+    Get started with invoice creation and payment collection in under 5 minutes.
+  </Card>
+  
+  <Card 
+    title="💰 Payouts" 
+    href="/use-cases/payouts"
+    icon="send"
+  >
+    **Best for:** Vendor payments, contractor payouts
+    
+    Send instant crypto payments to multiple recipients with batch processing.
+  </Card>
+  
+  <Card 
+    title="🛒 Checkout" 
+    href="/use-cases/checkout"
+    icon="shopping-cart"
+  >
+    **Best for:** E-commerce, digital goods
+    
+    Accept crypto payments in your online store with 80+ wallet support.
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card 
+    title="💼 Payroll" 
+    href="/use-cases/payroll"
+    icon="users"
+  >
+    **Best for:** Employee payments, bulk processing
+    
+    Automate payroll with batch payments and recurring schedules.
+  </Card>
+  
+  <Card 
+    title="🔄 Subscriptions" 
+    href="/use-cases/subscriptions"
+    icon="repeat"
+  >
+    **Best for:** SaaS billing, recurring revenue
+    
+    Set up automated subscription billing with flexible payment cycles.
+  </Card>
+</CardGroup>
+
+## Quick Test
+
+Verify your setup with a simple API call:
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.request.network/v2/requests \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currency": "USD",
+    "expectedAmount": "100",
+    "payeeIdentity": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+    "reason": "Test invoice"
+  }'
+```
+
+```javascript Node.js
+const axios = require('axios');
+
+async function createTestRequest() {
+  try {
+    const response = await axios.post('https://api.request.network/v2/requests', {
+      currency: 'USD',
+      expectedAmount: '100',
+      payeeIdentity: '0x627306090abaB3A6e1400e9345bC60c78a8BEf57',
+      reason: 'Test invoice'
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.REQUEST_NETWORK_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log('Request created:', response.data.requestId);
+    return response.data;
+    
+  } catch (error) {
+    console.error('Error creating request:', error.response?.data || error.message);
+  }
+}
+
+createTestRequest();
+```
+
+```python Python
+import requests
+import os
+
+def create_test_request():
+    url = "https://api.request.network/v2/requests"
+    
+    headers = {
+        "Authorization": f"Bearer {os.getenv('REQUEST_NETWORK_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "currency": "USD",
+        "expectedAmount": "100",
+        "payeeIdentity": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+        "reason": "Test invoice"
+    }
+    
+    try:
+        response = requests.post(url, json=data, headers=headers)
+        response.raise_for_status()
+        
+        print(f"Request created: {response.json()['requestId']}")
+        return response.json()
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Error creating request: {e}")
+
+create_test_request()
+```
+</CodeGroup>
+
+## Environment Configuration
+
+### Environment Variables
+
+Set up your environment variables for secure API key management:
+
+<CodeGroup>
+```bash .env
+# Request Network Configuration
+REQUEST_NETWORK_API_KEY=your_api_key_here
+REQUEST_NETWORK_ENVIRONMENT=testnet
+
+# Webhook Configuration (optional)
+REQUEST_WEBHOOK_SECRET=your_webhook_secret_here
+REQUEST_WEBHOOK_URL=https://your-domain.com/webhooks/request-network
+
+# Application Configuration
+PORT=3000
+NODE_ENV=development
+```
+
+```javascript config.js
+module.exports = {
+  requestNetwork: {
+    apiKey: process.env.REQUEST_NETWORK_API_KEY,
+    environment: process.env.REQUEST_NETWORK_ENVIRONMENT || 'testnet',
+    webhookSecret: process.env.REQUEST_WEBHOOK_SECRET,
+    webhookUrl: process.env.REQUEST_WEBHOOK_URL
+  },
+  app: {
+    port: process.env.PORT || 3000,
+    environment: process.env.NODE_ENV || 'development'
+  }
+};
+```
+</CodeGroup>
+
+## Development Tools
+
+### Request Portal Features
+
+<CardGroup cols={2}>
+  <Card title="API Explorer" icon="play">
+    **Interactive Testing:**
+    - Test API endpoints directly in browser
+    - Real-time response preview
+    - Code generation for multiple languages
+    - Request/response logging
+  </Card>
+  
+  <Card title="Webhook Testing" icon="webhook">
+    **Webhook Development:**
+    - Test webhook delivery
+    - Inspect webhook payloads
+    - Retry failed webhooks
+    - Webhook logs and analytics
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="Transaction Monitor" icon="activity">
+    **Real-time Monitoring:**
+    - Live transaction tracking
+    - Payment status updates
+    - Error monitoring and alerts
+    - Performance metrics
+  </Card>
+  
+  <Card title="Analytics Dashboard" icon="chart-bar">
+    **Usage Analytics:**
+    - API usage statistics
+    - Payment volume tracking
+    - Success/failure rates
+    - Performance insights
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Authentication Errors">
+    **401 Unauthorized:**
+    - Verify API key is correct
+    - Check environment (testnet vs mainnet)
+    - Ensure API key has required permissions
+    - Verify Authorization header format
+  </Accordion>
+  
+  <Accordion title="Rate Limiting">
+    **429 Too Many Requests:**
+    - Implement exponential backoff
+    - Check your current rate limits
+    - Consider upgrading to higher limits
+    - Optimize API call frequency
+  </Accordion>
+  
+  <Accordion title="Network Issues">
+    **Connection Problems:**
+    - Check network connectivity
+    - Verify API endpoint URLs
+    - Test with different networks
+    - Check firewall settings
+  </Accordion>
+</AccordionGroup>
+
+## What's Next?
+
+Now that you're set up, explore the features that matter most to your use case:
+
+<CardGroup cols={3}>
+  <Card 
+    title="📚 API Reference" 
+    href="/api-reference/authentication"
+    icon="book"
+  >
+    Detailed API endpoint documentation
+  </Card>
+  
+  <Card 
+    title="⚙️ API Features" 
+    href="/api-features/payment-types"
+    icon="cog"
+  >
+    Learn about payment types and advanced capabilities
+  </Card>
+  
+  <Card 
+    title="🛠️ Payment Types" 
+    href="/api-features/payment-types-overview"
+    icon="puzzle-piece"
+  >
+    Learn about payment types and integration options
+  </Card>
+</CardGroup>

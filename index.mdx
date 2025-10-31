@@ -1,97 +1,84 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Request Network Docs"
+description: "A protocol for requests, payments, and **100% automated reconciliation**. Requests add business context to payments, **eliminating manual accounting** with cryptographic certainty."
+sidebarTitle: "Welcome"
+mode: "center"
 ---
 
-## Setting up
+## Interactive Demo
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
+<Card title="🚀 Try Request Network (Coming Soon)" icon="play">
+  Experience how creating an invoice and getting paid is better than asking someone to send you money and hoping they remember to tell you they sent it.
+  
+  *Interactive demo will be embedded here*
 </Card>
 
-## Make it yours
+## Get Started
 
-Design a docs site that looks great and empowers your users.
+Choose your path based on what you want to build:
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
+<CardGroup cols={3}>
+  <Card 
+    title="Use Cases" 
+    href="/use-cases/invoicing"
+    icon="briefcase"
   >
-    Edit your docs locally and preview them in real time.
+    Explore specific business scenarios: invoicing, payouts, payroll, checkout, and subscriptions
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
+  
+  <Card 
+    title="API Features" 
+    href="/api-features/payment-types"
     icon="code"
-    href="/essentials/code"
   >
-    Add sample code to demonstrate how to use your product.
+    The easiest way to integrate. Payment types, webhooks, and developer tools.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
+  
+  <Card 
+    title="🌐 Resources" 
+    href="/resources/supported-chains-and-currencies"
+    icon="globe"
   >
-    Display images and other media.
+    Supported chains, currencies, smart contracts, and community resources
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+</CardGroup>
 
-## Need inspiration?
+<CardGroup cols={2}>
+  <Card 
+    title="SDK (Legacy)" 
+    href="/sdk-legacy/migration-guide"
+    icon="clock"
+  >
+    Legacy SDK and protocol documentation for advanced users
+  </Card>
+  
+  <Card 
+    title="📋 Release Notes" 
+    href="/release-notes/index"
+    icon="newspaper"
+  >
+    Stay updated with the latest features and improvements
+  </Card>
+</CardGroup>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+## Popular
+
+<AccordionGroup>
+  <Accordion title="🏃‍♂️ Quick Start - I want to test the API now">
+    1. [Get API Keys](/api-setup/getting-started) (2 minutes)
+    2. [Create your first request](/use-cases/invoicing) (1 minute)
+    3. [Test payment flow](/api-features/payment-types) (2 minutes)
+  </Accordion>
+  
+  <Accordion title="🔍 Demo Explorer - Show me what's possible">
+    1. [Try EasyInvoice Demo](/use-cases/invoicing) - See full invoicing workflow
+    2. [Explore Use Cases](/use-cases/payouts) - Discover business applications  
+    3. [Fork & Customize](/use-cases/invoicing) - Make it your own
+  </Accordion>
+  
+  <Accordion title="🏗️ Integration Planning - I need to understand compatibility">
+    1. [Check Supported Chains](/resources/supported-chains-and-currencies)
+    2. [Review Payment Types](/api-features/payment-types)
+    3. [Explore Use Cases](/use-cases/invoicing) that match your needs
+  </Accordion>
+</AccordionGroup>
