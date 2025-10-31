@@ -240,7 +240,7 @@ function CheckoutPage({ orderTotal, orderId }) {
 app.post('/webhook/payment', (req, res) => {
   const { eventType, request } = req.body;
   
-  if (eventType === 'payment_confirmed') {
+  if (eventType === 'payment.confirmed') {
     // Update order status
     updateOrder(request.orderId, {
       status: 'paid',
