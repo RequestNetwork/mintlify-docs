@@ -52,7 +52,7 @@ Request Network API uses API key authentication to secure access to endpoints. T
     
     ```bash
     curl -X POST https://api.request.network/v2/requests \
-      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "x-api-key: YOUR_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{
         "currency": "USD",
@@ -61,6 +61,12 @@ Request Network API uses API key authentication to secure access to endpoints. T
         "reason": "Test invoice"
       }'
     ```
+    
+    <Info>
+    **Optional Headers:**
+    - `x-client-id`: Your client identifier for request tracking
+    - `Origin`: Required for browser-based requests (CORS)
+    </Info>
   </Tab>
   
   <Tab title="Environment Variables">
