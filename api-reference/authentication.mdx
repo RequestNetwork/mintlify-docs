@@ -74,13 +74,22 @@ Request Network API uses API key authentication to secure access to endpoints. T
     
     ```javascript
     // .env file
-    REQUEST_NETWORK_API_KEY=your_api_key_here
-    REQUEST_NETWORK_ENVIRONMENT=testnet
+    REQUEST_NETWORK_GATEWAY_URL=https://sepolia.gateway.request.network/
     
     // Application code
+    import { RequestNetwork } from '@requestnetwork/request-client.js';
+    import { EthereumPrivateKeySignatureProvider } from '@requestnetwork/epk-signature';
+    
+    const signatureProvider = new EthereumPrivateKeySignatureProvider({
+      method: Types.SIGNATURE_METHOD.ECDSA,
+      privateKey: process.env.PRIVATE_KEY
+    });
+    
     const requestNetwork = new RequestNetwork({
-      apiKey: process.env.REQUEST_NETWORK_API_KEY,
-      environment: process.env.REQUEST_NETWORK_ENVIRONMENT
+      nodeConnectionConfig: {
+        baseURL: process.env.REQUEST_NETWORK_GATEWAY_URL
+      },
+      signatureProvider
     });
     ```
   </Tab>
@@ -89,13 +98,19 @@ Request Network API uses API key authentication to secure access to endpoints. T
     **SDK Authentication:**
     
     ```javascript
-    import { RequestNetwork } from '@requestnetwork/request-client.js';
+    import { RequestNetwork, Types } from '@requestnetwork/request-client.js';
+    import { EthereumPrivateKeySignatureProvider } from '@requestnetwork/epk-signature';
+    
+    const signatureProvider = new EthereumPrivateKeySignatureProvider({
+      method: Types.SIGNATURE_METHOD.ECDSA,
+      privateKey: process.env.PRIVATE_KEY
+    });
     
     const requestNetwork = new RequestNetwork({
-      apiKey: process.env.REQUEST_NETWORK_API_KEY,
       nodeConnectionConfig: {
-        baseURL: 'https://api.request.network'
-      }
+        baseURL: 'https://sepolia.gateway.request.network/'
+      },
+      signatureProvider
     });
     ```
   </Tab>
