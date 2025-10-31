@@ -285,6 +285,7 @@ async function createSubscription(customer, plan) {
     contentData: {
       reason: `${plan.name} Subscription`,
       dueDate: plan.nextBillingDate,
+      // Note: Verify recurring payment structure in latest SDK documentation
       recurring: {
         frequency: plan.billingCycle, // 'monthly', 'yearly'
         occurrences: plan.maxOccurrences
@@ -301,19 +302,14 @@ app.post('/webhook/subscription', (req, res) => {
   const { eventType, request } = req.body;
   
   switch(eventType) {
-    case 'recurring_payment_success':
-      // Extend subscription period
+    case 'payment.confirmed':
+      // Extend subscription period after successful payment
       extendSubscription(request.customerId);
       break;
       
-    case 'recurring_payment_failed':
-      // Handle failed payment
+    case 'payment.failed':
+      // Handle failed payment and retry logic
       handleFailedPayment(request.customerId);
-      break;
-      
-    case 'subscription_cancelled':
-      // Process cancellation
-      cancelSubscription(request.customerId);
       break;
   }
   
