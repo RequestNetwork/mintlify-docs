@@ -1,19 +1,3 @@
-// Shared button styles for contract interaction buttons
-const ButtonStyles = () => (
-  <style jsx>{`
-    .contract-button:hover {
-      color: var(--primary-color) !important;
-    }
-    .contract-button:focus {
-      color: var(--primary-color) !important;
-      box-shadow: 0 0 0 2px var(--primary-color) !important;
-    }
-    .contract-button:active {
-      color: var(--primary-color) !important;
-    }
-  `}</style>
-);
-
 export const CopyButton = ({ text, title = "Copy Address" }) => {
   const copyToClipboard = (e) => {
     const button = e.currentTarget;
@@ -59,7 +43,18 @@ export const CopyButton = ({ text, title = "Copy Address" }) => {
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
       </svg>
-      <ButtonStyles />
+      <style jsx>{`
+        .contract-button:hover {
+          color: var(--primary-color) !important;
+        }
+        .contract-button:focus {
+          color: var(--primary-color) !important;
+          box-shadow: 0 0 0 2px var(--primary-color) !important;
+        }
+        .contract-button:active {
+          color: var(--primary-color) !important;
+        }
+      `}</style>
     </button>
   );
 };
@@ -79,7 +74,18 @@ export const ExternalLinkButton = ({ href, title = "View on Block Explorer" }) =
         <polyline points="15,3 21,3 21,9"></polyline>
         <line x1="10" y1="14" x2="21" y2="3"></line>
       </svg>
-      <ButtonStyles />
+      <style jsx>{`
+        .contract-button:hover {
+          color: var(--primary-color) !important;
+        }
+        .contract-button:focus {
+          color: var(--primary-color) !important;
+          box-shadow: 0 0 0 2px var(--primary-color) !important;
+        }
+        .contract-button:active {
+          color: var(--primary-color) !important;
+        }
+      `}</style>
     </button>
   );
 };
