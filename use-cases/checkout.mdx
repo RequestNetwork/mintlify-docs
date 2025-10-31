@@ -5,7 +5,7 @@ description: "Integrate crypto payments into your e-commerce with 80+ wallet sup
 
 ## Overview
 
-Transform your e-commerce checkout with Request Network's payment infrastructure. Accept crypto payments with support for 80+ wallets, enable cross-chain transactions, and provide customers with a seamless payment experience that rivals traditional payment processors.
+Transform your e-commerce checkout with Request Network's payment infrastructure. Accept crypto payments with support for 80+ wallets, enable crosschain transactions, and provide customers with a seamless payment experience that rivals traditional payment processors.
 
 ## 🚀 Quickstart: Integrate Your First Checkout Payment
 
@@ -37,7 +37,6 @@ Experience checkout payment flows through our demo:
 <CardGroup cols={2}>
   <Card 
     title="🎬 Payment Widget Demo" 
-    href="#" 
     icon="play"
   >
     See the payment widget with wallet connection and direct payment forms
@@ -56,7 +55,7 @@ Experience checkout payment flows through our demo:
 - 80+ wallet connection support (MetaMask, WalletConnect, Coinbase, etc.)
 - Direct payment forms with QR codes
 - Real-time payment status updates
-- Cross-chain payment options
+- Crosschain payment options
 - Mobile-optimized payment experience
 
 ## Integration Options
@@ -65,12 +64,12 @@ Experience checkout payment flows through our demo:
   <Tab title="Use EasyInvoice As-Is">
     **Best for:** Quick e-commerce integration, existing payment forms
     
-    Embed payout functionality in existing e-commerce:
+    Embed checkout functionality in existing e-commerce:
     - Drop-in payment widget
     - Hosted payment pages
     - Minimal integration required
     
-    [Get Embed Code →](#)
+    *Embed code documentation coming soon*
   </Tab>
   
   <Tab title="Fork & Customize">
@@ -81,7 +80,7 @@ Experience checkout payment flows through our demo:
     - Branded checkout experience
     - Advanced payment flow customization
     
-    [Fork Repository →](#) | [Checkout Customization Guide →](#)
+    *Fork repository and customization guide coming soon*
   </Tab>
   
   <Tab title="Custom Implementation">
@@ -92,7 +91,7 @@ Experience checkout payment flows through our demo:
     - Advanced fraud prevention
     - Deep e-commerce platform integration
     
-    [Checkout API Documentation →](/api-features/payment-types)
+    [Checkout API Documentation →](/api-features/payment-types-overview)
   </Tab>
 </Tabs>
 
@@ -101,15 +100,15 @@ Experience checkout payment flows through our demo:
 <CardGroup cols={2}>
   <Card 
     title="Payment Widget" 
-    href="/api-features/integration-patterns"
+    href="/api-features/payment-types-overview"
     icon="credit-card"
   >
     Drop-in payment component with 80+ wallet support
   </Card>
   
   <Card 
-    title="Cross-chain Payments" 
-    href="/api-features/payment-types"
+    title="Crosschain Payments" 
+    href="/api-features/payment-types-overview"
     icon="link"
   >
     Accept payments from any supported blockchain
@@ -117,7 +116,7 @@ Experience checkout payment flows through our demo:
   
   <Card 
     title="Platform Fees" 
-    href="/api-features/advanced-features"
+    href="/api-features/platform-fees"
     icon="percentage"
   >
     Collect marketplace or processing fees automatically
@@ -125,7 +124,7 @@ Experience checkout payment flows through our demo:
   
   <Card 
     title="Error Handling" 
-    href="/api-features/advanced-features"
+    href="/api-features/partial-payments"
     icon="exclamation-triangle"
   >
     Robust error handling for failed or partial payments
@@ -133,7 +132,7 @@ Experience checkout payment flows through our demo:
   
   <Card 
     title="Payment Routing" 
-    href="/api-features/payment-types"
+    href="/api-features/payment-types-overview"
     icon="route"
   >
     Optimize payment paths for best rates and speed
@@ -141,7 +140,7 @@ Experience checkout payment flows through our demo:
   
   <Card 
     title="Real-time Updates" 
-    href="/api-features/advanced-features"
+    href="/api-features/webhooks-events"
     icon="bolt"
   >
     Instant payment confirmation and order updates
@@ -199,7 +198,7 @@ Experience checkout payment flows through our demo:
     **Multiple Payment Options:**
     - Direct wallet payments
     - QR code scanning for mobile
-    - Cross-chain payment routing
+    - Crosschain payment routing
     - Multiple currency options
   </Tab>
   
@@ -241,7 +240,7 @@ function CheckoutPage({ orderTotal, orderId }) {
 app.post('/webhook/payment', (req, res) => {
   const { eventType, request } = req.body;
   
-  if (eventType === 'payment_confirmed') {
+  if (eventType === 'payment.confirmed') {
     // Update order status
     updateOrder(request.orderId, {
       status: 'paid',
@@ -268,7 +267,7 @@ app.post('/webhook/payment', (req, res) => {
   
   <Card 
     title="⚙️ Payment Types" 
-    href="/api-features/payment-types"
+    href="/api-features/payment-types-overview"
     icon="cog"
   >
     Explore advanced payment options and routing
