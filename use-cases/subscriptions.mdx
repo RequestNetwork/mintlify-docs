@@ -92,7 +92,7 @@ Experience subscription management through our demo application:
     - Custom pricing models and billing logic
     - Integration with existing business systems
     
-    [Subscription API Documentation →](/api-features/payment-types)
+    [Subscription API Documentation →](/api-features/payment-types-overview)
   </Tab>
 </Tabs>
 
@@ -101,23 +101,23 @@ Experience subscription management through our demo application:
 <CardGroup cols={2}>
   <Card 
     title="Recurring Payments" 
-    href="/api-features/payment-types"
+    href="/api-features/payment-types-overview"
     icon="repeat"
   >
-    Automate billing cycles with flexible scheduling options
+    Automate billing cycles with flexible scheduling
   </Card>
   
   <Card 
-    title="Create Requests" 
-    href="/api-features/payment-types"
-    icon="plus"
+    title="Automated Invoicing" 
+    href="/api-features/payment-types-overview"
+    icon="file-invoice"
   >
     Generate subscription invoices automatically
   </Card>
   
   <Card 
     title="Webhooks" 
-    href="/api-features/advanced-features"
+    href="/api-features/webhooks-events"
     icon="webhook"
   >
     Real-time notifications for billing events and payment updates
@@ -125,7 +125,7 @@ Experience subscription management through our demo application:
   
   <Card 
     title="Partial Payments" 
-    href="/api-features/payment-types"
+    href="/api-features/payment-types-overview"
     icon="coins"
   >
     Handle pro-rated billing and partial period charges
@@ -133,7 +133,7 @@ Experience subscription management through our demo application:
   
   <Card 
     title="Payment Retry Logic" 
-    href="/api-features/advanced-features"
+    href="/api-features/recurring-payments"
     icon="refresh"
   >
     Automatically retry failed payments with configurable schedules
@@ -141,7 +141,57 @@ Experience subscription management through our demo application:
   
   <Card 
     title="Custom Metadata" 
-    href="/api-features/advanced-features"
+    href="/api-features/create-requests-query-status"
+    icon="tag"
+  >
+    Track subscription plans, customer IDs, and billing periods
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card 
+    title="Recurring Payments" 
+    href="/api-features/payment-types-overview"
+    icon="repeat"
+  >
+    Automate billing cycles with flexible scheduling options
+  </Card>
+  
+  <Card 
+    title="Create Requests" 
+    href="/api-features/payment-types-overview"
+    icon="plus"
+  >
+    Generate subscription invoices automatically
+  </Card>
+  
+  <Card 
+    title="Webhooks" 
+    href="/api-features/webhooks-events"
+    icon="webhook"
+  >
+    Real-time notifications for billing events and payment updates
+  </Card>
+  
+  <Card 
+    title="Partial Payments" 
+    href="/api-features/payment-types-overview"
+    icon="coins"
+  >
+    Handle pro-rated billing and partial period charges
+  </Card>
+  
+  <Card 
+    title="Payment Retry Logic" 
+    href="/api-features/recurring-payments"
+    icon="refresh"
+  >
+    Automatically retry failed payments with configurable schedules
+  </Card>
+  
+  <Card 
+    title="Custom Metadata" 
+    href="/api-features/create-requests-query-status"
     icon="tag"
   >
     Track subscription plans, customer IDs, and billing periods
@@ -306,6 +356,8 @@ app.post('/webhook/subscription', (req, res) => {
 
 ## What's Next?
 
+## What's Next?
+
 <CardGroup cols={3}>
   <Card 
     title="📄 Start with Invoicing" 
@@ -317,17 +369,17 @@ app.post('/webhook/subscription', (req, res) => {
   
   <Card 
     title="⚙️ Recurring Payments" 
-    href="/api-features/payment-types"
+    href="/api-features/payment-types-overview"
     icon="repeat"
   >
     Learn about recurring payment implementation details
   </Card>
   
   <Card 
-    title="🔑 Setup Account" 
+    title="🔑 Get Started" 
     href="/api-setup/getting-started"
-    icon="key"
+    icon="rocket"
   >
-    Get API keys and configure subscription processing
+    Set up your account for subscription billing
   </Card>
 </CardGroup>
