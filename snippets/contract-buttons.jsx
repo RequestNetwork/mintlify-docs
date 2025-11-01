@@ -52,6 +52,21 @@ export const CopyButton = ({ text, title = "Copy Address" }) => {
 };
 
 export const ExternalLinkButton = ({ href, title = "View on Block Explorer" }) => {
+  // Validate URL to prevent XSS/open redirects
+  const isValidUrl = (url) => {
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  };
+
+  if (!isValidUrl(href)) {
+    console.error('Invalid URL provided to ExternalLinkButton:', href);
+    return null;
+  }
+
   return (
     <a 
       href={href}
