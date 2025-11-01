@@ -70,8 +70,15 @@ function verifyWebhookSignature(rawBody, signature, secret) {
     .createHmac("sha256", secret)
     .update(rawBody)
     .digest("hex");
-    
-  return signature === expectedSignature;
+  
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    );
+  } catch {
+    return false;
+  }
 }
 
 // Usage in your webhook handler
@@ -277,13 +284,17 @@ app.post("/webhook/payment", async (req, res) => {
       .update(rawBody)
       .digest("hex");
 
-    if (!signature || signature !== expectedSignature) {
+    if (!signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
       return res.status(401).json({ error: "Invalid signature" });
     }
 
     // Parse JSON only after verifying signature
     const body = JSON.parse(rawBody.toString("utf8"));
     const isTest = req.headers["x-request-network-test"] === "true";
+
+    if (isTest) {
+      console.log("Received test webhook");
+    }
 
     // Process webhook based on event type
     const { event, requestId } = body;
@@ -328,7 +339,7 @@ export async function POST(request: Request) {
       .update(rawBody)
       .digest("hex");
 
-    if (!signature || signature !== expectedSignature) {
+    if (!signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
