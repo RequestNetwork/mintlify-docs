@@ -37,6 +37,9 @@ export const CopyButton = ({ text, title = "Copy Address" }) => {
       title={title}
       aria-label={title}
       className="inline-flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 transition-all duration-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
+      style={{
+        '--primary-color': '#01B089'
+      }}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -45,6 +48,13 @@ export const CopyButton = ({ text, title = "Copy Address" }) => {
       <style jsx>{`
         button[data-copied="true"] {
           color: #10b981 !important;
+        }
+        button:hover {
+          color: var(--primary-color) !important;
+        }
+        button:focus {
+          color: var(--primary-color) !important;
+          box-shadow: 0 0 0 2px var(--primary-color) !important;
         }
       `}</style>
     </button>
@@ -77,7 +87,8 @@ export const ExternalLinkButton = ({ href, title = "View on Block Explorer" }) =
       className="inline-flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 transition-all duration-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none no-underline"
       style={{
         textDecoration: 'none',
-        borderBottom: 'none'
+        borderBottom: 'none',
+        '--primary-color': '#01B089'
       }}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -85,6 +96,15 @@ export const ExternalLinkButton = ({ href, title = "View on Block Explorer" }) =
         <polyline points="15,3 21,3 21,9"></polyline>
         <line x1="10" y1="14" x2="21" y2="3"></line>
       </svg>
+      <style jsx>{`
+        a:hover {
+          color: var(--primary-color) !important;
+        }
+        a:focus {
+          color: var(--primary-color) !important;
+          box-shadow: 0 0 0 2px var(--primary-color) !important;
+        }
+      `}</style>
     </a>
   );
 };
