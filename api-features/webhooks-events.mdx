@@ -5,17 +5,33 @@ description: "Real-time notifications for payment lifecycle events and request s
 
 ## Overview
 
-Webhooks provide real-time notifications when payment and request events occur, enabling immediate response to status changes without polling.
+Webhooks provide real-time notifications when payment and request events occur, enabling immediate response to status changes without constant polling.
 
-## Supported Events
+## Event Categories
 
 <CardGroup cols={2}>
   <Card title="Payment Events" icon="credit-card">
-    Payment detected, confirmed, failed
+    **Core events:** confirmed, partial, failed, refunded
+
+    Immediate notification when payments are processed or fail
   </Card>
-  
+
+  <Card title="Processing Events" icon="spinner">
+    **Crypto-to-fiat:** payment.processing with detailed subStatus
+
+    Track multi-step fiat conversion progress
+  </Card>
+
   <Card title="Request Events" icon="file-invoice">
-    Request created, updated, cancelled
+    **Recurring:** request.recurring
+
+    Automatic subscription renewal generation
+  </Card>
+
+  <Card title="Compliance Events" icon="shield-check">
+    **KYC & verification:** compliance.updated, payment_detail.updated
+
+    User verification and bank account status changes
   </Card>
 </CardGroup>
 
@@ -23,58 +39,58 @@ Webhooks provide real-time notifications when payment and request events occur, 
 
 ```mermaid
 graph LR
-    A[Event Occurs] --> B[Webhook Triggered]
-    B --> C[HTTP POST]
-    C --> D[Your Endpoint]
-    D --> E[Process Event]
+    A[Event Occurs] --> B[HMAC Signed POST]
+    B --> C[Your Endpoint]
+    C --> D[Verify & Process]
+    D --> E[Return 200 OK]
 ```
 
-**Flow:**
-1. **Event:** Payment or request status changes
-2. **Trigger:** Automatic webhook activation
-3. **Delivery:** HTTP POST to your endpoint
-4. **Process:** Handle event in your application
+**Process:**
+1. **Event occurs:** Payment confirmed, request created, compliance updated
+2. **Secure delivery:** HMAC SHA-256 signed POST to your configured endpoint
+3. **Your processing:** Verify `x-request-network-signature`, update application state
+4. **Reliable delivery:** 3 retries (1s, 5s, 15s delays) with 5-second timeout
 
-## Event Types
+## Key Features
 
-### Payment Events
-- `payment.detected` - Payment transaction found
-- `payment.confirmed` - Payment confirmed on blockchain
-- `payment.failed` - Payment transaction failed
+### Reliability
+- **Idempotency support:** Use `x-request-network-delivery` header for duplicate detection
+- **Delivery confirmation:** Monitor `x-request-network-retry-count` header to track attempts
 
-### Request Events
-- `request.created` - New request created
-- `request.updated` - Request information changed
-- `request.cancelled` - Request cancelled by creator
+### Security
+- **HMAC SHA-256 signatures:** Every webhook includes `x-request-network-signature` header
+- **HTTPS required:** Production endpoints must use secure connections
+- **Test webhook identification:** `x-request-network-test` header for development
 
-## Webhook Configuration
+### Development Tools
+- **Portal testing:** Send test webhooks from [Request Portal](https://portal.request.network)
+- **ngrok integration:** Receive webhooks locally during development
+- **Comprehensive logging:** Request API logs all delivery failures with attempt details
 
-### Endpoint Requirements
-- **HTTPS Only:** Secure webhook endpoints required
-- **Response Codes:** Return 200-299 for successful processing
-- **Timeout:** Respond within 30 seconds
+## Common Use Cases
 
-### Retry Logic
-- **Automatic Retries:** Failed deliveries retried with backoff
-- **Maximum Attempts:** Up to 5 retry attempts
-- **Retry Schedule:** 1min, 5min, 25min, 2hr, 12hr
+- **Invoice systems:** Automatically mark invoices as paid when `payment.confirmed` received
+- **Order fulfillment:** Release goods or services immediately after payment confirmation
+- **Subscription management:** Handle `request.recurring` for automatic billing renewals
+- **Compliance workflows:** Update user permissions when `compliance.updated` shows KYC approval
+- **Real-time dashboards:** Display live payment status using `payment.processing` subStatus values
 
-## Security Features
+## Implementation
 
 <CardGroup cols={2}>
-  <Card title="Signature Verification" icon="shield-check">
-    HMAC signatures for authenticity
+  <Card title="Webhook Reference" href="/api-reference/webhooks">
+    Complete technical documentation with setup, payloads, and code examples
   </Card>
-  
-  <Card title="IP Allowlisting" icon="network-wired">
-    Restrict webhook sources
+
+  <Card title="Implementation Examples" href="/api-reference/webhooks">
+    Working webhook handlers with Express.js and Next.js
+  </Card>
+
+  <Card title="Request Portal" href="https://portal.request.network" icon="browser">
+    Configure webhooks and test delivery
+  </Card>
+
+  <Card title="Request Scan" href="https://scan.request.network" icon="magnifying-glass">
+    Explore payment transactions and request details
   </Card>
 </CardGroup>
-
-## Implementation Examples
-
-See EasyInvoice webhook handling for real-world integration patterns.
-
-## Implementation Details
-
-See [API Reference - Webhooks](/api-reference/webhooks) for complete technical documentation.
