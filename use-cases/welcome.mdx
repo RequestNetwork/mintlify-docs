@@ -1,0 +1,94 @@
+---
+title: "Request Network Docs"
+description: "A protocol for requests, payments, and **100% automated reconciliation**. Requests add business context to payments, eliminating manual accounting with cryptographic certainty."
+sidebarTitle: "Welcome"
+mode: "frame"
+---
+
+import { IntegratedDemo } from '/snippets/integrated-demo.jsx'
+import { ComparisonTable } from '/snippets/comparison-table.jsx'
+
+<div style={{ padding: '2rem 2rem 0', maxWidth: '1400px', margin: '0 auto' }}>
+  <div style={{ marginBottom: '2rem' }}>
+    <h1 className="text-zinc-950 dark:text-white" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Request Network Docs</h1>
+    <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75' }}>
+      A protocol for requests, payments, and <strong className="text-zinc-950 dark:text-white">100% automated reconciliation</strong>.
+    </p>
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
+    Identify Every Payment
+  </h2>
+
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
+    Requests add business context to payments, eliminating manual accounting with cryptographic certainty. See how unique Request IDs prevent payment collisions:
+  </p>
+
+  <div style={{ marginBottom: '4rem' }}>
+    <IntegratedDemo />
+  </div>
+
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
+    Blockchain Payment Detection Comparison
+  </h2>
+
+  <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', lineHeight: '1.75', marginBottom: '2rem' }}>
+    How does Request Network compare to other approaches?
+  </p>
+
+  <div style={{ marginBottom: '4rem' }}>
+    <ComparisonTable />
+  </div>
+  </div>
+
+<div style={{ padding: '0 2rem', maxWidth: '1400px', margin: '0 auto' }}>
+  <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>Get Started</h2>
+  
+  <div style={{ marginBottom: '0.5rem' }}>
+    <CardGroup cols={3}>
+      <Card 
+        title="Use Cases" 
+        href="/use-cases/invoicing"
+        icon="briefcase"
+      >
+        Explore specific business scenarios: invoicing, payouts, payroll, checkout, and subscriptions
+      </Card>
+      
+      <Card 
+        title="API Features" 
+        href="/api-features/payment-types"
+        icon="code"
+      >
+        The easiest way to integrate. Payment types, webhooks, and developer tools.
+      </Card>
+      
+      <Card 
+        title="🌐 Resources" 
+        href="/resources/supported-chains-and-currencies"
+        icon="globe"
+      >
+        Supported chains, currencies, smart contracts, and community resources
+      </Card>
+    </CardGroup>
+  </div>
+
+  <div style={{ marginBottom: '3rem' }}>
+    <CardGroup cols={2}>
+      <Card 
+        title="SDK (Legacy)" 
+        href="/sdk-legacy/migration-guide"
+        icon="clock"
+      >
+        Legacy SDK and protocol documentation for advanced users
+      </Card>
+      
+      <Card 
+        title="📋 Release Notes" 
+        href="/release-notes/index"
+        icon="newspaper"
+      >
+        Stay updated with the latest features and improvements
+      </Card>
+    </CardGroup>
+  </div>
+</div>
