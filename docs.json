@@ -31,7 +31,7 @@
     "appearance": "dark"
   },
   "banner": {
-    "content": "🚀 New: Check out our revamped documentation!",
+    "content": "⚠️ **Beta Docs** – Landing page, Webhooks, and NEAR docs are ready. Release Notes, SDK tab, API Features, and Use Cases sections are still being revised. [View stable docs →](https://docs.request.network)",
     "dismissible": true
   },
   "navigation": {
@@ -79,7 +79,7 @@
                 ]
               },
               {
-                "group": "Payments",
+                "group": "Payment Types",
                 "pages": [
                   "api-features/payment-types-overview",
                   "api-features/standard-payments",
@@ -103,7 +103,7 @@
               {
                 "group": "Fee Structure",
                 "pages": [
-                  "api-features/custom-fees",
+                  "api-features/platform-fees",
                   "api-features/fee-breakdowns"
                 ]
               }
@@ -116,7 +116,7 @@
               "api-reference/webhooks",
               {
                 "group": "Endpoints",
-                "openapi": "https://api.stage.request.network/open-api/openapi.json",
+                "openapi": "https://api.request.network/open-api/openapi.json",
                 "pages": [
                   "request-network-api/create-and-pay-requests"
                 ]
@@ -133,8 +133,21 @@
             "pages": [
               "resources/supported-chains-and-currencies",
               "resources/near-blockchain",
-              "resources/smart-contracts",
+              "resources/token-list",
               "resources/community"
+            ]
+          },
+          {
+            "group": "🛠️ Tools & Examples",
+            "pages": [
+              "request-network-api/easyinvoice-api-demo-app",
+              "resources/request-scan"
+            ]
+          },
+          {
+            "group": "🏗️ Architecture",
+            "pages": [
+              "resources/lifecycle-of-a-request"
             ]
           },
           {
@@ -152,8 +165,7 @@
           {
             "group": "🔧 SDK Documentation",
             "pages": [
-              "request-network-api/migrate-to-v2",
-              "sdk-legacy/migration-guide"
+              "request-network-api/migrate-to-v2"
             ]
           }
         ]

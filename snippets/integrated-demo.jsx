@@ -11,6 +11,10 @@ export const IntegratedDemo = () => {
   const CURRENCIES = ["USDC", "USDT", "DAI"];
 
   // Helper functions
+  const generateHexString = (length) => {
+    return Array.from({length}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  };
+
   const generateAmount = () => {
     const amount = Math.floor(Math.random() * 900) + 100;
     const currency = CURRENCIES[Math.floor(Math.random() * CURRENCIES.length)];
@@ -336,7 +340,7 @@ export const IntegratedDemo = () => {
       for (let i = 0; i < 3; i++) {
         const timestamp = new Date(Date.now() + i); // Slight offset for unique timestamps
         // Generate a realistic Request ID (64 character hex string like the example)
-        const id = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        const id = generateHexString(64);
         
         // Determine if this request should be part of the collision pair
         const isCollisionRequest = collisionPair.includes(i);
@@ -357,7 +361,7 @@ export const IntegratedDemo = () => {
           amount,
           currency,
           customer: shuffledCustomers[i].name,
-          customerAddress: `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+          customerAddress: `0x${generateHexString(40)}`,
           status: "awaiting_payment",
           timestamp,
           isNew: true,
@@ -410,7 +414,7 @@ export const IntegratedDemo = () => {
       // Use the customer's address from the request (for consistency between left and right)
       const randomAddress = selectedRequest.customerAddress;
       // Generate valid 64-character tx hash (32 bytes in hex)
-      const txHash = `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+      const txHash = `0x${generateHexString(64)}`;
 
       setLeftPayments((prev) => {
         const matchingPayments = prev.filter(
@@ -503,14 +507,14 @@ export const IntegratedDemo = () => {
 
       const timestamp = new Date();
       // Generate a realistic Request ID (64 character hex string)
-      const id = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+      const id = generateHexString(64);
 
       const newRequest = {
         id,
         amount,
         currency,
         customer: randomCustomer.name,
-        customerAddress: `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+        customerAddress: `0x${generateHexString(40)}`,
         status: "awaiting_payment",
         timestamp,
         isNew: true,
@@ -576,9 +580,9 @@ export const IntegratedDemo = () => {
     const paymentCurrency = selectedRequest.currency;
 
     // Generate valid 40-character wallet address (20 bytes in hex)
-    const randomAddress = `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    const randomAddress = `0x${generateHexString(40)}`;
     // Generate valid 64-character tx hash (32 bytes in hex)
-    const txHash = `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    const txHash = `0x${generateHexString(64)}`;
 
     const matchingPayments = leftPayments.filter(
       (p) => !p.isPlaceholder && p.amount === paymentAmount && p.currency === paymentCurrency,
