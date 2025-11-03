@@ -31,7 +31,7 @@
     "appearance": "dark"
   },
   "banner": {
-    "content": "🚀 New: Check out our revamped documentation!",
+    "content": "⚠️ **Beta Docs** – Landing page, Webhooks, and NEAR docs are ready. Release Notes, SDK tab, API Features, and Use Cases sections are still being revised. [View stable docs →](https://docs.request.network)",
     "dismissible": true
   },
   "navigation": {
