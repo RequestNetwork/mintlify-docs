@@ -7,6 +7,7 @@ mode: "frame"
 
 import { IntegratedDemo } from '/snippets/integrated-demo.jsx'
 import { ComparisonTable } from '/snippets/comparison-table.jsx'
+import { DemoContainer } from '/snippets/demo-container.jsx'
 
 <div style={{ padding: '2rem 2rem 0', maxWidth: '1400px', margin: '0 auto' }}>
   <div style={{ marginBottom: '2rem' }}>
@@ -25,7 +26,9 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   </p>
 
   <div style={{ marginBottom: '4rem' }}>
-    <IntegratedDemo />
+    <DemoContainer>
+      <IntegratedDemo />
+    </DemoContainer>
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
@@ -37,7 +40,9 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   </p>
 
   <div style={{ marginBottom: '4rem' }}>
-    <ComparisonTable />
+    <DemoContainer>
+      <ComparisonTable />
+    </DemoContainer>
   </div>
   </div>
 
@@ -47,11 +52,19 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   <div style={{ marginBottom: '0.5rem' }}>
     <CardGroup cols={3}>
       <Card 
+        title="🚀 Payment Processing Demo" 
+        href="/use-cases/payment-processing-demo"
+        icon="rocket"
+      >
+        Experience the payment lifecycle with our interactive demo and see how we compare to traditional processors.
+      </Card>
+
+      <Card 
         title="Use Cases" 
-        href="/use-cases/invoicing"
+        href="/use-cases/payment-detection"
         icon="briefcase"
       >
-        Explore specific business scenarios: invoicing, payouts, payroll, checkout, and subscriptions
+        Explore specific business scenarios: payment detection, invoicing, payouts, payroll, checkout, and subscriptions
       </Card>
       
       <Card 
@@ -61,7 +74,11 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
       >
         The easiest way to integrate. Payment types, webhooks, and developer tools.
       </Card>
-      
+    </CardGroup>
+  </div>
+
+  <div style={{ marginBottom: '3rem' }}>
+    <CardGroup cols={3}>
       <Card 
         title="🌐 Resources" 
         href="/resources/supported-chains-and-currencies"
@@ -69,11 +86,6 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
       >
         Supported chains, currencies, smart contracts, and community resources
       </Card>
-    </CardGroup>
-  </div>
-
-  <div style={{ marginBottom: '3rem' }}>
-    <CardGroup cols={2}>
       <Card 
         title="SDK (Legacy)" 
         href="/sdk-legacy/migration-guide"

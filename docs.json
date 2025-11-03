@@ -42,12 +42,14 @@
           {
             "group": "🚀 Get Started",
             "pages": [
-              "use-cases/welcome"
+              "use-cases/welcome",
+              "use-cases/payment-processing-demo"
             ]
           },
           {
             "group": "🎯 Use Cases",
             "pages": [
+              "use-cases/payment-detection",
               "use-cases/invoicing",
               "use-cases/payouts",
               "use-cases/payroll",
