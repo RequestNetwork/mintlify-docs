@@ -216,6 +216,11 @@
       "vscode"
     ]
   },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-F4XSSNMEN6"
+    }
+  },
   "footer": {
     "socials": {
       "x": "https://x.com/RequestNetwork",
