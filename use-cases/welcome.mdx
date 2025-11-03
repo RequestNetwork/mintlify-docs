@@ -7,6 +7,7 @@ mode: "frame"
 
 import { IntegratedDemo } from '/snippets/integrated-demo.jsx'
 import { ComparisonTable } from '/snippets/comparison-table.jsx'
+import { DemoContainer } from '/snippets/demo-container.jsx'
 
 <div style={{ padding: '2rem 2rem 0', maxWidth: '1400px', margin: '0 auto' }}>
   <div style={{ marginBottom: '2rem' }}>
@@ -25,7 +26,9 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   </p>
 
   <div style={{ marginBottom: '4rem' }}>
-    <IntegratedDemo />
+    <DemoContainer>
+      <IntegratedDemo />
+    </DemoContainer>
   </div>
 
   <h2 className="text-zinc-950 dark:text-white" style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '3rem', marginBottom: '2rem' }}>
@@ -37,7 +40,9 @@ import { ComparisonTable } from '/snippets/comparison-table.jsx'
   </p>
 
   <div style={{ marginBottom: '4rem' }}>
-    <ComparisonTable />
+    <DemoContainer>
+      <ComparisonTable />
+    </DemoContainer>
   </div>
   </div>
 

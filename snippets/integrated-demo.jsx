@@ -709,7 +709,7 @@ export const IntegratedDemo = () => {
 
   return (
     <div className="relative" ref={demoContainerRef}>
-      <div className="relative w-full bg-gray-50 dark:bg-[#002920] rounded-xl border border-gray-200 dark:border-[#014d3d] shadow-lg p-4 md:p-8">
+      <div className="relative w-full p-4 md:p-8">
         {showDialog && !hasStarted && (
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-10 flex items-start justify-center p-4"
