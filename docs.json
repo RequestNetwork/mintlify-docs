@@ -31,7 +31,7 @@
     "appearance": "dark"
   },
   "banner": {
-    "content": "⚠️ **Beta Docs** – Landing page, Payment Demo, Payment Detection, Webhooks, and NEAR docs are ready. Use Cases, API, Resources, SDK, and Release Notes are still being revised. [View stable docs →](https://docs.request.network)",
+    "content": "⚠️ **Beta Docs** – Landing page, Payment Demo, Webhooks, and NEAR docs are ready. Use Cases, API, Resources, SDK, and Release Notes are still being revised. [View stable docs →](https://docs.request.network)",
     "dismissible": true
   },
   "navigation": {
