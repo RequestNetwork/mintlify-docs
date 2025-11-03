@@ -65,22 +65,32 @@ Every webhook includes an HMAC SHA-256 signature in the `x-request-network-signa
 ```javascript
 import crypto from "node:crypto";
 
-function verifyWebhookSignature(payload, signature, secret) {
+function verifyWebhookSignature(rawBody, signature, secret) {
   const expectedSignature = crypto
     .createHmac("sha256", secret)
-    .update(JSON.stringify(payload))
+    .update(rawBody)
     .digest("hex");
-    
-  return signature === expectedSignature;
+  
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    );
+  } catch {
+    return false;
+  }
 }
 
 // Usage in your webhook handler
 app.post("/webhook", (req, res) => {
   const signature = req.headers["x-request-network-signature"];
   
-  if (!verifyWebhookSignature(req.body, signature, WEBHOOK_SECRET)) {
+  if (!verifyWebhookSignature(req.rawBody, signature, WEBHOOK_SECRET)) {
     return res.status(401).json({ error: "Invalid signature" });
   }
+  
+  // Parse JSON after verification
+  const body = JSON.parse(req.rawBody.toString("utf8"));
   
   // Process webhook...
   res.status(200).json({ success: true });
@@ -253,36 +263,51 @@ import crypto from "node:crypto";
 const app = express();
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
-app.use(express.json());
+// Use raw body parser to capture exact request bytes for signature verification
+app.use(
+  express.raw({
+    type: "application/json",
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 
 app.post("/webhook/payment", async (req, res) => {
   try {
-    // Verify signature
+    // Verify signature against raw body
     const signature = req.headers["x-request-network-signature"];
+    const rawBody = req.rawBody;
+
     const expectedSignature = crypto
       .createHmac("sha256", WEBHOOK_SECRET)
-      .update(JSON.stringify(req.body))
+      .update(rawBody)
       .digest("hex");
 
-    if (signature !== expectedSignature) {
+    if (!signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
       return res.status(401).json({ error: "Invalid signature" });
     }
 
-    // Check for test webhook
+    // Parse JSON only after verifying signature
+    const body = JSON.parse(rawBody.toString("utf8"));
     const isTest = req.headers["x-request-network-test"] === "true";
-    
+
+    if (isTest) {
+      console.log("Received test webhook");
+    }
+
     // Process webhook based on event type
-    const { event, requestId } = req.body;
+    const { event, requestId } = body;
     
     switch (event) {
       case "payment.confirmed":
-        await handlePaymentConfirmed(req.body);
+        await handlePaymentConfirmed(body);
         break;
       case "payment.processing":
-        await handlePaymentProcessing(req.body);
+        await handlePaymentProcessing(body);
         break;
       case "compliance.updated":
-        await handleComplianceUpdate(req.body);
+        await handleComplianceUpdate(body);
         break;
       default:
         console.log(`Unhandled event: ${event}`);
@@ -306,18 +331,20 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    
-    // Verify signature
+    // Read raw body for signature verification
+    const rawBody = await request.text();
     const signature = request.headers.get("x-request-network-signature");
     const expectedSignature = crypto
       .createHmac("sha256", process.env.WEBHOOK_SECRET!)
-      .update(JSON.stringify(body))
+      .update(rawBody)
       .digest("hex");
 
-    if (signature !== expectedSignature) {
+    if (!signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
+
+    // Parse JSON after verifying signature
+    const body = JSON.parse(rawBody);
 
     // Process webhook
     const { event, requestId } = body;
@@ -329,11 +356,6 @@ export async function POST(request: Request) {
     
   } catch (error) {
     console.error("Webhook error:", error);
-    
-    if (error instanceof ResourceNotFoundError) {
-      return NextResponse.json({ error: error.message }, { status: 404 });
-    }
-    
     return NextResponse.json(
       { error: "Internal server error" }, 
       { status: 500 }

@@ -1,81 +1,157 @@
 ---
 title: "Payment Detection"
-description: "Real-time monitoring and verification of blockchain payment completion"
+description: "Automatic reference-based payment detection system for blockchain transactions"
 ---
 
 ## Overview
 
-Payment detection automatically monitors blockchain networks to verify when payments are completed, providing real-time status updates without manual verification.
-
-## Detection Methods
-
-<CardGroup cols={2}>
-  <Card title="Blockchain Scanning" icon="magnifying-glass">
-    Direct network monitoring
-  </Card>
-  
-  <Card title="Event Listening" icon="bell">
-    Smart contract event detection
-  </Card>
-</CardGroup>
+The Request Network API uses a **reference-based payment detection system** that automatically monitors blockchain transactions to detect when payments are made to your requests. This system works across multiple blockchains and handles various payment scenarios with zero configuration required.
 
 ## How It Works
 
 ```mermaid
-graph LR
-    A[Payment Initiated] --> B[Blockchain Monitor]
-    B --> C[Transaction Confirmed]
-    C --> D[Payment Detected]
-    D --> E[Status Updated]
+graph TD
+    A[Create Request] --> B[Payment Reference Generated]
+    B --> C[Payer Sends Payment with Reference]
+    C --> D[Subgraph Detects Transaction]
+    D --> E[Validate Payment Details]
+    E --> F[Update Request Status]
+    F --> G[Trigger Webhook]
 ```
 
-**Process:**
-1. **Monitor:** Continuous blockchain scanning
-2. **Detect:** Payment transaction identification
-3. **Verify:** Confirmation count validation
-4. **Update:** Real-time status synchronization
+### 1. Payment Reference Generation
+
+When you create a payment request, the API automatically generates a unique **payment reference** — a 16-character identifier that acts as a fingerprint for your request. This reference is what connects blockchain transactions back to your specific request.
+
+**Example:** `0x1234567890abcdef`
+
+### 2. Blockchain Monitoring
+
+The API continuously monitors supported blockchains using subgraphs that scan for transactions containing payment references. This happens automatically in the background with no action required from you.
+
+**Monitoring includes:**
+- Real-time transaction scanning
+- Multi-network support
+- Payment reference matching
+- Amount and currency validation
+
+### 3. Automatic Detection
+
+When someone makes a payment and includes the payment reference in their transaction, the system:
+
+- **Detects** the transaction within minutes
+- **Validates** payment details (amount, currency, recipient)
+- **Updates** request status (pending → partially paid → fully paid)
+- **Triggers** your configured webhooks
+
+### 4. Real-time Status Updates
+
+Once a payment is detected, your request status is immediately updated and you can get the latest information via:
+
+- **API Queries:** GET requests to check payment status using the request ID
+- **Webhooks:** Automatically receive updates to your configured webhook endpoints
 
 ## Supported Networks
 
+Payment detection works across all Request Network supported chains:
+
 ### Mainnet Networks
-- Ethereum, Polygon, Arbitrum, Optimism
-- Gnosis, BSC, Fantom, Avalanche
+- Ethereum, Polygon (Matic), Arbitrum One, Optimism, Base
+- Gnosis Chain, BSC, Fantom, Avalanche, Celo
 
 ### Testnet Networks
-- Sepolia, Mumbai, Arbitrum Goerli
+- Sepolia, Base Sepolia, Arbitrum Sepolia, Optimism Sepolia
 
-## Detection Features
+## Crosschain Payment Detection
 
-### Real-time Updates
-- **Instant Detection:** Sub-second payment identification
-- **Confirmation Tracking:** Block confirmation monitoring
-- **Status Webhooks:** Automatic notifications
+All crosschain payments using the Request Network API use the **ERC-20 Fee Proxy contract** as the final payment leg, ensuring payment detection works seamlessly across chains.
 
-### Multi-currency Support
-- **Native Tokens:** ETH, MATIC, BNB, AVAX
-- **ERC20 Tokens:** USDC, USDT, DAI, and more
-- **Custom Tokens:** Any ERC20-compatible token
+**How it works:**
+1. Payer initiates payment on source chain (e.g., Polygon)
+2. Crosschain bridge transfers funds to destination chain (e.g., Base)
+3. Final payment uses ERC-20 Fee Proxy with payment reference
+4. Payment detection system identifies the transaction
+5. Request status updated automatically
 
-## Integration Points
+## Webhook Notifications
+
+Configure webhooks to receive real-time notifications for payment events:
 
 <CardGroup cols={2}>
-  <Card title="Webhooks" href="/api-features/webhooks-events" icon="webhook">
-    Combine with webhooks for automatic payment notifications
+  <Card title="Payment Confirmed" icon="circle-check">
+    Full payment received and confirmed on blockchain
   </Card>
   
-  <Card title="Query Payments" href="/api-features/query-payments" icon="magnifying-glass">
-    Manually check payment status and history
+  <Card title="Payment Partial" icon="circle-half-stroke">
+    Partial payment received (less than expected amount)
   </Card>
   
-  <Card title="Invoicing Use Case" href="/use-cases/invoicing" icon="file-invoice">
-    See payment detection in action with automatic invoice reconciliation
+  <Card title="Payment Failed" icon="circle-xmark">
+    Payment transaction failed or reverted
   </Card>
   
-  <Card title="Create Requests" href="/api-features/create-requests" icon="plus">
-    Start by creating requests to track payments for
+  <Card title="Payment Refunded" icon="arrow-rotate-left">
+    Payment was refunded to the payer
   </Card>
 </CardGroup>
 
-## Implementation Details
+This allows your application to react immediately to payment events without constantly polling the API.
 
-See [API Reference - Payment Detection](/api-reference/payment-detection) for complete technical documentation.
+## Integration Benefits
+
+<CardGroup cols={2}>
+  <Card title="Zero Configuration" icon="magic-wand-sparkles">
+    Payment detection happens automatically — no setup required
+  </Card>
+  
+  <Card title="Multi-blockchain" icon="link">
+    Works across all 10+ supported EVM networks
+  </Card>
+  
+  <Card title="Real-time Updates" icon="bolt">
+    Fast detection and status updates within minutes
+  </Card>
+  
+  <Card title="Reliable Infrastructure" icon="shield-check">
+    Built on proven blockchain indexing infrastructure
+  </Card>
+</CardGroup>
+
+## Payment States
+
+Requests progress through the following payment states:
+
+- **`created`** - Request created, awaiting payment
+- **`pending`** - Payment transaction detected, awaiting confirmations
+- **`partially_paid`** - Partial payment received
+- **`paid`** - Full payment received and confirmed
+- **`overpaid`** - Payment exceeds expected amount
+- **`refunded`** - Payment was refunded
+
+## What's Next?
+
+<CardGroup cols={3}>
+  <Card 
+    title="Webhooks" 
+    href="/api-features/webhooks-events"
+    icon="webhook"
+  >
+    Configure webhook notifications for payment events
+  </Card>
+  
+  <Card 
+    title="Query Payments" 
+    href="/api-features/query-payments"
+    icon="magnifying-glass"
+  >
+    Manually check payment status via API
+  </Card>
+  
+  <Card 
+    title="Supported Chains" 
+    href="/resources/supported-chains-and-currencies"
+    icon="globe"
+  >
+    View all supported networks and currencies
+  </Card>
+</CardGroup>

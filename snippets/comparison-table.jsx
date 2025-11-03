@@ -160,7 +160,7 @@ export const ComparisonTable = () => {
   };
 
   return (
-    <div className="w-full bg-gray-50 dark:bg-[#002920] rounded-xl border border-gray-200 dark:border-[#014d3d] shadow-lg p-4 md:p-8">
+    <div className="w-full p-4 md:p-8">
       <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
         <div className="min-w-[800px]">
           {/* Table Header */}
