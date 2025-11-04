@@ -1,0 +1,54 @@
+---
+title: "SDK Overview"
+description: "Legacy SDK documentation and migration information"
+---
+
+<Warning>
+**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
+</Warning>
+
+## Request Network SDK
+
+The Request Network SDK provides direct access to the Request Network protocol for advanced use cases and custom integrations.
+
+<Note>
+**Most developers should use the [Request Network API](/api-setup/getting-started)** instead of the SDK. The API provides a simpler interface with built-in features like webhooks, payment processing, and managed infrastructure.
+</Note>
+
+## When to Use the SDK
+
+The SDK is recommended for:
+
+- **NEAR blockchain integration** - NEAR support is currently SDK-only
+- **Custom protocol interactions** - Direct access to Request Network's core protocol
+- **Advanced cryptographic operations** - Custom encryption and signing workflows
+- **Protocol-level development** - Building on top of Request Network infrastructure
+
+## Getting Started with the SDK
+
+<CardGroup cols={2}>
+  <Card title="SDK Documentation" href="https://docs.request.network/advanced/request-network-sdk" icon="book">
+    Complete SDK reference and integration guides (legacy docs)
+  </Card>
+  
+  <Card title="Migrate to API V2" href="/api-setup/migrate-to-v2" icon="arrow-right">
+    Moving from V1 API to V2 API for better features and support
+  </Card>
+</CardGroup>
+
+## API vs SDK Comparison
+
+| Feature | API (Recommended) | SDK |
+|---------|-------------------|-----|
+| **Setup Complexity** | Simple - API key authentication | Complex - Direct protocol integration |
+| **Webhooks** | ✅ Built-in | ❌ Manual implementation required |
+| **Payment Processing** | ✅ Automated | 🔧 Manual transaction handling |
+| **Supported Chains** | EVM chains (Ethereum, Polygon, etc.) | EVM chains + NEAR |
+| **Maintenance** | Request Network handles infrastructure | You manage all infrastructure |
+| **Best For** | Most applications | NEAR support, protocol development |
+
+## Resources
+
+- [Request Network Protocol Documentation](https://docs.request.network) - Legacy documentation site
+- [GitHub Repository](https://github.com/RequestNetwork/requestNetwork) - SDK source code
+- [API Documentation](/api-setup/getting-started) - Recommended for new integrations
