@@ -32,7 +32,7 @@
   },
   "banner": {
     "content": "⚠️ **Beta Docs** – Welcome page, Payment Demo, Webhooks, and NEAR docs are ready. Use Cases, API, Resources, SDK, and Release Notes are still being revised. [View stable docs →](https://docs.request.network)",
-    "dismissible": true
+    "dismissible": false
   },
   "navigation": {
     "tabs": [
