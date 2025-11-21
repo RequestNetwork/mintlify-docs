@@ -22,7 +22,7 @@ Bring instant, verifiable payments to your invoicing flow. Generate invoices in 
     Call the [Create Request endpoint](/api-reference/request/create-request) with invoice details
   </Step>
   <Step title="Process Payment">
-    Use the returned payment call data to prompt the payer to sign and submit the transaction on-chain
+    Use the payment data to show payment options, then guide the payer through wallet signature and submission
   </Step>
   <Step title="Track Payment">
     Use [webhooks](/api-features/webhooks-events) for real-time payment notifications
@@ -132,14 +132,6 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
   </Card>
   
   <Card 
-    title="Cross-chain Payments" 
-    href="/api-features/crosschain-payments"
-    icon="arrows-left-right"
-  >
-    Accept payments across 9 different blockchain networks
-  </Card>
-  
-  <Card 
     title="Recurring Invoices" 
     href="#"
     icon="repeat"
@@ -161,14 +153,6 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
     icon="magnifying-glass"
   >
     Build invoicing dashboards with historical invoice data and status tracking
-  </Card>
-  
-  <Card 
-    title="Payment Types Overview" 
-    href="/api-features/payment-types-overview"
-    icon="list"
-  >
-    Explore all available payment methods and configurations
   </Card>
 </CardGroup>
 
