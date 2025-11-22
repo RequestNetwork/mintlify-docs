@@ -40,25 +40,20 @@ Request IDs solve this by attaching business context to every payment. Each requ
 
 ## Common Scenarios
 
-### Donations with Attribution
-Accept crypto donations to a single wallet and automatically attribute each to the correct donor, campaign, or cause.
+### E-commerce Checkout
+Accept crypto payments at scale without generating unique addresses for each customer.
 
-**Example:** A nonprofit collects donations from hundreds of donors to one Ethereum address. Each donation is linked to a unique Request ID, enabling automatic attribution and thank-you emails.
+**Example:** An e-commerce platform processes 10,000+ crypto orders per day. Each order gets a unique Request ID - customers pay to a single wallet address, and every payment is automatically attributed to the correct order.
 
-### SaaS Adding Crypto Payments
-Add crypto as a payment option to existing subscription or billing platforms alongside credit cards.
+### SaaS Subscriptions
+Add crypto as a payment option for recurring billing alongside traditional payment methods.
 
-**Example:** A SaaS company uses Stripe for card payments but wants to offer USDC payments. Payment Detection monitors for crypto payments and updates subscription status automatically.
+**Example:** A SaaS company uses Stripe for card payments but offers USDC for monthly subscriptions. Payment Detection automatically confirms renewals and updates subscription status without manual tracking.
 
 ### Manual Invoices with Crypto Settlement
-Send invoices through existing channels (email, PDF) and let customers pay in crypto with automatic detection.
+Send invoices through existing channels (email, PDF) and accept crypto payments with automatic reconciliation.
 
-**Example:** A freelancer emails invoices as PDFs with a Request ID. When clients pay in crypto, the freelancer's accounting software automatically marks invoices as paid via <Tooltip tip="HTTP callbacks that notify your server when payment events occur">webhook</Tooltip>.
-
-### High-Volume Payment Collection
-Collect thousands of payments without generating unique wallet addresses for each transaction.
-
-**Example:** An e-commerce platform processes 10,000+ crypto orders per day. Instead of unique addresses, each order gets a unique Request ID for attribution.
+**Example:** A freelancer emails invoices as PDFs with a Request ID. When clients pay in crypto, the accounting software automatically marks invoices as paid via <Tooltip tip="HTTP callbacks that notify your server when payment events occur">webhook</Tooltip> - no manual checking required.
 
 <Info>
 These scenarios all use automatic payment detection. [See technical details on detection methods and configuration →](/api-features/payment-detection)
