@@ -72,7 +72,7 @@ These scenarios all use automatic payment detection. [See technical details on d
   </Step>
   
   <Step title="Customer Pays">
-    Customer sends payment to your wallet address - the Request ID is automatically embedded
+    Customer sends payment to your wallet address - the Request ID is automatically included in the transaction
   </Step>
   
   <Step title="Automatic Detection">
@@ -80,7 +80,7 @@ These scenarios all use automatic payment detection. [See technical details on d
   </Step>
   
   <Step title="Get Notified">
-    When a payment is matched, your request status updates and you receive a <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> notification
+    When a payment is detected, you receive a <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> notification with payment details
   </Step>
 </Steps>
 
