@@ -4,280 +4,145 @@ icon: "credit-card"
 description: "Automatically detect and verify crypto payments with real-time blockchain monitoring and webhooks"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-Payment Detection monitors blockchain networks to automatically identify and verify when payments are completed. Add crypto payment acceptance to your existing systems without rebuilding your entire infrastructure.
+Traditional crypto payments lack business context. You receive a <Tooltip tip="Unique identifier of a transaction recorded on the blockchain">transaction hash,</Tooltip> but don't know which customer, invoice, or order it's for. Manual reconciliation is error-prone and doesn't scale.
+
+Request IDs solve this by attaching business context to every payment. Each request gets a unique Request ID that connects payments back to your specific invoice, order, or subscription with cryptographic certainty.
+
+**What you get:**
+- **Automatic attribution** - Every payment linked to its request via Request ID
+- **Multi-chain monitoring** - Track payments across 9 EVM chains in 150+ currencies
+- **Real-time notifications** - <Tooltip tip="HTTP callbacks that notify your server when payment events occur">Webhooks</Tooltip> for instant payment confirmations
+- **Zero manual work** - No spreadsheets, no guessing, no payment collisions
+
+[See how Request IDs prevent payment collisions (welcome page demo) →](/use-cases/welcome)
 
 ## When to Use Payment Detection
 
 <CardGroup cols={2}>
-  <Card title="Existing Business Logic" icon="building">
-    You already have invoicing, billing, or business systems and just need crypto payment acceptance
+  <Card title="Payment Collisions" icon="triangle-exclamation">
+    Multiple payments of the same amount create attribution problems - you can't tell which customer paid
   </Card>
   
-  <Card title="Single Wallet, Many Payments" icon="wallet">
-    Collect payments at scale to one wallet address and automatically attribute each payment
+  <Card title="High Payment Volume" icon="chart-line">
+    Processing hundreds or thousands of crypto payments where manual tracking doesn't scale
   </Card>
   
-  <Card title="Real-time Verification" icon="clock">
-    Need instant payment confirmation without manual blockchain checking
+  <Card title="Wallet Management Overhead" icon="key">
+    Managing separate wallets for each customer or transaction creates operational complexity
   </Card>
   
-  <Card title="Multi-chain Support" icon="link">
-    Accept payments across Ethereum, Polygon, BSC, and 10+ EVM chains
+  <Card title="Cross-chain Payments" icon="link">
+    Accepting payments across multiple blockchains and need unified detection without managing multiple APIs
   </Card>
 </CardGroup>
 
 ## Common Scenarios
 
-### Donations with Attribution
-Accept crypto donations to a single wallet and automatically attribute each to the correct donor, campaign, or cause.
+### E-commerce Checkout
+Accept crypto payments at scale without generating unique addresses for each customer.
 
-**Example:** A nonprofit collects donations from hundreds of donors to one Ethereum address. Each donation includes a Request ID, enabling automatic attribution and thank-you emails.
+**Example:** An e-commerce platform processes 10,000+ crypto orders per day. Each order gets a unique Request ID - customers pay to a single wallet address, and every payment is automatically attributed to the correct order.
 
-### SaaS Adding Crypto Payments
-Existing subscription or billing platform adds crypto as a payment option alongside credit cards.
+### SaaS Subscriptions
+Add crypto as a payment option for recurring billing alongside traditional payment methods.
 
-**Example:** A SaaS company uses Stripe for card payments but wants to offer USDC payments. Payment Detection monitors for crypto payments and updates subscription status automatically.
+**Example:** A SaaS company uses Stripe for card payments but offers USDC for monthly subscriptions. Payment Detection automatically confirms renewals and updates subscription status without manual tracking.
 
-### Manual Invoices + Crypto Detection
-Send invoices through existing channels (email, PDF) and let customers pay in crypto with automatic detection.
+### Manual Invoices with Crypto Settlement
+Send invoices through existing channels (email, PDF) and accept crypto payments with automatic reconciliation.
 
-**Example:** A freelancer emails invoices as PDFs with a Request ID. Clients pay in crypto, and the freelancer's accounting software automatically marks invoices as paid via webhook.
+**Example:** A freelancer emails invoices as PDFs with a Request ID. When clients pay in crypto, the accounting software automatically marks invoices as paid via <Tooltip tip="HTTP callbacks that notify your server when payment events occur">webhook</Tooltip> - no manual checking required.
 
-### High-Volume Payment Collection
-Collect thousands of payments without creating new wallet addresses for each transaction.
-
-**Example:** An e-commerce platform processes 10,000+ crypto orders per day. Instead of generating unique addresses, each order gets a Request ID for attribution.
-
----
+<Info>
+These scenarios all use automatic payment detection. [See technical details on detection methods and configuration →](/api-features/payment-detection)
+</Info>
 
 ## How Payment Detection Works
 
 <Steps>
-  <Step title="Payment Initiated">
-    Customer sends crypto payment including the Request ID in the transaction reference
+  <Step title="Create Request">
+    When you create a request, it gets a unique Request ID for tracking
   </Step>
   
-  <Step title="Blockchain Monitoring">
-    Request Network continuously scans supported blockchains for transactions matching your requests
+  <Step title="Customer Pays">
+    Customer sends payment to your wallet address - the Request ID is connected to the transaction
   </Step>
   
-  <Step title="Payment Detected">
-    When a matching payment is found, Request Network verifies amount, currency, and confirmations
+  <Step title="Automatic Detection">
+    Request Network monitors <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchains</Tooltip> and matches payments to your requests
   </Step>
   
-  <Step title="Webhook Notification">
-    Your system receives a real-time webhook with payment details and status
-  </Step>
-  
-  <Step title="Automatic Reconciliation">
-    Your business logic updates invoice status, triggers fulfillment, or sends receipts
+  <Step title="Get Notified">
+    When a payment is detected, you receive a <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> notification with payment details
   </Step>
 </Steps>
 
----
+<Info>
+Payment Detection powers all Request Network use cases: [invoicing](/use-cases/invoicing), [payouts](/use-cases/payouts), [payroll](/use-cases/payroll), [checkout](/use-cases/checkout), and [subscriptions](/use-cases/subscriptions). [See technical details on detection methods, confirmation thresholds, and implementation →](/api-features/payment-detection)
+</Info>
 
-## Detection Features
-
-### Real-time Blockchain Scanning
-- **Multi-chain monitoring:** Ethereum, Polygon, Arbitrum, Optimism, BSC, Gnosis, Fantom, Avalanche, and more
-- **Sub-minute detection:** Typically detect payments within seconds of blockchain confirmation
-- **Confirmation tracking:** Configurable confirmation thresholds for different security requirements
-
-### Payment Verification
-- **Amount matching:** Verify exact payment amount or accept partial payments
-- **Currency validation:** Support for 553+ tokens across all supported chains
-- **Smart contract verification:** Detect payments through ERC20, native tokens, and conversion proxies
-
-### Webhook Integration
-- **Event notifications:** `payment.detected`, `payment.confirmed`, `payment.failed`
-- **Retry logic:** Automatic webhook retries with exponential backoff
-- **Signature verification:** Cryptographically signed webhooks for security
-
----
-
-## API Integration
+## Key API Features for Payment Detection
 
 <CardGroup cols={2}>
-  <Card title="Webhooks" href="/api-features/webhooks-events" icon="webhook">
-    Real-time payment notifications sent to your server
+  <Card 
+    title="Payment Detection" 
+    href="/api-features/payment-detection"
+    icon="radar"
+  >
+    Monitor <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchain</Tooltip> transactions and match payments to requests automatically
   </Card>
   
-  <Card title="Query Payments" href="/api-features/query-payments" icon="magnifying-glass">
-    Poll for payment status on demand
+  <Card 
+    title="Webhooks" 
+    href="/api-features/webhooks-events"
+    icon="webhook"
+  >
+    Real-time notifications when payments are detected, confirmed, or failed
   </Card>
   
-  <Card title="Payment Detection API" href="/api-features/payment-detection" icon="code">
-    Technical details on detection methods and configuration
+  <Card 
+    title="Query Requests" 
+    href="/api-features/query-requests"
+    icon="magnifying-glass"
+  >
+    Check request status and payment history on demand
   </Card>
   
-  <Card title="Request Status" href="/api-features/query-requests" icon="circle-check">
-    Check request status including payment state
+  <Card 
+    title="Query Payments" 
+    href="/api-features/query-payments"
+    icon="circle-check"
+  >
+    Retrieve detailed payment information including confirmations and amounts
   </Card>
 </CardGroup>
 
----
+## What's Next?
 
-## Detection-Only vs Full Workflows
-
-Understanding when to use standalone payment detection versus integrated workflows:
-
-<Tabs>
-  <Tab title="Payment Detection Only">
-    **Best for:** Existing systems that just need crypto payment acceptance
-    
-    **What you handle:**
-    - Create invoices/requests in your existing system
-    - Generate Request IDs via API
-    - Include Request ID in payment instructions
-    - Receive webhooks when payments are detected
-    - Update your system based on payment status
-    
-    **What Request Network handles:**
-    - Blockchain monitoring across all chains
-    - Payment verification and confirmation tracking
-    - Webhook delivery with retry logic
-    - Permanent on-chain payment records
-    
-    **Example:** QuickBooks + crypto payments via Request Network detection
-  </Tab>
-  
-  <Tab title="Full Invoicing Workflow">
-    **Best for:** Building new invoicing systems from scratch
-    
-    **What Request Network handles:**
-    - Invoice creation with structured data
-    - Payment link generation
-    - Payment processing
-    - Payment detection
-    - Complete payment lifecycle management
-    
-    **What you handle:**
-    - User interface and experience
-    - Customer management
-    - Business logic and workflows
-    
-    **Example:** [EasyInvoice](/use-cases/invoicing) - full-stack invoicing application
-    
-    [Learn more →](/use-cases/invoicing)
-  </Tab>
-  
-  <Tab title="Other Use Cases">
-    **Payment detection powers all Request Network use cases:**
-    
-    - **[Payouts](/use-cases/payouts):** Detection confirms batch payment completion
-    - **[Payroll](/use-cases/payroll):** Detection verifies salary payments
-    - **[Checkout](/use-cases/checkout):** Detection triggers order fulfillment
-    - **[Subscriptions](/use-cases/subscriptions):** Detection handles recurring payments
-    
-    Each use case combines request creation with payment detection for specific workflows.
-  </Tab>
-</Tabs>
-
----
-
-## Implementation Example
-
-Here's a minimal example of using payment detection with webhooks:
-
-<CodeGroup>
-```javascript Node.js - Create Request
-const response = await fetch('https://api.request.network/requests', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${API_KEY}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    currency: 'USDC-matic',
-    expectedAmount: '100.00',
-    paymentAddress: '0x...your-wallet',
-    reason: 'Invoice #12345'
-  })
-});
-
-const { requestId } = await response.json();
-// Include requestId in payment instructions to customer
-```
-
-```javascript Node.js - Webhook Handler
-app.post('/webhooks/request', (req, res) => {
-  const { eventType, requestId, paymentAmount, status } = req.body;
-  
-  if (eventType === 'payment.detected') {
-    // Payment detected on blockchain
-    console.log(`Payment detected for ${requestId}: ${paymentAmount}`);
-    
-    // Update your system
-    await updateInvoiceStatus(requestId, 'PAID');
-    await sendReceiptEmail(requestId);
-  }
-  
-  res.status(200).send('OK');
-});
-```
-
-```python Python - Webhook Handler
-from flask import Flask, request
-
-@app.route('/webhooks/request', methods=['POST'])
-def handle_webhook():
-    data = request.json
-    
-    if data['eventType'] == 'payment.detected':
-        request_id = data['requestId']
-        payment_amount = data['paymentAmount']
-        
-        # Update your system
-        update_invoice_status(request_id, 'PAID')
-        send_receipt_email(request_id)
-    
-    return '', 200
-```
-</CodeGroup>
-
----
-
-## Supported Networks & Currencies
-
-### Mainnet Networks
-- **Ethereum:** ETH, USDC, USDT, DAI, and 200+ ERC20 tokens
-- **Polygon:** MATIC, USDC, USDT, DAI, and 150+ tokens
-- **Arbitrum, Optimism, BSC, Gnosis, Fantom, Avalanche:** Full ERC20 support
-
-### Detection Speed
-- **Ethereum:** ~15 seconds per confirmation
-- **Polygon:** ~2 seconds per confirmation
-- **Layer 2s:** Sub-second to ~2 seconds
-
-### Testnet Support
-Available on Sepolia, Mumbai, and other testnets for development
-
-[View all supported chains and currencies →](/resources/supported-chains-and-currencies)
-
----
-
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card title="Get API Keys" href="/api-setup/getting-started" icon="key">
-    Set up authentication and create your first request
+<CardGroup cols={3}>
+  <Card 
+    title="Get API Keys" 
+    href="/api-setup/getting-started"
+    icon="key"
+  >
+    Set up your account and get API credentials
   </Card>
   
-  <Card title="Configure Webhooks" href="/api-reference/webhooks" icon="webhook">
-    Set up real-time payment notifications
+  <Card 
+    title="Payment Detection Details" 
+    href="/api-features/payment-detection"
+    icon="code"
+  >
+    Technical deep dive on detection methods and configuration
   </Card>
   
-  <Card title="Query API" href="/api-features/query-payments" icon="code">
-    Learn how to check payment status programmatically
-  </Card>
-  
-  <Card title="View Portal" href="https://portal.request.network" icon="external-link">
-    Manage API keys and monitor requests in real-time
+  <Card 
+    title="Supported Chains & Currencies" 
+    href="/resources/supported-chains-and-currencies"
+    icon="globe"
+  >
+    See which networks and tokens you can use
   </Card>
 </CardGroup>
