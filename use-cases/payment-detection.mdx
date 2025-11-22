@@ -21,20 +21,20 @@ Request IDs solve this by attaching business context to every payment. Each requ
 ## When to Use Payment Detection
 
 <CardGroup cols={2}>
-  <Card title="Existing Business Systems" icon="building">
-    You have invoicing, billing, or business systems and need to add crypto payment acceptance
+  <Card title="Payment Collisions" icon="triangle-exclamation">
+    Multiple payments of the same amount create attribution problems - you can't tell which customer paid
   </Card>
   
-  <Card title="Single Wallet, Many Payments" icon="wallet">
-    Collect thousands of payments to one wallet and automatically attribute each one
+  <Card title="High Payment Volume" icon="chart-line">
+    Processing hundreds or thousands of crypto payments where manual tracking doesn't scale
   </Card>
   
-  <Card title="Real-time Verification" icon="clock">
-    Get instant payment confirmation without manual blockchain monitoring
+  <Card title="Wallet Management Overhead" icon="key">
+    Managing separate wallets for each customer or transaction creates operational complexity
   </Card>
   
-  <Card title="Multi-chain Support" icon="link">
-    Accept payments across 9 EVM chains in 150+ currencies
+  <Card title="Cross-chain Payments" icon="link">
+    Accepting payments across multiple blockchains and need unified detection without managing multiple APIs
   </Card>
 </CardGroup>
 
