@@ -67,29 +67,25 @@ These scenarios all use automatic payment detection. [See technical details on d
 ## How Payment Detection Works
 
 <Steps>
-  <Step title="Payment Initiated">
-    Customer sends crypto payment including the Request ID in the transaction reference
+  <Step title="Create Request">
+    Generate a unique Request ID when creating an invoice, order, or payment request
   </Step>
   
-  <Step title="Blockchain Monitoring">
-    Request Network continuously scans supported <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchains</Tooltip> for transactions matching your requests
+  <Step title="Customer Pays">
+    Customer sends payment to your wallet address - the Request ID is included in the transaction
   </Step>
   
-  <Step title="Payment Verified">
-    When a matching payment is found, Request Network verifies amount, currency, and <Tooltip tip="The number of subsequent blocks added to the blockchain after your transaction, indicating finality">confirmations</Tooltip>
+  <Step title="Automatic Detection">
+    Request Network monitors the <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchain</Tooltip> and matches the payment to your request
   </Step>
   
-  <Step title="Webhook Notification">
-    Your system receives a real-time <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> with payment details and status
-  </Step>
-  
-  <Step title="Automatic Reconciliation">
-    Your business logic updates invoice status, triggers fulfillment, or sends receipts - no manual work needed
+  <Step title="Get Notified">
+    Your system receives a <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> confirming the payment
   </Step>
 </Steps>
 
 <Info>
-Payment Detection powers all Request Network use cases: [invoicing](/use-cases/invoicing), [payouts](/use-cases/payouts), [payroll](/use-cases/payroll), [checkout](/use-cases/checkout), and [subscriptions](/use-cases/subscriptions). Every use case includes automatic detection with no manual tracking.
+Payment Detection powers all Request Network use cases: [invoicing](/use-cases/invoicing), [payouts](/use-cases/payouts), [payroll](/use-cases/payroll), [checkout](/use-cases/checkout), and [subscriptions](/use-cases/subscriptions). [See technical details on detection methods, confirmation thresholds, and implementation →](/api-features/payment-detection)
 </Info>
 
 ## Key API Features for Payment Detection
