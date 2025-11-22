@@ -8,15 +8,15 @@ description: "Automatically detect and verify crypto payments with real-time blo
 
 Traditional crypto payments lack business context. You receive a <Tooltip tip="Unique identifier of a transaction recorded on the blockchain">transaction hash</Tooltip>, but don't know which customer, invoice, or order it's for. Manual reconciliation is error-prone and doesn't scale.
 
-Request Network solves this with reference-based payment detection. Each request automatically generates a unique payment reference—a 16-character identifier included in the blockchain transaction. This connects every payment back to your specific invoice, order, or subscription with cryptographic certainty.
+Request IDs solve this by attaching business context to every payment. Each request gets a unique Request ID that connects payments back to your specific invoice, order, or subscription with cryptographic certainty.
 
 **What you get:**
-- **Automatic attribution** - Every payment linked to its request via payment reference
+- **Automatic attribution** - Every payment linked to its request via Request ID
 - **Multi-chain monitoring** - Track payments across 9 EVM chains in 150+ currencies
 - **Real-time notifications** - <Tooltip tip="HTTP callbacks that notify your server when payment events occur">Webhooks</Tooltip> for instant payment confirmations
 - **Zero manual work** - No spreadsheets, no guessing, no payment collisions
 
-[See how payment references prevent payment collisions (welcome page demo) →](/use-cases/welcome)
+[See how Request IDs prevent payment collisions (welcome page demo) →](/use-cases/welcome)
 
 ## When to Use Payment Detection
 
@@ -43,7 +43,7 @@ Request Network solves this with reference-based payment detection. Each request
 ### Donations with Attribution
 Accept crypto donations to a single wallet and automatically attribute each to the correct donor, campaign, or cause.
 
-**Example:** A nonprofit collects donations from hundreds of donors to one Ethereum address. Each donation includes a unique payment reference, enabling automatic attribution and thank-you emails.
+**Example:** A nonprofit collects donations from hundreds of donors to one Ethereum address. Each donation is linked to a unique Request ID, enabling automatic attribution and thank-you emails.
 
 ### SaaS Adding Crypto Payments
 Add crypto as a payment option to existing subscription or billing platforms alongside credit cards.
@@ -53,12 +53,12 @@ Add crypto as a payment option to existing subscription or billing platforms alo
 ### Manual Invoices with Crypto Settlement
 Send invoices through existing channels (email, PDF) and let customers pay in crypto with automatic detection.
 
-**Example:** A freelancer emails invoices as PDFs with a payment reference. Clients include the reference when paying in crypto, and the freelancer's accounting software automatically marks invoices as paid via <Tooltip tip="HTTP callbacks that notify your server when payment events occur">webhook</Tooltip>.
+**Example:** A freelancer emails invoices as PDFs with a Request ID. When clients pay in crypto, the freelancer's accounting software automatically marks invoices as paid via <Tooltip tip="HTTP callbacks that notify your server when payment events occur">webhook</Tooltip>.
 
 ### High-Volume Payment Collection
 Collect thousands of payments without generating unique wallet addresses for each transaction.
 
-**Example:** An e-commerce platform processes 10,000+ crypto orders per day. Instead of unique addresses, each order gets a unique payment reference for attribution.
+**Example:** An e-commerce platform processes 10,000+ crypto orders per day. Instead of unique addresses, each order gets a unique Request ID for attribution.
 
 <Info>
 These scenarios all use automatic payment detection. [See technical details on detection methods and configuration →](/api-features/payment-detection)
@@ -67,20 +67,20 @@ These scenarios all use automatic payment detection. [See technical details on d
 ## How Payment Detection Works
 
 <Steps>
-  <Step title="Payment Reference Generated">
-    When you create a request, a unique 16-character payment reference is automatically generated
+  <Step title="Create Request">
+    When you create a request, it gets a unique Request ID for tracking
   </Step>
   
   <Step title="Customer Pays">
-    Customer sends payment to your wallet address including the payment reference in the transaction
+    Customer sends payment to your wallet address - the Request ID is automatically embedded
   </Step>
   
   <Step title="Automatic Detection">
-    Request Network monitors <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchains</Tooltip> for transactions containing your payment references
+    Request Network monitors <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchains</Tooltip> and matches payments to your requests
   </Step>
   
   <Step title="Get Notified">
-    When a match is found, your request status updates and you receive a <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> notification
+    When a payment is matched, your request status updates and you receive a <Tooltip tip="HTTP callback that notifies your server when payment events occur">webhook</Tooltip> notification
   </Step>
 </Steps>
 
