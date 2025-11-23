@@ -22,14 +22,14 @@ Unlike traditional crypto payments where customers send funds and you manually m
 ## Quickstart
 
 <Steps>
-  <Step title="Create Checkout Request">
-    Call the [payout endpoint](/api-features/payouts) with order details to generate payment transaction
+  <Step title="Choose Integration">
+    Use [Payment Widget Button](#) for drop-in checkout or [payout endpoint](/api-features/payouts) for custom API integration
   </Step>
-  <Step title="Process Payment">
-    Use Payment Widget Button or custom implementation to guide customer through wallet connection and payment
+  <Step title="Customer Pays">
+    Customer connects wallet and completes payment - funds go directly to your wallet via <Tooltip tip="Funds processed through blockchain smart contracts - Request Network never holds your money">non-custodial</Tooltip> smart contract
   </Step>
   <Step title="Get Confirmation">
-    Receive [webhook](/api-features/webhooks-events) notification when payment is confirmed
+    API integrations receive [webhook](/api-features/webhooks-events) notification when payment is confirmed
   </Step>
   <Step title="Fulfill Order">
     Automatically trigger fulfillment based on payment confirmation
@@ -51,9 +51,13 @@ Try the checkout payment flow with our interactive demo:
 **What you'll see:**
 - **Demo Tab**: Mock e-commerce store with shopping cart and checkout
 - **Playground Tab**: Interactive Payment Widget configuration tool
-- Multi-wallet support (80+ wallets via WalletConnect)
+- Multi-wallet support (6 wallets: Injected, Coinbase, MetaMask, Safe, WalletConnect, plus 400+ more via WalletConnect)
 - Real-time payment processing
 - Multiple currencies and chains
+
+<Info>
+**Note:** EasyInvoice uses WalletConnect by Reown and supports 490+ wallets. The Payment Widget (used in this demo) uses Wagmi and supports a smaller subset focused on popular wallets.
+</Info>
 
 <Check>
 **Ready to integrate?** The demo uses the Payment Widget Button component. For custom checkout flows, explore integration options below.
@@ -79,9 +83,7 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
     - Payment processing built-in
     - Fully customizable styling
     
-    [shadcn installation guide →](#)
-    
-    *Note: Links will point to Payment Widget API Feature page (Issue #36)*
+    [View demo →](https://checkout.request.network)
   </Card>
   
   <Card 
@@ -89,13 +91,13 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
     icon="store"
     href="https://easyinvoice.request.network/ecommerce/manage"
   >
-    **App builder platform**
+    **Hosted platform for merchants**
     
-    Issue Client IDs to your customers for their e-commerce sites.
+    Use immediately or issue Client IDs for your merchant customers.
     
+    - No development required
     - Manage multiple merchants
     - Client ID generation
-    - Sales dashboard
     
     [Try Easy Invoice →](https://easyinvoice.request.network)
   </Card>
@@ -113,7 +115,7 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
     - Custom branding
     - Add your own features
     
-    [Forking guide →](#)
+    [View repository →](https://github.com/RequestNetwork/easy-invoice)
   </Card>
   
   <Card 
@@ -161,9 +163,9 @@ Accept crypto payments for physical or digital products without generating uniqu
 **Example:** An online retailer processes 5,000+ orders per day. Customers add items to cart and pay in crypto at checkout. Each order gets a unique Request ID - all payments go to a single wallet address, and every transaction is automatically matched to the correct order for instant fulfillment.
 
 ### Digital Goods & Services
-Sell software, subscriptions, or digital content with instant delivery upon payment confirmation.
+Sell software, digital content, or online courses with instant delivery upon payment confirmation.
 
-**Example:** A SaaS platform offers monthly subscriptions payable in USDC. At checkout, customers connect their wallet and pay immediately. <Tooltip tip="HTTP callbacks that notify your server when payment events occur">Webhook</Tooltip> confirmation triggers instant account activation and service access.
+**Example:** A digital asset marketplace sells design templates, stock photos, and fonts. At checkout, customers pay in USDC and instantly receive download links. For recurring billing needs, see [Subscriptions use case](/use-cases/subscriptions).
 
 ### Event Ticketing
 Process high-volume ticket sales with automatic ticket delivery and anti-fraud protection.
@@ -173,7 +175,7 @@ Process high-volume ticket sales with automatic ticket delivery and anti-fraud p
 ### Multi-vendor Marketplace
 Enable marketplace checkout where payments are automatically split between vendors and platform fees.
 
-**Example:** An NFT marketplace processes sales from hundreds of creators. At checkout, buyer pays once - Request Network automatically splits payment between seller (90%), platform fee (8%), and creator royalty (2%) using a single transaction.
+**Example:** An NFT marketplace processes sales from hundreds of creators. At checkout, buyer pays once - Request Network automatically splits payment between seller (90%), platform fee (8%), and creator royalty (2%) using [batch payments](/api-features/batch-payments).
 
 <Info>
 **Commerce escrow with fraud prevention** is in development for Base chain, enabling authorize-capture workflows with KYT (Know Your Transaction) checks. [Track progress →](https://github.com/RequestNetwork/requestNetwork/issues/1650)
@@ -196,8 +198,14 @@ Enable marketplace checkout where payments are automatically split between vendo
     icon="credit-card"
   >
     Pre-built React component with wallet connection and payment processing
-    
-    *Note: Link will point to Payment Widget API Feature page (Issue #36)*
+  </Card>
+  
+  <Card 
+    title="Batch Payments" 
+    href="/api-features/batch-payments"
+    icon="layer-group"
+  >
+    Split payments between multiple recipients in a single transaction for marketplace scenarios
   </Card>
   
   <Card 
