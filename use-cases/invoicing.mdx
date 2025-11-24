@@ -1,157 +1,162 @@
 ---
-title: "📄 Invoicing"
+title: "Invoicing"
+icon: "file-invoice"
 description: "Create crypto invoices with automatic payment detection and reconciliation"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-Transform your invoicing workflow with Request Network. Create professional invoices, accept payments in 553+ currencies across 10 EVM chains, and maintain perfect payment records with zero reconciliation errors.
+Bring instant, verifiable payments to your invoicing flow. Generate invoices in fiat or crypto, let customers pay in their preferred token across 9 EVM chains and 150+ currencies, and receive automatic reconciliation with on-chain payment detection - no manual tracking, no infrastructure overhead.
 
-## 🚀 Quickstart: Create Your First Invoice
+**What you get:**
+- **Permanent records** - Invoices stored on <Tooltip tip="InterPlanetary File System - a distributed storage network for permanent data">IPFS</Tooltip> create a tamper-proof audit trail
+- **Multi-currency flexibility** - Invoice in USD, get paid in crypto with automatic conversion
+- **Instant reconciliation** - Every invoice automatically linked to its <Tooltip tip="Blockchain-recorded transaction verified by network validators">on-chain</Tooltip> payment
+- **Cross-chain support** - Accept payments across 9 networks in 150+ currencies
+- **Webhook automation** - Real-time payment confirmations for backend integration
 
-<Info>
-**Get your first invoice paid in under 1 minute**
-
-*Interactive quickstart experience coming soon*
-</Info>
+## Quickstart
 
 <Steps>
   <Step title="Create Invoice">
-    Generate a payment request with amount, recipient, and payment terms
+    Call the [Create Request endpoint](/api-features/create-requests) with invoice details
   </Step>
-  <Step title="Share Payment Link">
-    Send the secure payment link to your customer
-  </Step>
-  <Step title="Get Paid">
-    Customer pays with their preferred wallet and currency
+  <Step title="Process Payment">
+    Use the payment data to show payment options, then guide the payer through wallet signature and submission
   </Step>
   <Step title="Track Payment">
-    Real-time payment detection and automatic reconciliation
+    Use [webhooks](/api-features/webhooks-events) for real-time payment notifications
   </Step>
 </Steps>
 
-## EasyInvoice Demo
+## Invoicing Demo
 
-See the complete invoicing workflow in action with our demo application:
+Try the complete invoicing workflow with EasyInvoice:
+
+<Card 
+  title="Try EasyInvoice Demo" 
+  href="https://easyinvoice.request.network" 
+  icon="external-link"
+>
+  Create invoices, accept crypto payments, and track payment status - all powered by Request Network API
+</Card>
+
+**What you'll see:**
+- Invoice creation with Request Network
+- Multiple payment currencies and chains
+- Automatic payment detection
+- Real-time status updates via webhooks
+
+<Check>
+**Ready to integrate?** If EasyInvoice meets your needs, you can start using it immediately. For custom requirements, explore the integration options below.
+</Check>
+
+## Integration Approaches
+
+<Info>
+Not sure which approach fits your needs? [See our detailed comparison of integration approaches →](/resources/integration-approaches)
+</Info>
 
 <CardGroup cols={2}>
   <Card 
-    title="🎬 Watch Demo Video" 
-    href="#" 
-    icon="play"
+    title="Use EasyInvoice" 
+    icon="rocket"
+    href="https://easyinvoice.request.network"
   >
-    Complete invoicing workflow with Google login, dashboard metrics, and real-time updates
+    **Go live in minutes**
+    
+    Use our hosted application with no development required.
+    
+    - Dashboard analytics
+    - Multi-currency support
+    - Immediate deployment
+    
+    [Try it now →](https://easyinvoice.request.network)
   </Card>
   
   <Card 
-    title="🔗 Try Live Demo" 
-    href="https://easy-invoice-demo.vercel.app" 
-    icon="external-link"
+    title="Fork EasyInvoice" 
+    icon="code-fork"
+    href="#"
   >
-    Experience the full EasyInvoice application
+    **Customize for your brand**
+    
+    Clone and modify the open-source application to match your needs.
+    
+    - Full source code access
+    - Custom branding
+    - Add your own features
+    
+    [Forking guide →](#)
   </Card>
 </CardGroup>
 
-**Demo Features:**
-- Google authentication and user management
-- Professional invoice creation with custom branding
-- Real-time payment tracking and notifications
-- Dashboard with payment analytics and metrics
-- Multi-currency support (USD invoicing, crypto settlement)
-
-## Integration Options
-
-Choose the approach that best fits your needs:
-
-<Tabs>
-  <Tab title="Use EasyInvoice As-Is">
-    **Best for:** Quick deployment, immediate invoicing capabilities
-    
-    Deploy EasyInvoice directly for your business:
-    - Ready-to-use invoicing interface
-    - No development required
-    - Hosted solution with custom domain support
-    
-    [Deploy EasyInvoice →](#)
-  </Tab>
+<Card 
+  title="Build with API" 
+  icon="code"
+  href="/api-features/create-requests"
+>
+  **Complete control**
   
-  <Tab title="Fork & Customize">
-    **Best for:** Custom branding, workflow modifications
-    
-    Customize EasyInvoice for your specific needs:
-    - Clone the repository
-    - Modify UI/UX to match your brand
-    - Add custom business logic
-    - Requires API key setup
-    
-    [Fork Repository →](#) | [Setup Guide →](#)
-  </Tab>
+  Build a custom solution integrated with your existing systems.
   
-  <Tab title="Custom Implementation">
-    **Best for:** White-label solutions, full control
-    
-    Build your own invoicing system using Request Network API:
-    - Complete customization freedom
-    - Integrate with existing systems
-    - Pure API integration
-    
-    [API Documentation →](/api-features/payment-types)
-  </Tab>
-</Tabs>
+  - White-label ready
+  - Full customization
+  - Add fee layers
+  - <Tooltip tip="Users maintain control of their funds - you never custody crypto">Non-custodial</Tooltip> architecture
+  
+  [API docs →](/api-features/create-requests)
+</Card>
 
 ## Key API Features for Invoicing
 
 <CardGroup cols={2}>
   <Card 
     title="Create Requests" 
-    href="/api-features/payment-types"
+    href="/api-features/create-requests"
     icon="plus"
   >
-    Generate payment requests with flexible parameters and metadata
+    Generate payment requests with amount, recipient, and payment terms
   </Card>
   
   <Card 
     title="Conversion Payments" 
-    href="/api-features/payment-types"
+    href="/api-features/conversion-payments"
     icon="exchange"
   >
-    Invoice in USD, get paid in crypto with automatic conversion
+    Fiat-denominated invoices settled in crypto with real-time price conversion
   </Card>
   
   <Card 
-    title="Recurring Payments" 
-    href="/api-features/payment-types"
+    title="Batch Payments" 
+    href="/api-features/batch-payments"
+    icon="layer-group"
+  >
+    Pay multiple invoices in a single transaction
+  </Card>
+  
+  <Card 
+    title="Recurring Invoices" 
+    href="/api-features/recurring-payments"
     icon="repeat"
   >
-    Set up subscription billing and automated recurring invoices
+    Automate recurring invoice generation for ongoing vendor relationships
   </Card>
   
   <Card 
-    title="Webhooks" 
-    href="/api-features/advanced-features"
-    icon="webhook"
+    title="Payment Detection" 
+    href="/api-features/payment-detection"
+    icon="radar"
   >
-    Real-time payment notifications for instant reconciliation
+    Automatic detection and verification of payments across chains
   </Card>
   
   <Card 
-    title="Partial Payments" 
-    href="/api-features/payment-types"
-    icon="coins"
+    title="Query Requests" 
+    href="/api-features/query-requests"
+    icon="magnifying-glass"
   >
-    Accept installment payments and partial settlements
-  </Card>
-  
-  <Card 
-    title="Custom Metadata" 
-    href="/api-features/advanced-features"
-    icon="tag"
-  >
-    Add invoice numbers, tax info, and business data
+    Build invoicing dashboards with historical invoice data and status tracking
   </Card>
 </CardGroup>
 
@@ -159,7 +164,7 @@ Choose the approach that best fits your needs:
 
 <CardGroup cols={3}>
   <Card 
-    title="🔑 Get API Keys" 
+    title="Get API Keys" 
     href="/api-setup/getting-started"
     icon="key"
   >
@@ -167,18 +172,18 @@ Choose the approach that best fits your needs:
   </Card>
   
   <Card 
-    title="⚙️ Explore Features" 
-    href="/api-features/payment-types"
-    icon="cog"
+    title="View Invoicing Examples" 
+    href="#"
+    icon="code"
   >
-    Learn about payment types and advanced capabilities
+    See code examples for common invoicing workflows
   </Card>
   
   <Card 
-    title="🌐 Check Compatibility" 
+    title="Supported Chains & Currencies" 
     href="/resources/supported-chains-and-currencies"
     icon="globe"
   >
-    Review supported chains and currencies
+    See which networks and tokens you can use
   </Card>
 </CardGroup>
