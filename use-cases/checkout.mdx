@@ -138,48 +138,44 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
 ## When to Use Checkout
 
 <CardGroup cols={2}>
-  <Card title="Immediate Payments" icon="bolt">
-    You need instant payment processing at the point of purchase - not invoices sent later
+  <Card title="Point-of-Sale Payments" icon="bolt">
+    You need instant payment processing during checkout - not invoices sent later for manual payment
   </Card>
   
-  <Card title="E-commerce Scale" icon="chart-line">
-    Processing hundreds or thousands of orders per day where manual reconciliation doesn't work
+  <Card title="Payment Splitting" icon="split">
+    Revenue needs to be automatically distributed between multiple parties (vendors, platform fees, royalties)
   </Card>
   
-  <Card title="Order Attribution" icon="tag">
-    Multiple customers paying similar amounts create attribution problems - you can't tell which payment is for which order
+  <Card title="High-Volume Attribution" icon="chart-line">
+    Processing many concurrent transactions where manual reconciliation or unique addresses per customer don't scale
   </Card>
   
-  <Card title="Multi-Currency Support" icon="coins">
-    You want to accept many different tokens without managing separate payment processors or wallets for each
+  <Card title="Conversion Payments" icon="exchange">
+    You price in fiat but want customers to pay in crypto at current exchange rates
   </Card>
 </CardGroup>
 
 ## Common Scenarios
 
 ### Online Store Checkout
-Accept crypto payments for physical or digital products without generating unique addresses for each customer.
+Retailer processes thousands of daily orders with automatic payment attribution.
 
-**Example:** An online retailer processes 5,000+ orders per day. Customers add items to cart and pay in crypto at checkout. Each order gets a unique Request ID - all payments go to a single wallet address, and every transaction is automatically matched to the correct order for instant fulfillment.
+**Example:** Customers pay in crypto at checkout, each order gets a unique Request ID for automatic matching to the correct order.
 
 ### Digital Goods & Services
-Sell software, digital content, or online courses with instant delivery upon payment confirmation.
+Marketplace sells design templates and fonts with instant delivery upon payment.
 
-**Example:** A digital asset marketplace sells design templates, stock photos, and fonts. At checkout, customers pay in USDC and instantly receive download links. For recurring billing needs, see [Subscriptions use case](/use-cases/subscriptions).
+**Example:** Customer pays in USDC and instantly receives download links. For recurring billing, see [Subscriptions](/use-cases/subscriptions).
 
 ### Event Ticketing
-Process high-volume ticket sales with automatic ticket delivery and anti-fraud protection.
+Venue sells thousands of tickets with automatic NFT ticket delivery.
 
-**Example:** A concert venue sells 10,000+ tickets. Each ticket purchase gets a unique Request ID. Upon payment confirmation, the system automatically generates and sends the ticket NFT or digital ticket to the customer's wallet.
+**Example:** Upon payment confirmation, system automatically generates and sends digital ticket to customer's wallet.
 
 ### Multi-vendor Marketplace
-Enable marketplace checkout where payments are automatically split between vendors and platform fees.
+NFT marketplace automatically splits payments between sellers, platform, and royalties.
 
-**Example:** An NFT marketplace processes sales from hundreds of creators. At checkout, buyer pays once - Request Network automatically splits payment between seller (90%), platform fee (8%), and creator royalty (2%) using [batch payments](/api-features/batch-payments).
-
-<Info>
-**Commerce escrow with fraud prevention** is in development for Base chain, enabling authorize-capture workflows with KYT (Know Your Transaction) checks. [Track progress →](https://github.com/RequestNetwork/requestNetwork/issues/1650)
-</Info>
+**Example:** Buyer pays once, Request Network splits payment between multiple recipients using [batch payments](/api-features/batch-payments).
 
 ## Key API Features for Checkout
 
