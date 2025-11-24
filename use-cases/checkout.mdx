@@ -1,122 +1,219 @@
 ---
 title: "Checkout"
 icon: "cart-shopping"
-description: "Add crypto payment checkout to your e-commerce platform with seamless customer experience"
+description: "Accept crypto payments at point of purchase with automatic payment attribution and instant confirmation"
 ---
-
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
 
 ## Overview
 
-Transform your e-commerce checkout with Request Network's payment infrastructure. Accept crypto payments with support for 80+ wallets, enable crosschain transactions, and provide customers with a seamless payment experience that rivals traditional payment processors.
+Accept crypto payments at the point of purchase with instant attribution and confirmation. Whether you're running an online store, selling digital goods, or processing event tickets, Request Network enables immediate crypto payments with automatic reconciliation at scale.
 
-## 🚀 Quickstart: Integrate Your First Checkout Payment
+Unlike traditional crypto payments where customers send funds and you manually match transactions to orders, Request IDs automatically connect each payment to its specific order with cryptographic certainty.
 
-<Info>
-**Integrate your first checkout payment in under 1 minute**
+**What you get:**
+- **Instant attribution** - Every payment automatically linked to the correct order via Request ID
+- **Multi-wallet support** - Accept payments from 80+ wallets via <Tooltip tip="Multi-wallet connection protocol enabling users to connect any supported wallet">WalletConnect</Tooltip>
+- **Multi-currency flexibility** - Accept payments across 9 EVM chains in 150+ currencies
+- **Real-time confirmations** - <Tooltip tip="HTTP callbacks that notify your server when payment events occur">Webhook</Tooltip> notifications for instant order fulfillment
+- **High-volume ready** - Process thousands of orders per day without unique wallet addresses
 
-*Interactive quickstart experience coming soon*
-</Info>
+[See how Request IDs prevent payment collisions →](/use-cases/welcome)
+
+## Quickstart
 
 <Steps>
-  <Step title="Add Payment Widget">
-    Embed the Request Network payment widget in your checkout
+  <Step title="Create Easy Invoice Account">
+    Sign up at [easyinvoice.request.network](https://easyinvoice.request.network) and generate a Client ID for your site
   </Step>
-  <Step title="Configure Currencies">
-    Set accepted payment currencies and conversion rates
+  <Step title="Integrate Payment Widget">
+    Add Payment Widget Button to your checkout page using your Client ID
   </Step>
-  <Step title="Handle Payment Events">
-    Listen for payment confirmations and update order status
+  <Step title="Customer Completes Payment">
+    Customer connects wallet and pays - funds go directly to your wallet via <Tooltip tip="Funds processed through blockchain smart contracts - Request Network never holds your money">non-custodial</Tooltip> smart contract
   </Step>
-  <Step title="Reconcile Orders">
-    Automatically match payments to orders with zero manual work
+  <Step title="View in Dashboard">
+    Check Easy Invoice dashboard for payment confirmation and transaction details
   </Step>
 </Steps>
 
-## EasyInvoice Demo
+<Info>
+For custom API integration without Easy Invoice dashboard, see [Payout API docs](/api-features/payouts). For white-label platforms serving multiple merchants, see [Fork EasyInvoice](https://github.com/RequestNetwork/easy-invoice).
+</Info>
 
-Experience checkout payment flows through our demo:
+## Reference Implementations
 
-<CardGroup cols={2}>
-  <Card 
-    title="🎬 Payment Widget Demo" 
-    icon="play"
-  >
-    See the payment widget with wallet connection and direct payment forms
-  </Card>
-  
-  <Card 
-    title="🔗 Try Checkout Flow" 
-    href="https://easy-invoice-demo.vercel.app/pay" 
-    icon="external-link"
-  >
-    Experience the complete customer payment journey
-  </Card>
-</CardGroup>
+### Checkout Demo - Payment Widget Integration
+See the Payment Widget in action in a mock e-commerce store: [checkout.request.network](https://checkout.request.network)
 
-**Demo Features:**
-- 80+ wallet connection support (MetaMask, WalletConnect, Coinbase, etc.)
-- Direct payment forms with QR codes
-- Real-time payment status updates
-- Crosschain payment options
-- Mobile-optimized payment experience
+**What it demonstrates:**
+- **Demo Tab**: Customer checkout flow with shopping cart
+- **Playground Tab**: Interactive widget configuration tool
+- Real-time payment processing across multiple currencies and chains
+- Open-source reference you can fork and customize
+
+### Easy Invoice - Full Application Example
+See a complete merchant dashboard built with Request Network APIs: [easyinvoice.request.network](https://easyinvoice.request.network)
+
+**What it demonstrates:**
+- E-commerce sales dashboard and transaction history
+- Client ID management for multiple merchant-owned sites
+- Open-source reference you can fork to build multi-tenant platforms
+
+<Check>
+**Ready to integrate?** Choose your integration approach and explore developer tools below.
+</Check>
 
 ## Integration Options
 
-<Tabs>
-  <Tab title="Use EasyInvoice As-Is">
-    **Best for:** Quick e-commerce integration, existing payment forms
+Choose how you want to structure your implementation:
+
+<Info>
+Not sure which approach fits your needs? [See our detailed comparison of integration approaches →](/resources/integration-approaches)
+</Info>
+
+<CardGroup cols={2}>
+  <Card 
+    title="Easy Invoice" 
+    icon="store"
+    href="https://easyinvoice.request.network/ecommerce/manage"
+  >
+    **No-code merchant dashboard**
     
-    Embed checkout functionality in existing e-commerce:
-    - Drop-in payment widget
-    - Hosted payment pages
-    - Minimal integration required
+    Get a merchant dashboard with sales tracking and Client ID management—then integrate payments using Payment Widget or custom code.
     
-    *Embed code documentation coming soon*
-  </Tab>
+    - No-code dashboard setup
+    - Generate Client IDs for multiple sites
+    - Built-in sales analytics
+    
+    [Try Easy Invoice →](https://easyinvoice.request.network)
+  </Card>
   
-  <Tab title="Fork & Customize">
-    **Best for:** Custom checkout experience, brand matching
+  <Card 
+    title="Fork EasyInvoice" 
+    icon="code-fork"
+    href="https://github.com/RequestNetwork/easy-invoice"
+  >
+    **White-label platform starter**
     
-    Tailor checkout flow to match brand/UX requirements:
-    - Custom payment UI components
-    - Branded checkout experience
-    - Advanced payment flow customization
+    Full merchant dashboard application (sales tracking, multi-site management) you can brand and deploy for your own merchant users.
     
-    *Fork repository and customization guide coming soon*
-  </Tab>
+    - Issue Client IDs to your merchant customers
+    - Complete application source code
+    - Customize branding and features
+    
+    [View repository →](https://github.com/RequestNetwork/easy-invoice)
+  </Card>
+</CardGroup>
+
+<Card 
+  title="Build with API" 
+  icon="code"
+  href="/api-features/payouts"
+>
+  **Full API integration**
   
-  <Tab title="Custom Implementation">
-    **Best for:** Complete control, enterprise integration
-    
-    Build checkout with full control over user experience:
-    - Custom payment logic and validation
-    - Advanced fraud prevention
-    - Deep e-commerce platform integration
-    
-    [Checkout API Documentation →](/api-features/payment-types-overview)
-  </Tab>
-</Tabs>
+  Build custom checkout experience using Request Network API directly.
+  
+  - Complete control over UX and flows
+  - Use payout endpoints for immediate payments
+  - Add platform fees and custom logic
+  
+  [Payout API docs →](/api-features/payouts)
+</Card>
+
+## Developer Tools
+
+<Card 
+  title="Payment Widget Button" 
+  icon="credit-card"
+  href="#"
+>
+  **Pre-built React checkout component**
+  
+  Drop-in component for crypto payments—works with Easy Invoice Client IDs or direct API integration.
+  
+  - Wallet connection and payment processing included
+  - Fully customizable styling
+  - Compatible with all integration options above
+  
+  [View demo →](https://checkout.request.network)
+</Card>
+
+## When to Use Checkout
+
+<CardGroup cols={2}>
+  <Card title="Point-of-Sale Payments" icon="bolt">
+    You need instant payment processing during checkout - not invoices sent later for manual payment
+  </Card>
+  
+  <Card title="Payment Splitting" icon="split">
+    Revenue needs to be automatically distributed between multiple parties (vendors, platform fees, royalties)
+  </Card>
+  
+  <Card title="High-Volume Attribution" icon="chart-line">
+    Processing many concurrent transactions where manual reconciliation or unique addresses per customer don't scale
+  </Card>
+  
+  <Card title="Conversion Payments" icon="exchange">
+    You price in fiat but want customers to pay in crypto at current exchange rates
+  </Card>
+</CardGroup>
+
+## Common Scenarios
+
+### Online Store Checkout
+Retailer processes thousands of daily orders with automatic payment attribution.
+
+**Example:** Customers pay in crypto at checkout, each order gets a unique Request ID for automatic matching to the correct order.
+
+### Digital Goods & Services
+Marketplace sells design templates and fonts with instant delivery upon payment.
+
+**Example:** Customer pays in USDC and instantly receives download links. For recurring billing, see [Subscriptions](/use-cases/subscriptions).
+
+### Event Ticketing
+Venue sells thousands of tickets with automatic NFT ticket delivery.
+
+**Example:** Upon payment confirmation, system automatically generates and sends digital ticket to customer's wallet.
+
+### Multi-vendor Marketplace
+NFT marketplace automatically splits payments between sellers, platform, and royalties.
+
+**Example:** Buyer pays once, Request Network splits payment between multiple recipients using [batch payments](/api-features/batch-payments).
 
 ## Key API Features for Checkout
 
 <CardGroup cols={2}>
   <Card 
-    title="Payment Widget" 
-    href="/api-features/payment-types-overview"
-    icon="credit-card"
+    title="Payout Endpoints" 
+    href="/api-features/payouts"
+    icon="paper-plane"
   >
-    Drop-in payment component with 80+ wallet support
+    Recommended for checkout - bundles request creation with payment transaction generation
   </Card>
   
   <Card 
-    title="Crosschain Payments" 
-    href="/api-features/payment-types-overview"
-    icon="link"
+    title="Payment Widget Button" 
+    href="#"
+    icon="credit-card"
   >
-    Accept payments from any supported blockchain
+    Pre-built React component with wallet connection and payment processing
+  </Card>
+  
+  <Card 
+    title="Batch Payments" 
+    href="/api-features/batch-payments"
+    icon="layer-group"
+  >
+    Split payments between multiple recipients in a single transaction for marketplace scenarios
+  </Card>
+  
+  <Card 
+    title="Conversion Payments" 
+    href="/api-features/conversion-payments"
+    icon="exchange"
+  >
+    Accept fiat-denominated orders with crypto settlement at current exchange rates
   </Card>
   
   <Card 
@@ -124,165 +221,50 @@ Experience checkout payment flows through our demo:
     href="/api-features/platform-fees"
     icon="percentage"
   >
-    Collect marketplace or processing fees automatically
+    Automatically collect marketplace or platform fees on each transaction
   </Card>
   
   <Card 
-    title="Error Handling" 
-    href="/api-features/partial-payments"
-    icon="exclamation-triangle"
+    title="Payment Detection" 
+    href="/api-features/payment-detection"
+    icon="radar"
   >
-    Robust error handling for failed or partial payments
+    Automatic <Tooltip tip="Decentralized networks where cryptocurrency transactions are recorded">blockchain</Tooltip> monitoring and payment-to-order matching
   </Card>
   
   <Card 
-    title="Payment Routing" 
-    href="/api-features/payment-types-overview"
-    icon="route"
-  >
-    Optimize payment paths for best rates and speed
-  </Card>
-  
-  <Card 
-    title="Real-time Updates" 
+    title="Webhooks" 
     href="/api-features/webhooks-events"
-    icon="bolt"
+    icon="webhook"
   >
-    Instant payment confirmation and order updates
+    Real-time notifications for instant order fulfillment and status updates
   </Card>
 </CardGroup>
-
-## E-commerce Integration Patterns
-
-<AccordionGroup>
-  <Accordion title="🛍️ Traditional E-commerce">
-    Integrate with existing e-commerce platforms:
-    - Shopify, WooCommerce, Magento plugins
-    - Payment gateway replacement
-    - Inventory management integration
-    - Order fulfillment automation
-  </Accordion>
-  
-  <Accordion title="🎮 Digital Goods & Services">
-    Perfect for digital product sales:
-    - Instant payment confirmation
-    - Automated delivery for digital products
-    - Subscription and recurring billing
-    - Global payment acceptance without banking restrictions
-  </Accordion>
-  
-  <Accordion title="🏪 Marketplace Platforms">
-    Enable multi-vendor marketplaces:
-    - Automatic vendor payout splitting
-    - Marketplace fee collection
-    - Escrow and dispute resolution
-    - Multi-party payment flows
-  </Accordion>
-  
-  <Accordion title="🎫 Event & Ticket Sales">
-    Handle high-volume event sales:
-    - Instant ticket delivery
-    - Anti-fraud protection
-    - High-throughput payment processing
-    - Global accessibility without regional payment restrictions
-  </Accordion>
-</AccordionGroup>
-
-## Customer Experience Benefits
-
-<Tabs>
-  <Tab title="Wallet Choice">
-    **80+ Supported Wallets:**
-    - MetaMask, WalletConnect, Coinbase Wallet
-    - Hardware wallets (Ledger, Trezor)
-    - Mobile wallets (Trust Wallet, Rainbow)
-    - Exchange wallets and DeFi wallets
-  </Tab>
-  
-  <Tab title="Payment Flexibility">
-    **Multiple Payment Options:**
-    - Direct wallet payments
-    - QR code scanning for mobile
-    - Crosschain payment routing
-    - Multiple currency options
-  </Tab>
-  
-  <Tab title="Security & Trust">
-    **Enhanced Security:**
-    - No stored payment credentials
-    - Transparent blockchain transactions
-    - Real-time payment verification
-    - Immutable payment records
-  </Tab>
-</Tabs>
-
-## Technical Implementation
-
-<CodeGroup>
-```javascript React Component
-import { PaymentWidget } from '@requestnetwork/payment-widget';
-
-function CheckoutPage({ orderTotal, orderId }) {
-  return (
-    <PaymentWidget
-      amount={orderTotal}
-      currency="USD"
-      paymentCurrencies={["ETH", "USDC", "DAI"]}
-      onPaymentSuccess={(payment) => {
-        // Handle successful payment
-        updateOrderStatus(orderId, 'paid');
-      }}
-      onPaymentError={(error) => {
-        // Handle payment errors
-        console.error('Payment failed:', error);
-      }}
-    />
-  );
-}
-```
-
-```javascript Webhook Handler
-app.post('/webhook/payment', (req, res) => {
-  const { eventType, request } = req.body;
-  
-  if (eventType === 'payment.confirmed') {
-    // Update order status
-    updateOrder(request.orderId, {
-      status: 'paid',
-      paymentHash: request.paymentHash,
-      paidAt: new Date()
-    });
-  }
-  
-  res.status(200).send('OK');
-});
-```
-</CodeGroup>
 
 ## What's Next?
 
 <CardGroup cols={3}>
   <Card 
-    title="🔄 Add Subscriptions" 
-    href="/use-cases/subscriptions"
-    icon="repeat"
-  >
-    Enable recurring billing for subscription products
-  </Card>
-  
-  <Card 
-    title="⚙️ Payment Types" 
-    href="/api-features/payment-types-overview"
-    icon="cog"
-  >
-    Explore advanced payment options and routing
-  </Card>
-  
-  <Card 
-    title="🔑 Get Started" 
+    title="Get API Keys" 
     href="/api-setup/getting-started"
-    icon="rocket"
+    icon="key"
   >
-    Set up your account and start integrating
+    Set up your account and get API credentials
+  </Card>
+  
+  <Card 
+    title="Try Checkout Demo" 
+    href="https://checkout.request.network"
+    icon="play"
+  >
+    Experience the complete checkout flow with Payment Widget
+  </Card>
+  
+  <Card 
+    title="Supported Chains & Currencies" 
+    href="/resources/supported-chains-and-currencies"
+    icon="globe"
+  >
+    See which networks and tokens you can use
   </Card>
 </CardGroup>
