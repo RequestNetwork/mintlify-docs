@@ -22,19 +22,23 @@ Unlike traditional crypto payments where customers send funds and you manually m
 ## Quickstart
 
 <Steps>
-  <Step title="Choose Integration">
-    Use [Payment Widget Button](#) for drop-in checkout or [payout endpoint](/api-features/payouts) for custom API integration
+  <Step title="Create Easy Invoice Account">
+    Sign up at [easyinvoice.request.network](https://easyinvoice.request.network) and generate a Client ID for your site
   </Step>
-  <Step title="Customer Pays">
-    Customer connects wallet and completes payment - funds go directly to your wallet via <Tooltip tip="Funds processed through blockchain smart contracts - Request Network never holds your money">non-custodial</Tooltip> smart contract
+  <Step title="Integrate Payment Widget">
+    Add Payment Widget Button to your checkout page using your Client ID
   </Step>
-  <Step title="Get Confirmation">
-    API integrations receive [webhook](/api-features/webhooks-events) notification when payment is confirmed
+  <Step title="Customer Completes Payment">
+    Customer connects wallet and pays - funds go directly to your wallet via <Tooltip tip="Funds processed through blockchain smart contracts - Request Network never holds your money">non-custodial</Tooltip> smart contract
   </Step>
-  <Step title="Fulfill Order">
-    Automatically trigger fulfillment based on payment confirmation
+  <Step title="View in Dashboard">
+    Check Easy Invoice dashboard for payment confirmation and transaction details
   </Step>
 </Steps>
+
+<Info>
+For custom API integration without Easy Invoice dashboard, see [Payout API docs](/api-features/payouts). For white-label platforms serving multiple merchants, see [Fork EasyInvoice](https://github.com/RequestNetwork/easy-invoice).
+</Info>
 
 ## Reference Implementations
 
