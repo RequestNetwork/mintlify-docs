@@ -56,10 +56,12 @@ See a complete merchant dashboard built with Request Network APIs: [easyinvoice.
 - Open-source reference you can fork to build multi-tenant platforms
 
 <Check>
-**Ready to integrate?** Choose an integration approach below based on your technical requirements.
+**Ready to integrate?** Choose your integration approach and explore developer tools below.
 </Check>
 
-## Integration Approaches
+## Integration Options
+
+Choose how you want to structure your implementation:
 
 <Info>
 Not sure which approach fits your needs? [See our detailed comparison of integration approaches →](/resources/integration-approaches)
@@ -67,33 +69,17 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
 
 <CardGroup cols={2}>
   <Card 
-    title="Payment Widget Button" 
-    icon="credit-card"
-    href="#"
-  >
-    **Drop-in checkout component**
-    
-    Add crypto checkout to your app with a pre-built React component.
-    
-    - Wallet connection included
-    - Payment processing built-in
-    - Fully customizable styling
-    
-    [View demo →](https://checkout.request.network)
-  </Card>
-  
-  <Card 
-    title="Easy Invoice E-commerce" 
+    title="Easy Invoice" 
     icon="store"
     href="https://easyinvoice.request.network/ecommerce/manage"
   >
-    **Hosted solution for merchants**
+    **No-code merchant dashboard**
     
-    Create account, generate Client IDs, and integrate into your e-commerce sites.
+    Get a merchant dashboard with sales tracking and Client ID management—then integrate payments using Payment Widget or custom code.
     
-    - No development required
-    - Manage multiple sites with different Client IDs
-    - Sales dashboard included
+    - No-code dashboard setup
+    - Generate Client IDs for multiple sites
+    - Built-in sales analytics
     
     [Try Easy Invoice →](https://easyinvoice.request.network)
   </Card>
@@ -101,15 +87,15 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
   <Card 
     title="Fork EasyInvoice" 
     icon="code-fork"
-    href="#"
+    href="https://github.com/RequestNetwork/easy-invoice"
   >
-    **Build platform for other merchants**
+    **White-label platform starter**
     
-    Clone and modify the open-source application to create your own multi-tenant platform.
+    Full merchant dashboard application (sales tracking, multi-site management) you can brand and deploy for your own merchant users.
     
     - Issue Client IDs to your merchant customers
-    - Custom branding and features
-    - Full source code access
+    - Complete application source code
+    - Customize branding and features
     
     [View repository →](https://github.com/RequestNetwork/easy-invoice)
   </Card>
@@ -119,17 +105,35 @@ Not sure which approach fits your needs? [See our detailed comparison of integra
     icon="code"
     href="/api-features/payouts"
   >
-    **Complete control**
+    **Full API integration**
     
-    Build custom checkout using Request Network API.
+    Build custom checkout experience using Request Network API directly.
     
-    - Use payout endpoints (recommended for immediate payments)
-    - Full customization and branding
-    - Add marketplace fees
+    - Complete control over UX and flows
+    - Use payout endpoints for immediate payments
+    - Add platform fees and custom logic
     
     [Payout API docs →](/api-features/payouts)
   </Card>
 </CardGroup>
+
+## Developer Tools
+
+<Card 
+  title="Payment Widget Button" 
+  icon="credit-card"
+  href="#"
+>
+  **Pre-built React checkout component**
+  
+  Drop-in component for crypto payments—works with Easy Invoice Client IDs or direct API integration.
+  
+  - Wallet connection and payment processing included
+  - Fully customizable styling
+  - Compatible with all integration options above
+  
+  [View demo →](https://checkout.request.network)
+</Card>
 
 ## When to Use Checkout
 
