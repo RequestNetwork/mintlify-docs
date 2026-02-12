@@ -1,0 +1,55 @@
+---
+title: "Secure Payment Supported Networks and Currencies"
+description: "Chain and currency coverage for Secure Payment Pages."
+---
+
+## Coverage model
+
+Secure Payment Pages use the same chain and currency coverage as standard Request API request flows.
+
+This means supported options are the networks and currencies available through the API token list and request creation endpoints.
+
+## Supported currencies
+
+Currencies are determined by the Request token list and available per network.
+
+Use `GET /v2/currencies` to query support by network.
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.request.network/v2/currencies?network=sepolia" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+</RequestExample>
+
+<ResponseExample>
+```json Example
+[
+  {
+    "id": "FAU-sepolia",
+    "name": "FAU",
+    "symbol": "FAU",
+    "decimals": 18,
+    "network": "sepolia",
+    "type": "ERC20",
+    "chainId": 11155111
+  }
+]
+```
+</ResponseExample>
+
+## How to verify support
+
+- Query `GET /v2/currencies` with `network` and `symbol` filters for discovery
+- Validate currency IDs before calling `POST /v2/secure-payments`
+- Use the same network and currency validation rules you apply to normal request flows
+
+<Info>
+For an at-a-glance list of ecosystem support, see [Supported Chains and Currencies](/resources/supported-chains-and-currencies).
+</Info>
+
+## Preflight checklist
+
+- Confirm each currency ID exists in `GET /v2/currencies`
+- Confirm each request network is supported by your target flow
+- Confirm your selected currencies are available on those networks
