@@ -1,0 +1,166 @@
+---
+title: "Secure Payments API Reference"
+description: "Generate secure payment URLs and retrieve token-based payment calldata."
+---
+
+## Endpoints
+
+- `POST /v2/secure-payments`
+- `GET /v2/secure-payments/:token`
+
+## Authentication
+
+Both endpoints support:
+- `x-api-key`, or
+- `x-client-id` with browser `Origin`
+
+## POST /v2/secure-payments
+
+Create a secure payment entry and return a hosted payment URL.
+
+### Request fields
+
+<ParamField body="requests" type="array" required>
+Array of payment requests. One item creates a single payment. Multiple items create a batch payment.
+</ParamField>
+
+<ParamField body="requests[].payee" type="string" required>
+Payee EVM address.
+</ParamField>
+
+<ParamField body="requests[].amount" type="string" required>
+Human-readable amount.
+</ParamField>
+
+<ParamField body="requests[].invoiceCurrency" type="string" required>
+Invoice currency ID.
+</ParamField>
+
+<ParamField body="requests[].paymentCurrency" type="string" required>
+Payment currency ID.
+</ParamField>
+
+<ParamField body="feePercentage" type="string">
+Optional fee percentage from `0` to `100`.
+</ParamField>
+
+<ParamField body="feeAddress" type="string">
+Optional fee recipient address.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST "https://api.request.network/v2/secure-payments" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requests": [
+      {
+        "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+        "amount": "10",
+        "invoiceCurrency": "FAU-sepolia",
+        "paymentCurrency": "FAU-sepolia"
+      }
+    ],
+    "feePercentage": "2.5",
+    "feeAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7"
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "requestIds": [
+    "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"
+  ],
+  "securePaymentUrl": "https://secure.request.network/?token=01ABC123DEF456GHI789JKL",
+  "token": "01ABC123DEF456GHI789JKL"
+}
+```
+</ResponseExample>
+
+### Error responses
+
+- `400`: invalid body or unsupported secure payment configuration
+- `401`: unauthorized
+- `429`: rate limited
+
+## GET /v2/secure-payments/:token
+
+Retrieve secure payment status and prepared transactions.
+
+### Path parameters
+
+<ParamField path="token" type="string" required>
+Secure payment token returned from `POST /v2/secure-payments`.
+</ParamField>
+
+### Query parameters
+
+<ParamField query="wallet" type="string">
+Optional payer wallet address used to optimize approval checks.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789JKL?wallet=0x1234567890123456789012345678901234567890" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 Single payment
+{
+  "paymentType": "single",
+  "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "network": "sepolia",
+  "amount": "10000000000000000000",
+  "paymentCurrency": "FAU-sepolia",
+  "isNativeCurrency": false,
+  "status": "pending",
+  "transactions": [
+    {
+      "to": "0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+      "data": "0x...",
+      "value": 0
+    }
+  ],
+  "metadata": {
+    "stepsRequired": 1,
+    "needsApproval": false,
+    "paymentTransactionIndex": 0
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json 200 Batch payment
+{
+  "paymentType": "batch",
+  "payees": [
+    "0xb07d2398d2004378cad234da0ef14f1c94a530e4",
+    "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7"
+  ],
+  "network": "sepolia",
+  "amounts": ["50", "10"],
+  "paymentCurrencies": ["FAU-sepolia", "FAU-sepolia"],
+  "isNativeCurrency": [false, false],
+  "status": "pending",
+  "ERC20ApprovalTransactions": [],
+  "batchPaymentTransaction": {
+    "to": "0x399F5EE127ce7432E4921a61b8CF52b0af52cbfE",
+    "data": "0x...",
+    "value": 0
+  }
+}
+```
+</ResponseExample>
+
+### Error responses
+
+- `403`: token expired or not payable
+- `404`: token not found
+- `409`: secure payment already completed
+- `429`: rate limited

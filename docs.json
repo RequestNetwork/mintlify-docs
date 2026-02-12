@@ -102,6 +102,13 @@
                 ]
               },
               {
+                "group": "Secure Payment Pages",
+                "pages": [
+                  "api-features/secure-payment-pages",
+                  "api-features/secure-payment-supported-networks-and-currencies"
+                ]
+              },
+              {
                 "group": "Fee Structure",
                 "pages": [
                   "api-features/platform-fees",
@@ -114,6 +121,7 @@
             "group": "📚 API Reference",
             "pages": [
               "api-reference/authentication",
+              "api-reference/secure-payments",
               "api-reference/webhooks",
               {
                 "group": "Endpoints",
@@ -198,8 +206,7 @@
         "href": "https://github.com/orgs/RequestNetwork/discussions"
       }
     ],
-    "primary": 
-    {
+    "primary": {
       "type": "button",
       "label": "Get your API Key",
       "href": "https://portal.request.network"
@@ -233,32 +240,31 @@
     "links": [
       {
         "items": [
-        {
-          "label": "Website",
-          "href": "https://request.network"
-        },
-        {
-          "label": "Community",
-          "href": "https://discord.com/invite/FsVAR3ny3f"
-        },
-        {
-          "label": "Portal",
-          "href": "https://portal.request.network"
-        },
-        {
-          "label": "Scan",
-          "href": "https://scan.request.network"
-        },
-        {
-          "label": "Status",
-          "href": "https://status.request.network"
-        },
-        {
-          "label": "Blog",
-          "href": "https://request.network/blog"
-        }
+          {
+            "label": "Website",
+            "href": "https://request.network"
+          },
+          {
+            "label": "Community",
+            "href": "https://discord.com/invite/FsVAR3ny3f"
+          },
+          {
+            "label": "Portal",
+            "href": "https://portal.request.network"
+          },
+          {
+            "label": "Scan",
+            "href": "https://scan.request.network"
+          },
+          {
+            "label": "Status",
+            "href": "https://status.request.network"
+          },
+          {
+            "label": "Blog",
+            "href": "https://request.network/blog"
+          }
         ]
-
       }
     ]
   }
