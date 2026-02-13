@@ -1,0 +1,104 @@
+---
+title: "Secure Payment Pages"
+description: "Create hosted secure payment links and let payers complete payments from a dedicated secure flow."
+---
+
+## Overview
+
+Secure Payment Pages let you generate a hosted payment URL from the API and redirect the payer to a dedicated payment experience.
+
+This feature is useful when you want to reduce frontend tampering risk and separate payment execution from your checkout UI.
+
+## Built-in contract safety check
+
+Before signing, the secure page validates that the transaction targets official Request Network contracts.
+
+The payer-facing status copy is:
+- "This is a safe smart contract"
+- "The smart contract you are interacting with is an official Request Network smart contract, it is audited and valid."
+
+If validation fails, the secure page warns the payer and prevents continuing with unsafe contract interactions.
+
+## How the flow works
+
+<Steps>
+  <Step title="Create a secure payment link">
+    Call `POST /v2/secure-payments` with one or more requests.
+
+    The API creates Request records and returns:
+    - `requestIds`
+    - `token`
+    - `securePaymentUrl`
+  </Step>
+
+  <Step title="Redirect the payer to the hosted page">
+    Send the payer to `securePaymentUrl`.
+  </Step>
+
+  <Step title="Payer reviews payment details">
+    The hosted page loads the payment details and prepares the required transaction flow.
+  </Step>
+
+  <Step title="Sign and submit payment transactions">
+    The payer signs the returned transaction set from their wallet. Depending on token approvals, this can be one or more transactions.
+  </Step>
+</Steps>
+
+## Authentication
+
+Both secure payment endpoints accept:
+- `x-api-key`, or
+- `x-client-id` with browser `Origin`
+
+See [Authentication](/api-reference/authentication) for implementation options.
+
+## Create example
+
+<RequestExample>
+```bash cURL
+curl -X POST "https://api.request.network/v2/secure-payments" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requests": [
+      {
+        "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+        "amount": "10",
+        "invoiceCurrency": "FAU-sepolia",
+        "paymentCurrency": "FAU-sepolia"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "requestIds": [
+    "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"
+  ],
+  "securePaymentUrl": "https://secure.request.network/?token=01ABC123DEF456GHI789JKL",
+  "token": "01ABC123DEF456GHI789JKL"
+}
+```
+</ResponseExample>
+
+## Status outcomes
+
+- `200`: token is valid and payable
+- `403`: token expired or status is not payable
+- `404`: token not found
+- `409`: payment already completed
+
+## Next pages
+
+<CardGroup cols={2}>
+  <Card title="Secure Payments API Reference" icon="book" href="/api-reference/secure-payments">
+    Endpoint details, request and response schemas, and error codes.
+  </Card>
+
+  <Card title="Supported Networks and Currencies" icon="globe" href="/api-features/secure-payment-supported-networks-and-currencies">
+    Check supported chain and currency coverage before creating links.
+  </Card>
+</CardGroup>
