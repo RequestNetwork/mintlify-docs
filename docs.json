@@ -105,6 +105,7 @@
                 "group": "Secure Payment Pages",
                 "pages": [
                   "api-features/secure-payment-pages",
+                  "api-features/secure-payment-integration-guide",
                   "api-features/secure-payment-supported-networks-and-currencies"
                 ]
               },
