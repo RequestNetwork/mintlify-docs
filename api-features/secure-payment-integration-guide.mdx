@@ -1,0 +1,259 @@
+---
+title: "Secure Payment Integration Guide"
+description: "Integrate a secure payment experience via a secured link (redirect)"
+---
+
+## Overview
+
+This guide shows how to integrate Secure Payment Pages in a production-ready way.
+
+The recommended pattern is:
+1. Create secure payment links with `POST /v2/secure-payments`
+2. Store returned `requestIds` in your system
+3. Redirect the payer to the secure page
+4. Use webhooks as the source of truth for payment status updates
+
+## Prerequisites
+
+Before you integrate, make sure you have:
+
+- An API key or a Client ID linked to your integration domain
+- A webhook endpoint configured in Request Portal
+- Your webhook signing secret stored securely on your backend
+
+For setup details, see:
+- [Authentication](/api-reference/authentication)
+- [Webhooks](/api-reference/webhooks)
+
+## Quick start
+
+<Steps>
+  <Step title="Create secure payment links">
+    Call `POST /v2/secure-payments` and store the returned `requestIds`.
+
+    <RequestExample>
+    ```bash cURL
+    curl -X POST "https://api.request.network/v2/secure-payments" \
+      -H "x-api-key: YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "requests": [
+          {
+            "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+            "amount": "10",
+            "invoiceCurrency": "USDC-base",
+            "paymentCurrency": "USDC-base"
+          }
+        ]
+      }'
+    ```
+    </RequestExample>
+
+    <ResponseExample>
+    ```json 201 Created
+    {
+      "requestIds": [
+        "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"
+      ],
+      "securePaymentUrl": "https://secure.request.network/?token=01ABC123DEF456GHI789JKL",
+      "token": "01ABC123DEF456GHI789JKL"
+    }
+    ```
+    </ResponseExample>
+  </Step>
+
+  <Step title="Persist payment mapping in your database">
+    Store at least:
+    - your internal metadata
+    - returned `requestIds`
+    - `token`
+    - `securePaymentUrl`
+
+    This mapping lets you reconcile webhook events back to your internal records.
+  </Step>
+
+  <Step title="Redirect payer to secure page">
+    Redirect in the same tab or open the secure URL in a new tab.
+  </Step>
+
+  <Step title="Process webhook events and update order status">
+    Handle payment events from webhooks and update your order/payment state from those events.
+  </Step>
+</Steps>
+
+## Integration pattern: generated URL + redirect
+
+### Backend example (Node.js/Express)
+
+```javascript server.js
+import express from "express";
+
+const app = express();
+app.use(express.json());
+
+app.post("/api/checkout/secure-payment", async (req, res) => {
+  const { orderId, payee, amount, currencyId } = req.body;
+
+  const apiResponse = await fetch("https://api.request.network/v2/secure-payments", {
+    method: "POST",
+    headers: {
+      "x-api-key": process.env.REQUEST_API_KEY,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      requests: [
+        {
+          payee,
+          amount,
+          invoiceCurrency: currencyId,
+          paymentCurrency: currencyId,
+        },
+      ],
+    }),
+  });
+
+  if (!apiResponse.ok) {
+    const errorBody = await apiResponse.text();
+    return res.status(apiResponse.status).json({ error: errorBody });
+  }
+
+  const securePayment = await apiResponse.json();
+
+  // Persist in your DB
+  // Example payload:
+  // {
+  //   orderId,
+  //   requestIds: securePayment.requestIds,
+  //   token: securePayment.token,
+  //   securePaymentUrl: securePayment.securePaymentUrl,
+  //   status: "pending"
+  // }
+
+  return res.status(200).json({
+    orderId,
+    securePaymentUrl: securePayment.securePaymentUrl,
+  });
+});
+```
+
+### Frontend redirect examples
+
+<CodeGroup>
+```javascript Same tab
+window.location.href = securePaymentUrl;
+```
+
+```javascript New tab
+window.open(securePaymentUrl, "_blank", "noopener,noreferrer");
+```
+</CodeGroup>
+
+## Payment status updates with webhooks
+
+Use webhook events as your payment status source of truth.
+
+Typical mapping:
+- `payment.confirmed` -> mark order as paid
+- `payment.partial` -> mark order as partially paid
+- `payment.failed` -> mark order as failed
+
+### Webhook handler example (signature verification + reconciliation)
+
+```javascript webhook.js
+import crypto from "node:crypto";
+import express from "express";
+
+const app = express();
+
+app.use(
+  express.raw({
+    type: "application/json",
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
+
+app.post("/webhooks/request", async (req, res) => {
+  const signature = req.headers["x-request-network-signature"];
+  const secret = process.env.REQUEST_WEBHOOK_SECRET;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(req.rawBody)
+    .digest("hex");
+
+  if (!signature) {
+    return res.status(401).json({ error: "Missing signature" });
+  }
+
+  try {
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature),
+    );
+    if (!isValid) {
+      return res.status(401).json({ error: "Invalid signature" });
+    }
+  } catch {
+    return res.status(401).json({ error: "Invalid signature format" });
+  }
+
+  const event = JSON.parse(req.rawBody.toString("utf8"));
+  const requestId = event.requestId || event.requestID;
+
+  // Find internal record by requestId in your DB, then update order status.
+  // Example:
+  // const checkout = await db.findCheckoutByRequestId(requestId)
+  // if (event.event === "payment.confirmed") await db.markPaid(checkout.orderId)
+
+  return res.status(200).json({ received: true });
+});
+```
+
+## Expiry handling
+
+Secure payment links expire after one week by default.
+
+If a payer opens an expired link, create a new secure payment link and redirect again.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized when creating secure payments">
+    - Verify your `x-api-key` or `x-client-id` header
+    - If using Client ID in browser, verify the request origin is in allowed domains
+  </Accordion>
+
+  <Accordion title="403 when loading secure payment token">
+    - The token may be expired
+    - Create a fresh secure payment link and retry
+  </Accordion>
+
+  <Accordion title="409 already completed">
+    - Payment is already completed
+    - Show a paid/completed state in your app instead of retrying payment
+  </Accordion>
+
+  <Accordion title="Webhook events not updating order status">
+    - Verify HMAC signature validation uses raw request body
+    - Ensure your endpoint returns `2xx` after successful processing
+    - Confirm your DB lookup maps incoming `requestId`/`requestID` to stored request IDs
+  </Accordion>
+</AccordionGroup>
+
+## Related docs
+
+<CardGroup cols={3}>
+  <Card title="Secure Payments API Reference" href="/api-reference/secure-payments" icon="book">
+    Full request and response schema details.
+  </Card>
+
+  <Card title="Webhooks" href="/api-reference/webhooks" icon="webhook">
+    Event types, signing, retries, and payload details.
+  </Card>
+
+  <Card title="Authentication" href="/api-reference/authentication" icon="key">
+    API key and Client ID setup.
+  </Card>
+</CardGroup>
