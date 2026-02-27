@@ -155,7 +155,7 @@ Select the integration approach that best fits your needs:
 Verify your setup with a simple API call:
 
 <CodeGroup>
-```bash cURL
+```bash cURL (EVM)
 curl -X POST https://api.request.network/v2/requests \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -164,6 +164,18 @@ curl -X POST https://api.request.network/v2/requests \
     "expectedAmount": "100",
     "payeeIdentity": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
     "reason": "Test invoice"
+  }'
+```
+
+```bash cURL (Tron)
+curl -X POST https://api.request.network/v2/requests \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currency": "USDT-tron",
+    "expectedAmount": "50",
+    "payeeIdentity": "TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE",
+    "reason": "USDT payment on Tron"
   }'
 ```
 

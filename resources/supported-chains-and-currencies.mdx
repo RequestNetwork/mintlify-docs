@@ -9,7 +9,7 @@ description: "Complete list of supported blockchain networks and currencies for 
 
 ## Overview
 
-Request Network supports payments across **10 EVM-compatible blockchain networks** with **553+ currencies** including major cryptocurrencies, stablecoins, and fiat currencies. This comprehensive coverage ensures global accessibility and flexibility for all payment scenarios.
+Request Network supports payments across **EVM-compatible blockchain networks and select non-EVM chains** with **553+ currencies** including major cryptocurrencies, stablecoins, and fiat currencies. This comprehensive coverage ensures global accessibility and flexibility for all payment scenarios.
 
 ## Supported Blockchain Networks
 
@@ -78,6 +78,22 @@ Request Network supports payments across **10 EVM-compatible blockchain networks
   </Card>
 </CardGroup>
 
+<CardGroup cols={2}>
+  <Card title="Tron" icon="bolt">
+    **Mainnet only**
+
+    **Native Token:** TRX
+    **Supported Token:** USDT (TRC-20)
+    **Network ID:** `tron`
+
+    **Best For:** High-volume USDT transfers with low fees
+
+    <Warning>
+      Tron uses the **TRC-20** token standard, not ERC-20. Wallet addresses use the `T...` prefix format (e.g. `TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE`). Validate addresses against this format before creating requests.
+    </Warning>
+  </Card>
+</CardGroup>
+
 ## Currency Categories
 
 ### Major Cryptocurrencies
@@ -93,6 +109,7 @@ Request Network supports payments across **10 EVM-compatible blockchain networks
     | Binance Coin | BNB | BSC |
     | Avalanche | AVAX | Avalanche |
     | Fantom | FTM | Fantom |
+    | Tron | TRX | Tron |
   </Tab>
   
   <Tab title="Stablecoins">
@@ -101,7 +118,7 @@ Request Network supports payments across **10 EVM-compatible blockchain networks
     | Currency | Symbol | Chains Available |
     |----------|--------|------------------|
     | USD Coin | USDC | All supported chains |
-    | Tether | USDT | Ethereum, Polygon, BSC, Avalanche |
+    | Tether | USDT | Ethereum, Polygon, BSC, Avalanche, Tron |
     | DAI | DAI | Ethereum, Polygon, Arbitrum, Optimism |
     | BUSD | BUSD | BSC, Ethereum |
     | FRAX | FRAX | Ethereum, Polygon, Arbitrum |
@@ -285,6 +302,11 @@ Request Network uses standardized currency codes:
 "DAI-mainnet"        // DAI on Ethereum
 ```
 
+```javascript TRC-20 Tokens (Tron)
+// Tron uses a separate token standard — not ERC-20
+"USDT-tron"          // USDT on Tron mainnet
+```
+
 ```javascript Fiat Currencies
 // Format: {ISO_CODE}
 "USD"                // US Dollar
@@ -391,5 +413,13 @@ Request Network uses multiple price feed sources for accurate conversions:
     icon="globe"
   >
     Learn about NEAR blockchain support and unique features
+  </Card>
+
+  <Card
+    title="🔵 Tron"
+    href="/resources/supported-chains-and-currencies#tron"
+    icon="bolt"
+  >
+    USDT payments on Tron using the TRC-20 standard
   </Card>
 </CardGroup>
