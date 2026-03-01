@@ -1,58 +1,52 @@
 ---
 title: "Payment Types Overview"
-description: "Understanding Invoice-first vs Payment-first workflows and direct payment types"
+description: "Choose the right Request Network payment type for your integration"
 ---
-
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
 
 ## Overview
 
-Request Network supports two primary payment workflows and multiple payment types to accommodate different business needs.
+Request Network supports multiple payment types. This page helps you choose the right one for your integration.
 
-## Payment Workflows
+## Payment Types
 
-### Invoice-first Workflow
-Create a payment request first, then allow customers to pay at their convenience.
-
-**Use Cases:** Professional invoicing, B2B payments, formal payment collection
-
-### Payment-first Workflow  
-Send payments directly without creating a request first.
-
-**Use Cases:** Vendor payments, contractor payouts, immediate transfers
-
-## Direct Payment Types
-
-**Direct Payments** include Native, ERC20, and Conversion payments - the foundational payment methods that other features build upon.
+Core payment types available in the API:
 
 <CardGroup cols={3}>
   <Card title="Native & ERC20" href="/api-features/standard-payments">
-    Simple crypto-to-crypto payments
+    Same-currency payments with native tokens and ERC20 tokens
   </Card>
   
   <Card title="Conversion" href="/api-features/conversion-payments">
-    Fiat-denominated, crypto-settled
+    Fiat-denominated requests paid in crypto
   </Card>
   
   <Card title="Crosschain" href="/api-features/crosschain-payments">
-    Multi-network payment routing
+    Pay from a different chain and token than the request currency
   </Card>
 </CardGroup>
-
-## Used In
 
 <CardGroup cols={2}>
-  <Card title="Invoicing" href="/use-cases/invoicing">
-    Invoice-first workflow with payment requests
+  <Card title="Batch Payments" href="/api-features/batch-payments">
+    Process multiple payments in one transaction
   </Card>
-  
-  <Card title="Payouts" href="/use-cases/payouts">
-    Payment-first workflow for direct transfers
+
+  <Card title="Recurring Payments" href="/api-features/recurring-payments">
+    Subscription-style scheduled payments
   </Card>
 </CardGroup>
 
-## Implementation Details
+## Choosing a Payment Type
 
-See [API Reference - Payment Types](/api-reference/payment-types) for complete technical documentation.
+<Steps>
+<Step title="Choose your payment type">
+Use Native/ERC20 for same-currency flows, Conversion for fiat pricing, and Crosschain when payer and request chains differ.
+</Step>
+
+<Step title="Add advanced behavior if needed">
+Use Batch for multi-recipient execution and Recurring for scheduled payments.
+</Step>
+</Steps>
+
+## API Reference
+
+For full endpoint schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
