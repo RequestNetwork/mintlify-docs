@@ -63,6 +63,7 @@
             "group": "🔑 API Setup",
             "pages": [
               "api-setup/getting-started",
+              "api-setup/integration-tutorial",
               "request-network-api/api-portal-manage-api-keys-and-webhooks",
               "api-setup/migrate-to-v2"
             ]
