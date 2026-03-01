@@ -3,60 +3,86 @@ title: "Standard Native & ERC20 Payments"
 description: "Simple crypto-to-crypto payments using native currencies and ERC20 tokens"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-Standard payments are the simplest form of crypto transactions - sending tokens directly from one wallet to another without conversion or crosschain routing.
+Standard payments are same-currency payments where `invoiceCurrency` and `paymentCurrency` match.
+
+Use this type when you want straightforward crypto settlement without conversion or crosschain routing.
 
 ## Native Currency Payments
 
-Pay using blockchain native currencies like ETH, MATIC, BNB.
+Pay with network native currencies (for example ETH on Ethereum-compatible networks).
 
-**Benefits:**
-- No token approval required
-- Fastest execution
-- Lowest gas costs
+**Characteristics:**
+- no ERC20 allowance step
+- one payment transaction in most cases
+- payer covers gas in native token
 
 ## ERC20 Token Payments
 
-Pay using standard tokens like USDC, USDT, DAI.
+Pay with ERC20 tokens such as USDC, USDT, and DAI (depending on chain support).
 
-**Benefits:** 
-- Stable value (stablecoins)
-- Wide acceptance
-- Predictable costs
+**Characteristics:**
+- may require approval before payment
+- API can return approval calldata when needed
+- payment then executes with token transfer transaction(s)
+
+## How It Works
+
+<Steps>
+<Step title="Create request or initiate payout">
+Use either:
+
+- [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request) for request-first flows
+- [POST /v2/payouts](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts) for payment-first flows
+
+For standard payments, set matching values for `invoiceCurrency` and `paymentCurrency`.
+</Step>
+
+<Step title="Get payment calldata">
+Fetch payment payload with [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay) when using request-first flow.
+
+The response includes:
+
+- payment transaction calldata
+- approval calldata when token approval is required
+- metadata such as `stepsRequired` and `needsApproval`
+</Step>
+
+<Step title="Execute transactions">
+For native payments, execute the payment transaction.
+
+For ERC20 payments, execute approval first if needed, then execute the payment transaction.
+</Step>
+</Steps>
 
 ## Supported Networks & Tokens
 
 <CardGroup cols={2}>
-  <Card title="Production Networks" icon="globe">
-    Ethereum, Polygon, Arbitrum, Base, Optimism, BSC, Avalanche, Fantom, Tron
+  <Card title="Chains & Currencies" icon="globe">
+    Choose valid chain/token pairs from the supported currencies and chains catalog.
   </Card>
   
-  <Card title="500+ Tokens" icon="coins">
-    USDC, USDT, DAI, and hundreds more across all networks
+  <Card title="Token Types" icon="coins">
+    Supports native currency payments and ERC20 token payments.
   </Card>
 </CardGroup>
 
+Use [Supported Chains and Currencies](/resources/supported-chains-and-currencies) and [Request Network Token List](/resources/token-list) for current availability.
+
 ## Used In
 
-<CardGroup cols={3}>
-  <Card title="Payouts" href="/use-cases/payouts">
-    Direct vendor payments
-  </Card>
-  
-  <Card title="Payroll" href="/use-cases/payroll">
-    Employee compensation
-  </Card>
+<CardGroup cols={2}>
   
   <Card title="Invoicing" href="/use-cases/invoicing">
     Simple crypto invoices
   </Card>
+
+  <Card title="Checkout" href="/use-cases/checkout">
+    Direct same-currency checkout payments
+  </Card>
 </CardGroup>
 
-## Implementation Details
+## API Reference
 
-See [API Reference - Standard Payments](/api-reference/standard-payments) for complete technical documentation.
+For full endpoint schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
