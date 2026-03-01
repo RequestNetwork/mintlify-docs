@@ -3,30 +3,39 @@ title: "Partial Payments"
 description: "Split payments across multiple transactions and funding sources"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-Partial payments allow requests to be fulfilled through multiple transactions, enabling split payments, installment plans, and flexible funding approaches.
+Partial payments let you settle a request over multiple transactions instead of one full payment.
+
+This is useful for installments, split settlement, and staged collections.
 
 ## How It Works
 
-```mermaid
-graph TD
-    A[Request: $1000] --> B[Payment 1: $400]
-    A --> C[Payment 2: $300] 
-    A --> D[Payment 3: $300]
-    B --> E[Request Fulfilled]
-    C --> E
-    D --> E
-```
+<Steps>
+<Step title="Create the request">
+Create a request with [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request).
+</Step>
 
-**Benefits:**
-- **Flexible Payment Plans:** Installments and split payments
-- **Multiple Funding Sources:** Different wallets, chains, or currencies
-- **Risk Management:** Partial fulfillment tracking
+<Step title="Pay a partial amount">
+Fetch payment payload with [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay) and pass `amount` in query parameters to pay only part of the request.
+
+The `amount` query parameter is human-readable and must be greater than 0.
+</Step>
+
+<Step title="Repeat until fully paid">
+Execute additional partial payments as needed until the request reaches full settlement.
+</Step>
+
+<Step title="Track status and breakdown">
+Check [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}) for status and conversion/payment breakdown fields.
+</Step>
+</Steps>
+
+## Key Behavior
+
+- Partial payments are applied incrementally against the same request
+- Request status reflects progress until full settlement
+- For conversion flows, breakdown fields expose paid vs remaining values
 
 ## Use Cases
 
@@ -42,15 +51,17 @@ graph TD
 
 ## Supported Payment Types
 
-Works with all payment types except Crypto-to-fiat payments:
+Partial settlement can be used in request-based payment flows where payment payloads are fetched via `GET /v2/request/{requestId}/pay`.
+
+Commonly used with:
+
 - Native & ERC20 payments
-- Conversion payments  
+- Conversion payments
 - Crosschain payments
-- Batch payments
 
 ## Used In
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Invoicing" href="/use-cases/invoicing">
     Large invoice installments
   </Card>
@@ -58,12 +69,8 @@ Works with all payment types except Crypto-to-fiat payments:
   <Card title="Checkout" href="/use-cases/checkout">
     Flexible payment options
   </Card>
-  
-  <Card title="Subscriptions" href="/use-cases/subscriptions">
-    Partial subscription payments
-  </Card>
 </CardGroup>
 
-## Implementation Details
+## API Reference
 
-See [API Reference - Partial Payments](/api-reference/partial-payments) for complete technical documentation.
+For full endpoint schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
