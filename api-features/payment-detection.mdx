@@ -3,13 +3,11 @@ title: "Payment Detection"
 description: "Automatic reference-based payment detection system for blockchain transactions"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-The Request Network API uses a **reference-based payment detection system** that automatically monitors blockchain transactions to detect when payments are made to your requests. This system works across multiple blockchains and handles various payment scenarios with zero configuration required.
+The Request Network API uses a **reference-based payment detection system** that automatically monitors blockchain transactions to detect when payments are made to your requests.
+
+This works across supported blockchains and handles payment matching automatically.
 
 ## How It Works
 
@@ -25,51 +23,40 @@ graph TD
 
 ### 1. Payment Reference Generation
 
-When you create a payment request, the API automatically generates a unique **payment reference** — a 16-character identifier that acts as a fingerprint for your request. This reference is what connects blockchain transactions back to your specific request.
+When you create a request, the API automatically generates a unique **payment reference** (16-character identifier). This reference is what links on-chain payment transactions to your request.
 
 **Example:** `0x1234567890abcdef`
 
 ### 2. Blockchain Monitoring
 
-The API continuously monitors supported blockchains using subgraphs that scan for transactions containing payment references. This happens automatically in the background with no action required from you.
+The API continuously monitors supported blockchains using subgraphs that scan for transactions containing payment references. This happens automatically in the background.
 
 **Monitoring includes:**
-- Real-time transaction scanning
-- Multi-network support
-- Payment reference matching
-- Amount and currency validation
+- transaction scanning
+- payment reference matching
+- amount and currency validation
 
 ### 3. Automatic Detection
 
 When someone makes a payment and includes the payment reference in their transaction, the system:
 
-- **Detects** the transaction within minutes
+- **Detects** the transaction
 - **Validates** payment details (amount, currency, recipient)
-- **Updates** request status (pending → partially paid → fully paid)
+- **Updates** request status (for example partially paid or fully paid)
 - **Triggers** your configured webhooks
 
 ### 4. Real-time Status Updates
 
-Once a payment is detected, your request status is immediately updated and you can get the latest information via:
+Once a payment is detected, your request status is updated and you can retrieve the latest information via:
 
-- **API Queries:** GET requests to check payment status using the request ID
-- **Webhooks:** Automatically receive updates to your configured webhook endpoints
+- **API Queries:** `GET /v2/request/{requestId}`
+- **Webhooks:** receive updates on your configured endpoints
 
-## Supported Networks
-
-Payment detection works across all Request Network supported chains:
-
-### Mainnet Networks
-- Ethereum, Polygon (Matic), Arbitrum One, Optimism, Base
-- Gnosis Chain, BSC, Fantom, Avalanche, Celo
-- Tron (USDT TRC-20 only)
-
-### Testnet Networks
-- Sepolia, Base Sepolia, Arbitrum Sepolia, Optimism Sepolia
+For the latest chain and currency support, see [Supported Chains and Currencies](/resources/supported-chains-and-currencies).
 
 ## Crosschain Payment Detection
 
-All crosschain payments using the Request Network API use the **ERC-20 Fee Proxy contract** as the final payment leg, ensuring payment detection works seamlessly across chains.
+All crosschain payments using Request Network API use the **ERC-20 Fee Proxy contract** as the last payment leg, so payment detection works out of the box.
 
 **How it works:**
 1. Payer initiates payment on source chain (e.g., Polygon)
@@ -106,32 +93,21 @@ This allows your application to react immediately to payment events without cons
 
 <CardGroup cols={2}>
   <Card title="Zero Configuration" icon="magic-wand-sparkles">
-    Payment detection happens automatically — no setup required
+    Payment detection happens automatically
   </Card>
   
   <Card title="Multi-blockchain" icon="link">
-    Works across all 10+ supported EVM networks
+    Works across supported chains
   </Card>
   
   <Card title="Real-time Updates" icon="bolt">
-    Fast detection and status updates within minutes
+    Fast detection and status updates
   </Card>
   
   <Card title="Reliable Infrastructure" icon="shield-check">
-    Built on proven blockchain indexing infrastructure
+    Built on blockchain indexing infrastructure
   </Card>
 </CardGroup>
-
-## Payment States
-
-Requests progress through the following payment states:
-
-- **`created`** - Request created, awaiting payment
-- **`pending`** - Payment transaction detected, awaiting confirmations
-- **`partially_paid`** - Partial payment received
-- **`paid`** - Full payment received and confirmed
-- **`overpaid`** - Payment exceeds expected amount
-- **`refunded`** - Payment was refunded
 
 ## What's Next?
 
