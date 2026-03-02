@@ -1,109 +1,140 @@
 ---
 title: "Fee Breakdowns"
-description: "Comprehensive fee transparency with USD amounts and detailed cost structures"
+description: "Where to read fee details in routes, payment search, and status responses"
 ---
-
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
 
 ## Overview
 
-Detailed fee breakdowns provide complete transparency into all costs associated with payments, including network fees, service fees, and USD equivalent amounts for better financial planning.
+Fee breakdowns provide itemized cost details returned by reconciliation and routing endpoints.
 
-## Fee Components
+Use this page to understand where fee data appears and how to consume it reliably.
 
-<CardGroup cols={2}>
-  <Card title="Network Fees" icon="network-wired">
-    Blockchain transaction costs
-  </Card>
-  
-  <Card title="Service Fees" icon="handshake">
-    Platform and processing fees
-  </Card>
-</CardGroup>
+## Where Fee Breakdowns Appear
 
-## How It Works
+### Payment Routes
 
-```mermaid
-graph TD
-    A[Payment Request] --> B[Calculate Base Amount]
-    B --> C[Add Service Fees]
-    C --> D[Add Network Fees]
-    D --> E[Convert to USD]
-    E --> F[Fee Breakdown Response]
-```
+- Endpoint: [GET /v2/request/{requestId}/routes](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/routes)
+- Fields include:
+  - `fee`
+  - `feeBreakdown[]`
 
-**Calculation Process:**
-1. **Base Amount:** Original payment amount
-2. **Service Fees:** Platform and custom fees
-3. **Network Fees:** Gas and transaction costs
-4. **USD Conversion:** Real-time exchange rates
-5. **Breakdown:** Itemized fee structure
+Route-level fee breakdowns are useful before execution (quote/comparison stage).
 
-## Fee Categories
+### Payment Search
 
-### Platform Fees
-- **Request Network Fee:** Protocol usage fee
-- **API Service Fee:** Request API processing fee
-- **Custom Fees:** Application-specific charges
+- Endpoint: [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments)
+- Field includes:
+  - `fees[]`
 
-### Network Fees
-- **Gas Fees:** Transaction execution costs
-- **Bridge Fees:** Crosschain transfer costs
-- **Token Conversion:** DEX swap fees
+Payment-level fee breakdowns are useful after execution (reconciliation/reporting stage).
 
-## USD Amount Calculations
+### Request Status (when applicable)
 
-### Real-time Conversion
-- **Live Rates:** Current market exchange rates
-- **Historical Rates:** Rates at payment time
-- **Multi-currency:** Support for various fiat currencies
+- Endpoint: [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId})
+- May include fee information in enriched status outputs.
 
-### Breakdown Format
+## Fee Types
+
+Common fee `type` values in API responses:
+
+- `protocol`
+- `gas`
+- `platform`
+- `crosschain`
+- `crypto-to-fiat`
+- `offramp`
+
+## Route Fee Stages
+
+For route responses, `feeBreakdown` can include stage-level attribution:
+
+- `sending`
+- `receiving`
+- `proxying`
+- `refunding`
+- `overall`
+
+## How to Use in Reconciliation
+
+<Steps>
+<Step title="Store raw fee objects">
+Persist fee arrays exactly as returned (`fees[]` or `feeBreakdown[]`) before deriving reporting values.
+</Step>
+
+<Step title="Normalize by type and provider">
+Group by `type`, `provider`, and currency to build accounting-friendly summaries.
+</Step>
+
+<Step title="Keep idempotent processing">
+When replaying jobs or webhooks, deduplicate with stable identifiers (`requestId`, `paymentReference`, tx hash, delivery IDs).
+</Step>
+</Steps>
+
+## Example Shapes
+
+### From routes endpoint
+
 ```json
 {
-  "baseAmount": {
-    "crypto": "100 USDC",
-    "usd": "$100.00"
-  },
-  "fees": {
-    "network": {
-      "crypto": "0.25 USDC",
-      "usd": "$0.25"
+  "fee": 0.0021,
+  "feeBreakdown": [
+    {
+      "type": "gas",
+      "stage": "sending",
+      "provider": "request-network",
+      "amount": "0.0012",
+      "currency": "USDC"
     },
-    "service": {
-      "crypto": "2.5 USDC", 
-      "usd": "$2.50"
+    {
+      "type": "crosschain",
+      "stage": "overall",
+      "provider": "lifi",
+      "amount": "0.0009",
+      "currency": "USDC"
     }
-  },
-  "total": {
-    "crypto": "102.75 USDC",
-    "usd": "$102.75"
-  }
+  ]
 }
 ```
 
-## Integration Points
+### From payments endpoint
+
+```json
+{
+  "fees": [
+    {
+      "type": "protocol",
+      "provider": "request-network",
+      "amount": "0.05",
+      "currency": "USDC"
+    },
+    {
+      "type": "platform",
+      "provider": "request-network",
+      "amount": "0.50",
+      "currency": "USDC"
+    },
+    {
+      "type": "gas",
+      "provider": "ethereum",
+      "amount": "0.002",
+      "currency": "ETH"
+    }
+  ]
+}
+```
+
+## Related Pages
 
 <CardGroup cols={2}>
-  <Card title="Payment Routes" icon="route">
-    Fee estimates for payment routing
+  <Card title="Platform Fees" href="/api-features/platform-fees">
+    Configure integrator fees with feePercentage and feeAddress.
   </Card>
-  
-  <Card title="Payment Queries" icon="magnifying-glass">
-    Historical fee information
+
+  <Card title="Protocol Fees" href="/api-features/protocol-fees">
+    Understand protocol-level fee policy, rate, and cap.
   </Card>
 </CardGroup>
 
-## Available Endpoints
+## API Reference
 
-Fee breakdowns are included in:
-- **Payment route calculations**
-- **GET /payments responses**
-- **Request creation responses**
-- **Payment status updates**
-
-## Implementation Details
-
-See [API Reference - Fee Breakdowns](/api-reference/fee-breakdowns) for complete technical documentation.
+For complete schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
