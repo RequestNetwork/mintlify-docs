@@ -111,6 +111,7 @@
                 "group": "Fee Structure",
                 "pages": [
                   "api-features/platform-fees",
+                  "api-features/protocol-fees",
                   "api-features/fee-breakdowns"
                 ]
               }
