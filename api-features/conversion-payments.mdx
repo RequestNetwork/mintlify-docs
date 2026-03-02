@@ -1,45 +1,61 @@
 ---
 title: "Conversion Payments"
-description: "Fiat-denominated requests settled in cryptocurrency with real-time conversion"
+description: "Requests denominated in one currency and settled in another with conversion at payment time"
 ---
-
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
 
 ## Overview
 
-Conversion payments allow you to create requests denominated in fiat currencies (USD, EUR) while receiving settlement in cryptocurrency, with automatic exchange rate conversion at payment time.
+Conversion payments let you denominate a request in one currency (for example USD) and collect payment in a different currency (for example USDC or ETH).
+
+This is useful when you want stable invoicing amounts while still collecting crypto on-chain.
 
 ## How It Works
 
-```mermaid
-graph LR
-    A[Request: $100 USD] --> B[Real-time Rate] 
-    B --> C[Pay: 0.041 ETH]
-    C --> D[Receive: 0.041 ETH]
-```
+<Steps>
+<Step title="Create a request with different invoice and payment currencies">
+Create the request with [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request):
 
-**Benefits:**
-- Stable pricing in familiar currencies
-- Automatic exchange rate handling
-- No manual conversion required
+- `invoiceCurrency`: currency you want to denominate the request in (for example `USD`)
+- `paymentCurrency`: currency you want to receive on-chain (for example `USDC-base`)
 
-## Supported Fiat Currencies
+The API stores both values and computes payable amounts using the configured rate source.
+</Step>
 
-- **USD** - US Dollar
-- **EUR** - Euro  
-- **GBP** - British Pound
-- **CNY** - Chinese Yuan
-- **JPY** - Japanese Yen
+<Step title="Fetch payment calldata and execute payment">
+Use [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay) to get transaction payloads, then execute on-chain.
 
-## Exchange Rate Sources
+At payment time, the converted amount is applied so the request can be settled in `paymentCurrency`.
+</Step>
 
-Real-time rates from multiple providers ensure accuracy and reliability.
+<Step title="Check payment status and conversion details">
+Use [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}) to inspect status fields such as:
+
+- `amountInUsd`
+- `conversionRate`
+- `rateSource`
+- `conversionBreakdown` (for multi-payment or partial-payment scenarios)
+
+When a request is paid in multiple parts, conversion details are returned in the breakdown instead of a single conversion rate value.
+</Step>
+</Steps>
+
+## Conversion Behavior
+
+- Single-payment requests can expose a direct `conversionRate`
+- Multi-payment or partial-payment requests return detailed `conversionBreakdown`
+- Rate source metadata is returned by the status endpoint
+
+## Supported Currencies and Chains
+
+Use [Request Network Token List](/resources/token-list) and [Supported Chains and Currencies](/resources/supported-chains-and-currencies) to choose valid `invoiceCurrency` and `paymentCurrency` pairs.
+
+<Info>
+Conversion behavior depends on the selected currency pair and network support.
+</Info>
 
 ## Used In
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Invoicing" href="/use-cases/invoicing">
     Professional invoices in fiat
   </Card>
@@ -47,12 +63,8 @@ Real-time rates from multiple providers ensure accuracy and reliability.
   <Card title="Checkout" href="/use-cases/checkout">
     E-commerce pricing
   </Card>
-  
-  <Card title="Subscriptions" href="/use-cases/subscriptions">
-    Predictable subscription pricing
-  </Card>
 </CardGroup>
 
-## Implementation Details
+## API Reference
 
-See [API Reference - Conversion Payments](/api-reference/conversion-payments) for complete technical documentation.
+For full endpoint schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
