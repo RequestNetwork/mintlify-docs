@@ -3,103 +3,83 @@ title: "Query Requests"
 description: "Request status monitoring, lifecycle management, and information retrieval"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-Query requests provides comprehensive request status monitoring and information retrieval, enabling real-time tracking of payment requests throughout their lifecycle.
+Use query endpoints to retrieve the latest status for a specific request.
 
-## Request Status Lifecycle
+These endpoints are the main reconciliation surface for request-level state (paid/not paid, payment references, transaction hash, and optional metadata).
 
-<CardGroup cols={2}>
-  <Card title="Active States" icon="play">
-    Created, pending, partially paid
-  </Card>
-  
-  <Card title="Final States" icon="check">
-    Paid, cancelled, expired
-  </Card>
-</CardGroup>
+## Core Endpoints
+
+- [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}) - get request status/details
+- [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments) - wallet-level payment search and reconciliation
 
 ## How It Works
 
-```mermaid
-graph LR
-    A[Request ID] --> B[Query Status]
-    B --> C[Retrieve Info]
-    C --> D[Check Payments]
-    D --> E[Update Status]
-```
+<Steps>
+<Step title="Read a single request status">
+Call [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}) to get current request-level status fields.
 
-**Query Process:**
-1. **Identify:** Use request ID for lookup
-2. **Retrieve:** Get current request information
-3. **Analyze:** Check payment status and history
-4. **Update:** Reflect latest blockchain state
+Typical fields include:
 
-## Status Types
+- `hasBeenPaid`
+- `paymentReference`
+- `txHash`
+- `isListening`
+- optional metadata such as `customerInfo` and `reference`
+</Step>
 
-### Request States
-- `created` - Request initialized and stored
-- `pending` - Awaiting payment completion
-- `paid` - Full payment received and confirmed
-- `cancelled` - Request cancelled by creator
-- `expired` - Past due date without payment
+<Step title="Combine with events for real-time updates">
+Use [Webhooks & Events](/api-features/webhooks-events) for push updates, and use query endpoints as source-of-truth reads.
+</Step>
 
-### Payment States
-- `no_payment` - No payment transactions detected
-- `partially_paid` - Partial payment received
-- `paid` - Full payment amount received
-- `overpaid` - Payment exceeds requested amount
+<Step title="Use wallet-level search when needed">
+For wallet-level reconciliation views, use [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments).
+</Step>
+</Steps>
 
-## Query Methods
+## Request Status Query
+
+`GET /v2/request/{requestId}` is the canonical request-level status endpoint for:
+
+- request payment completion checks (`hasBeenPaid`)
+- transaction linkage (`txHash`)
+- request identification (`requestId`, `paymentReference`)
+- conversion-related status fields when applicable (`amountInUsd`, `conversionRate`, `conversionBreakdown`)
+
+## Reconciliation Pattern
 
 <CardGroup cols={2}>
-  <Card title="Single Request" icon="magnifying-glass">
-    Detailed status for specific request
+  <Card title="Webhooks First" icon="bolt">
+    React to events in real time and update app state immediately.
   </Card>
   
-  <Card title="Batch Queries" icon="list">
-    Multiple request status in one call
+  <Card title="Query for Verification" icon="magnifying-glass">
+    Use query endpoints to confirm latest status and backfill missed events.
   </Card>
 </CardGroup>
 
-### Information Retrieved
-- **Basic Details:** Amount, currency, participants
-- **Payment History:** Transaction details and confirmations
-- **Status Timeline:** Creation, updates, completion dates
-- **Network Data:** Blockchain and transaction information
+## Practical Notes
 
-## Real-time Monitoring
+- Use `requestId` for deterministic lookup.
+- Keep idempotent reconciliation logic in case the same request is processed multiple times by your workers.
 
-### Automatic Updates
-Combine with [Payment Detection](/api-features/payment-detection) for automatic status updates
+## Related Pages
 
-### Event Integration
-Use [Webhooks & Events](/api-features/webhooks-events) for instant notifications
-
-## Advanced Filtering
-
-Filter requests by:
-- **Date Range:** Creation or due date periods
-- **Status:** Current request or payment state
-- **Participants:** Payee or payer addresses
-- **Amount Range:** Minimum and maximum values
-
-## Used In
-
-<CardGroup cols={2}>
-  <Card title="Dashboard Apps" icon="chart-line">
-    Real-time payment tracking
+<CardGroup cols={3}>
+  <Card title="Payment Detection" href="/api-features/payment-detection">
+    Understand automatic detection and status updates.
   </Card>
-  
-  <Card title="Accounting Systems" icon="calculator">
-    Invoice status reconciliation
+
+  <Card title="Query Payments" href="/api-features/query-payments">
+    Search and reconcile payment-level events.
+  </Card>
+
+  <Card title="Webhooks & Events" href="/api-features/webhooks-events">
+    Build real-time event-driven reconciliation.
   </Card>
 </CardGroup>
 
-## Implementation Details
+## API Reference
 
-See [API Reference - Query Requests](/api-reference/endpoints/get-request) for complete technical documentation.
+For full schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
