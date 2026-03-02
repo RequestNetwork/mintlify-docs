@@ -3,69 +3,141 @@ title: "Crosschain Payments"
 description: "Multi-network payment routing with automatic bridging and optimization"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-Crosschain payments enable seamless transactions across different blockchain networks, allowing payers to send from their preferred chain while payees receive on their preferred network.
+Crosschain payments allow users to pay a request using a stablecoin from a different blockchain network than the one specified on the request. For example, a payer can pay a request for USDC on Base using USDT from their Optimism wallet.
+
+## Benefits
+
+- **Flexibility:** Payers can pay with their preferred currency.
+- **Cost-Effective:** Automated routing balances cost and speed.
+- **Time-Saving:** Payers don't need to swap or bridge tokens manually.
+- **Simplified UX:** Payment settlement requires only 1 or 2 signatures from the payer.
+
+## Crosschain Payments Supported Chains and Currencies
+
+For crosschain (and samechain) payments, the Request Network API supports 12 stablecoins: USDC, USDT, and DAI on 4 chains (Ethereum, Arbitrum One, Base, OP Mainnet).
+
+### Crosschain Payments Supported Chains
+
+Crosschain payments are supported on the following blockchain networks:
+
+- Ethereum
+- Arbitrum One
+- Base
+- OP Mainnet
+
+### Crosschain Payments Supported Currencies
+
+<Warning>
+Crosschain payments work only with mainnet funds (real money). Test networks are not supported.
+</Warning>
+
+The following stablecoins are supported for crosschain payments on both the sending and receiving networks:
+
+- USDC
+- USDT
+- DAI
 
 ## How It Works
+<Steps>
+<Step title="Request creation">
+To enable crosschain payments, the request must be created with:
 
-```mermaid
-graph LR
-    A[Payer: USDC on Polygon] --> B[Bridge Protocol]
-    B --> C[Payee: USDC on Base]
+- `paymentCurrency` in the supported stablecoins and supported networks
+- `amount` greater than 1 (crosschain execution under 1 stablecoin is not allowed)
+
+Create the request via [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request).
+</Step>
+
+<Step title="Payment route fetching">
+Fetch possible routes with [GET /v2/request/{requestId}/routes](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/routes). The API returns routes based on payer balances.
+
+The API ranks routes by:
+
+- transaction fees
+- processing speed
+
+Each route includes fee estimates and breakdowns:
+
+1. **Gas fees** for transfer/approval/execution on the processor side
+2. **Service fees** for crosschain infrastructure
+
+For tokens that do not support EIP-2612, payer approval gas is paid directly by the payer and is not included in route total fees.
+
+The API may also return samechain routes when payer funds are on the same chain as `paymentCurrency`.
+</Step>
+
+<Step title="Getting payment calldata">
+Once a route is selected, fetch unsigned payloads using [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay).
+
+- For crosschain routes: returns payment intent + approval payload (permit/calldata)
+- For direct samechain routes: returns payment calldata and approval data only when needed
+</Step>
+
+<Step title="Signing the payment intent">
+Sign the returned payloads with the payer wallet. Approval handling depends on EIP-2612 support.
+
+```typescript
+import { ethers } from "ethers";
+
+const ethersProvider = new ethers.providers.Web3Provider(
+  walletProvider as ethers.providers.ExternalProvider,
+);
+const signer = await ethersProvider.getSigner();
+
+const paymentIntent = JSON.parse(paymentData.paymentIntent);
+const supportsEIP2612 = paymentData.metadata.supportsEIP2612;
+let approvalSignature = undefined;
+let approval = undefined;
+
+if (supportsEIP2612) {
+  approval = JSON.parse(paymentData.approvalPermitPayload);
+
+  approvalSignature = await signer._signTypedData(
+    approval.domain,
+    approval.types,
+    approval.values,
+  );
+} else {
+  const tx = await signer.sendTransaction(paymentData.approvalCalldata);
+  await tx.wait();
+}
+
+const paymentIntentSignature = await signer._signTypedData(
+  paymentIntent.domain,
+  paymentIntent.types,
+  paymentIntent.values,
+);
+
+const signedData = {
+  signedPaymentIntent: {
+    signature: paymentIntentSignature,
+    nonce: paymentIntent.values.nonce.toString(),
+    deadline: paymentIntent.values.deadline.toString(),
+  },
+  signedApprovalPermit: approvalSignature
+    ? {
+        signature: approvalSignature,
+        nonce: approval.values.nonce.toString(),
+        deadline: approval?.values?.deadline
+          ? approval.values.deadline.toString()
+          : approval.values.expiry.toString(),
+      }
+    : undefined,
+};
 ```
+</Step>
 
-**Benefits:**
-- Access to funds across multiple chains
-- Automatic routing optimization  
-- No manual bridging required
+<Step title="Sending the signed data">
+Send signed payment data with [POST /v2/request/payment-intents/{paymentIntentId}](https://api.request.network/open-api/#tag/v2request/POST/v2/request/payment-intents/{paymentIntentId}).
 
-## Samechain Payments
+The API processes the payment and sends webhook lifecycle updates, including completion events.
+</Step>
+</Steps>
 
-A special case of crosschain infrastructure that converts currencies on the same network (e.g., ETH → USDC on Ethereum).
+## Custom fee configuration
 
-## Supported Networks
+Custom fee configuration is available.
 
-<CardGroup cols={2}>
-  <Card title="Layer 1" icon="link">
-    Ethereum, BSC, Avalanche, Fantom
-  </Card>
-  
-  <Card title="Layer 2" icon="layers">
-    Polygon, Arbitrum, Base, Optimism
-  </Card>
-</CardGroup>
-
-## Bridge Protocols
-
-- **LayerZero:** Ultra Light Node security
-- **Stargate:** Liquidity-based bridging
-- **Automatic Selection:** Optimal route chosen
-
-## Used In
-
-<CardGroup cols={4}>
-  <Card title="Checkout" href="/use-cases/checkout">
-    Flexible payment options
-  </Card>
-  
-  <Card title="Invoicing" href="/use-cases/invoicing">
-    Accept from any chain
-  </Card>
-  
-  <Card title="Payouts" href="/use-cases/payouts">
-    Send to preferred networks
-  </Card>
-  
-  <Card title="Payroll" href="/use-cases/payroll">
-    Multi-chain employee payments
-  </Card>
-</CardGroup>
-
-## Implementation Details
-
-See [API Reference - Crosschain Payments](/api-reference/crosschain-payments) for complete technical documentation.
+See [Platform Fees](/api-features/platform-fees) for setup details (`feePercentage`, `feeAddress`) and implementation examples.
