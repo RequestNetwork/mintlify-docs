@@ -142,8 +142,7 @@
             "pages": [
               "resources/supported-chains-and-currencies",
               "resources/near-blockchain",
-              "resources/token-list",
-              "resources/community"
+              "resources/token-list"
             ]
           },
           {
