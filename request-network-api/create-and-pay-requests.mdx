@@ -1,33 +1,60 @@
 ---
-title: "Create and Pay Requests "
+title: "Endpoints Overview"
 sidebarTitle: "Overview"
-description: "The Request Network API provides an interface for creating and paying requests within your application."
+description: "Quick index of Request Network API endpoint groups"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
+## Overview
 
-<Info>
-**Reach out**
+Use this page as a quick index to the main endpoint groups in Request Network API.
 
-For more details on how to start accepting crypto payments, [get in touch](https://2deywy.share-eu1.hsforms.com/2b92phs9LR_eJdeZoxzmoMA?utm_source=request.network&utm_medium=docs&utm_campaign=evergreen&utm_content=get_in_touch) and we will reach out.
-</Info>
+For implementation guides, use the pages in **API Features**. For full request/response schemas, use the OpenAPI reference links below.
 
-## **Core Functionality**
+## Core Endpoint Groups
 
-At its core, the Request Network API empowers you to:
+<CardGroup cols={2}>
+  <Card
+    title="Requests"
+    href="/api-reference/endpoints"
+    icon="file-invoice"
+  >
+    v2 request endpoints: create, status, pay calldata, and routes.
+  </Card>
 
-- **Create Requests:** Define payment requests with information such as payee, payer (optional), amount, currency, and recurrence (optional).
-- **Facilitate Payments:** Return transaction calldata, ready to be signed by end-users and sent to the blockchain for secure and transparent value transfer.
-- **Deliver Webhook Notifications:** Receive instant updates on payment status changes, enabling your application to react dynamically to completed transactions.
-- **Fee Collection:** When paying a request, you can specify a fee percentage (between 0 and 100) and a fee address, which will add the fee on top of the payment amount - meaning the payer will pay the original amount plus the fee percentage, with the fee portion being sent to the specified fee address.
-- **Partial Payment Support:** Pay a portion of a request instead of the full amount at once. This unlocks powerful use cases such as:
-	- **Split payment**: split a payment 50% USDC on Base and 50% with USDT on Optimism.
-	- **Gradual payment plans:** Allow users to pay large invoices in smaller chunks.
-	- **Risk mitigation:** Test with small amounts before completing large payments.
-	The API automatically tracks payment progress, showing `partially_paid` status until the request is fully paid, and prevents overpayment by capping amounts to the remaining balance.
+  <Card
+    title="Payouts"
+    href="/api-reference/endpoints"
+    icon="paper-plane"
+  >
+    v2 payout endpoints: direct, batch, and recurring payment operations.
+  </Card>
 
-### Supported Chains and Currencies
+  <Card
+    title="Payments"
+    href="/api-reference/endpoints"
+    icon="magnifying-glass"
+  >
+    v2 payments search endpoint for reconciliation and reporting.
+  </Card>
 
-See [Supported Chains and Currencies](https://docs.request.network/request-network-api/supported-chains-and-currencies#request-network-api-supported-currencies)
+  <Card
+    title="Payer / Compliance"
+    href="/api-reference/endpoints"
+    icon="shield-check"
+  >
+    v2 payer/compliance endpoints for KYC and payment details.
+  </Card>
+</CardGroup>
+
+## Frequently Used Endpoints
+
+- [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request)
+- [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId})
+- [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay)
+- [POST /v2/payouts](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts)
+- [POST /v2/payouts/batch](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts/batch)
+- [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments)
+
+## OpenAPI Reference
+
+See the full API specification in the [Request Network OpenAPI docs](https://api.request.network/open-api).

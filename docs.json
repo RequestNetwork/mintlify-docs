@@ -124,10 +124,10 @@
               "api-reference/secure-payments",
               "api-reference/webhooks",
               {
-                "group": "Endpoints",
-                "openapi": "https://api.request.network/open-api/openapi.json",
+                "group": "Endpoints (V2)",
+                "openapi": "api-reference/openapi.v2.json",
                 "pages": [
-                  "request-network-api/create-and-pay-requests"
+                  "api-reference/endpoints-overview"
                 ]
               }
             ]
