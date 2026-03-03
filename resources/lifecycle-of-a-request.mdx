@@ -3,12 +3,8 @@ title: "Lifecycle of a Request"
 description: "The typical lifecycle of a request is as follows:"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 <Frame caption="Typical Lifecycle of a Request">
-![Typical Lifecycle of a Request](https://docs.request.network/~gitbook/image?url=https%3A%2F%2F1914277788-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fei6UAiSK3iAAi0mFH667%252Fuploads%252Fgit-blob-bb17b9b51fa3361ad54d1ac2185323f707ac8766%252FLifecycle%2520of%2520a%2520Request.jpg%3Falt%3Dmedia&width=768&dpr=4&quality=100&sign=b63df9bb&sv=2)
+  <img src="/images/architecture/lifecycle-of-a-request/request-lifecycle.webp" alt="Typical Lifecycle of a Request" />
 </Frame>
 
 ## Create a request
@@ -44,4 +40,4 @@ The exception is when paying a "declarative" request, in which case, data *is* w
 <Info>
 The request balance is calculated by adding up all the on-chain payment events with the same paymentReference. Partial payments are possible.
 </Info>
-All of these steps are facilitated by the Request Network JavaScript SDK such that the developer needs only make a few function calls. See the [Quickstart](https://docs.request.network/advanced/request-network-sdk/get-started/quickstart-browser) to learn more.
+All of these steps are facilitated by the Request Network JavaScript SDK such that the developer needs only make a few function calls. See [SDK (Legacy)](/sdk-legacy/overview) to learn more.
