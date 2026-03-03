@@ -30,10 +30,6 @@
   "thumbnails": {
     "appearance": "dark"
   },
-  "banner": {
-    "content": "⚠️ **Beta Docs** – Welcome page, Payment Demo, Webhooks, and NEAR docs are ready. Use Cases, API, Resources, SDK, and Release Notes are still being revised. [View stable docs →](https://docs.request.network)",
-    "dismissible": false
-  },
   "navigation": {
     "tabs": [
       {
@@ -163,17 +159,6 @@
             "pages": [
               "faq",
               "glossary"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "SDK (Legacy)",
-        "groups": [
-          {
-            "group": "🔧 SDK Documentation",
-            "pages": [
-              "sdk-legacy/overview"
             ]
           }
         ]
