@@ -1,0 +1,43 @@
+---
+title: "Private Requests Using Encryption"
+description: "How Request Network encrypts request contents while preserving protocol interoperability."
+---
+
+## Overview
+
+Request contents are stored on IPFS. When privacy is required, requests can be encrypted so only authorized stakeholders can read them.
+
+Request encryption combines:
+
+- **Symmetric encryption (AES)** for request content
+- **Asymmetric encryption** for sharing the symmetric key with authorized stakeholders
+
+## Encryption flow
+
+1. Generate a random AES key.
+2. Encrypt request payload with AES.
+3. Encrypt AES key for each stakeholder (payer, payee, approved third parties).
+4. Persist encrypted payload and encrypted keys.
+
+## Decryption flow
+
+1. Retrieve encrypted payload and encrypted keys.
+2. Decrypt AES key with stakeholder private key (or wallet-based flow).
+3. Decrypt payload with AES key.
+
+## Why this design
+
+- Keeps sensitive business data private
+- Preserves decentralized storage and interoperability
+- Supports selective access for approved parties
+
+## Implementation guides
+
+<CardGroup cols={2}>
+  <Card title="Encryption guide (stable docs)" href="https://docs.request.network/advanced/request-network-sdk/sdk-guides/encryption-and-decryption/handle-encryption-with-a-web3-wallet" icon="shield-keyhole">
+    Wallet-based encryption/decryption flow for end-user integrations.
+  </Card>
+  <Card title="Webhooks" href="/api-reference/webhooks" icon="webhook">
+    Pair encrypted request flows with event-driven status updates.
+  </Card>
+</CardGroup>

@@ -157,7 +157,11 @@
           {
             "group": "🏗️ Architecture",
             "pages": [
-              "resources/lifecycle-of-a-request"
+              "resources/lifecycle-of-a-request",
+              "resources/sdk-and-request-node-overview",
+              "resources/payment-networks",
+              "resources/private-requests-using-encryption",
+              "resources/smart-contracts-overview"
             ]
           },
           {
