@@ -1,259 +1,332 @@
 ---
-title: "Secure Payment Integration Guide"
-description: "Integrate a secure payment experience via a secured link (redirect)"
+title: "Creating Payment Destinations and Payment Links"
+description: "End-to-end flow: wallet sign-in, payment destinations, client IDs, webhooks, and secure payment links."
 ---
 
 ## Overview
 
-This guide shows how to integrate Secure Payment Pages in a production-ready way.
+This guide walks through the end-to-end flow for receiving payments via Request Network: creating a payment destination in Dashboard, generating a Client ID, setting up webhooks, and creating a secure payment link.
 
-The recommended pattern is:
-1. Create secure payment links with `POST /v2/secure-payments`
-2. Store returned `requestIds` in your system
-3. Redirect the payer to the secure page
-4. Use webhooks as the source of truth for payment status updates
+The flow involves four services:
+
+1. **Dashboard** (`dashboard.request.network`) - Sign in with wallet and create payment destinations
+2. **Auth API** (`auth.request.network`) - Create Client IDs
+3. **Portal** (`portal.request.network`) - Set up webhooks
+4. **Request API** (`api.request.network`) - Create secure payments (payment links)
+
+```text
+┌──────────────────────┐
+│  1. Sign in with     │  dashboard.request.network
+│     wallet           │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  2. Create Payee     │  dashboard.request.network
+│     Destination      │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  3. Create Client ID │  auth.request.network/open-api
+│     (Auth API)       │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  4. Set up Webhook   │  portal.request.network
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  5. Create Secure    │  api.request.network/open-api
+│     Payment (link)   │
+└──────────────────────┘
+```
+
+<Info>
+Your wallet session cookie (`session_token`) is shared across Dashboard, Portal, Auth API, and Request API docs. Signing in once on Dashboard gives access to the others.
+</Info>
 
 ## Prerequisites
 
-Before you integrate, make sure you have:
+- An EVM wallet (for example MetaMask) that will receive payments
+- Ability to sign authentication messages with that wallet
+- A server endpoint for receiving webhooks
 
-- An API key or a Client ID linked to your integration domain
-- A webhook endpoint configured in Request Portal
-- Your webhook signing secret stored securely on your backend
+## Step 1: Sign in with wallet
 
-For setup details, see:
-- [Authentication](/api-reference/authentication)
-- [Webhooks](/api-reference/webhooks)
+1. Go to [dashboard.request.network](https://dashboard.request.network/).
+2. Connect your EVM wallet and sign the authentication message.
+3. Keep this session active for the next steps.
 
-## Quick start
+<Warning>
+Wallet sessions expire after around 15 minutes. If your session expires, sign in again from Dashboard.
+</Warning>
 
-<Steps>
-  <Step title="Create secure payment links">
-    Call `POST /v2/secure-payments` and store the returned `requestIds`.
+## Step 2: Create a payment destination
 
-    <RequestExample>
-    ```bash cURL
-    curl -X POST "https://api.request.network/v2/secure-payments" \
-      -H "x-api-key: YOUR_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{
-        "requests": [
-          {
-            "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
-            "amount": "10",
-            "invoiceCurrency": "USDC-base",
-            "paymentCurrency": "USDC-base"
-          }
-        ]
-      }'
-    ```
-    </RequestExample>
+A payment destination registers where you receive payments, by linking your wallet address to a token on a chain.
 
-    <ResponseExample>
-    ```json 201 Created
+1. In Dashboard, navigate to payment destination setup.
+2. Select chain and token.
+3. Confirm creation.
+
+Dashboard returns a `destinationId` (also shown as `humanReadableInteropAddress`). Save it for Step 5.
+
+The `destinationId` follows ERC-7828 format:
+
+```text
+{walletAddress}@eip155:{chainId}#{checksum}
+```
+
+### Supported chains and tokens
+
+| Network | Chain ID | USDC | USDT |
+| --- | --- | --- | --- |
+| Ethereum | `1` | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | `0xdAC17F958D2ee523a2206206994597C13D831ec7` |
+| Arbitrum One | `42161` | `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` | `0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9` |
+| Optimism | `10` | `0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85` | `0x94b008aA00579c1307B0EF2c499aD98a8ce58e58` |
+| Base | `8453` | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | `0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2` |
+| Polygon | `137` | `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359` | `0xc2132D05D31c914a87C6611C10748AEb04B58e8F` |
+| BSC | `56` | `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` | `0x55d398326f99059ff775485246999027b3197955` |
+
+**Testnet**
+
+| Network | Chain ID | Tokens |
+| --- | --- | --- |
+| Sepolia | `11155111` | FAU `0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C`, USDC `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`, USDT `0xF046b3CA5ae2879c6bAcC4D42fAF363eE8379F78` |
+
+## Step 3: Create a Client ID
+
+A Client ID identifies your application and is required for browser-origin payment-link creation.
+
+1. Open [Auth API docs: POST /v1/client-ids](https://auth.request.network/open-api/#tag/client-ids/POST/v1/client-ids).
+2. Reuse your active wallet session.
+3. Submit:
+
+```json
+{
+  "label": "My Client ID",
+  "allowedDomains": [
+    "https://mydomain.com"
+  ]
+}
+```
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | Yes | Human-readable name (1-100 chars) |
+| `allowedDomains` | `string[]` | Yes | Origins allowed to use this client ID (1-10) |
+| `feePercentage` | `string` | No | Fee percentage to charge (0-100) |
+| `feeAddress` | `string` | No | Wallet address to receive fees |
+| `operatorWalletAddress` | `string` | No | Operator wallet address |
+
+<Info>
+`allowedDomains` must use `https://` (except `localhost`, `127.0.0.1`, or `::1`, which can use `http://`). No path/query/fragment.
+</Info>
+
+**Example response**
+
+```json 201 Created
+{
+  "id": "01KJBN4KR5PFG4NAQG60EHR2Y0",
+  "clientId": "cli_nz1bj41szV2fvjm9pbxdIhro3ld4x4",
+  "label": "My Client ID",
+  "allowedDomains": [
+    "https://mydomain.com"
+  ],
+  "feePercentage": null,
+  "feeAddress": null,
+  "operatorWalletAddress": null,
+  "defaultPreApprovalExpiry": null,
+  "defaultAuthorizationExpiry": null,
+  "status": "active",
+  "createdAt": "2026-03-02T19:42:37 GMT+0000"
+}
+```
+
+Save `clientId` for Step 5.
+
+## Step 4: Set up a webhook
+
+Webhooks provide payment notifications (`payment.confirmed`, `payment.partial`, and others) without polling.
+
+1. Go to [portal.request.network/dashboard/webhooks](https://portal.request.network/dashboard/webhooks).
+2. Add your endpoint URL (for example `https://mydomain.com/webhook`).
+3. Save the webhook signing secret.
+
+The webhook is scoped to your platform (wallet). Payment links created under your platform trigger this webhook regardless of client ID; payloads include `clientId` so you can route events.
+
+### Signature headers
+
+| Header | Description |
+| --- | --- |
+| `x-request-network-signature` | HMAC-SHA256 of the request body, signed with your webhook secret |
+| `x-request-network-delivery` | Unique delivery ID |
+| `x-request-network-retry-count` | Retry attempt number |
+
+Verify by computing `HMAC-SHA256(raw_request_body, webhook_secret)` and comparing to `x-request-network-signature`.
+
+For full webhook setup, events, retries, security, and payload docs, see [Webhooks](/api-reference/webhooks).
+
+## Step 5: Create a secure payment (payment link)
+
+Now create the payment link using:
+- `destinationId` from Step 2
+- `clientId` from Step 3 in the `x-client-id` header
+
+1. Open [Request API docs: POST /v2/secure-payments](https://api.request.network/open-api/#tag/v2secure-payment/POST/v2/secure-payments).
+2. Set header: `x-client-id: <your-client-id>`.
+3. Submit:
+
+```json
+{
+  "requests": [
     {
-      "requestIds": [
-        "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"
-      ],
-      "securePaymentUrl": "https://secure.request.network/?token=01ABC123DEF456GHI789JKL",
-      "token": "01ABC123DEF456GHI789JKL"
+      "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#1f969856:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+      "amount": "1"
     }
-    ```
-    </ResponseExample>
-  </Step>
-
-  <Step title="Persist payment mapping in your database">
-    Store at least:
-    - your internal metadata
-    - returned `requestIds`
-    - `token`
-    - `securePaymentUrl`
-
-    This mapping lets you reconcile webhook events back to your internal records.
-  </Step>
-
-  <Step title="Redirect payer to secure page">
-    Redirect in the same tab or open the secure URL in a new tab.
-  </Step>
-
-  <Step title="Process webhook events and update order status">
-    Handle payment events from webhooks and update your order/payment state from those events.
-  </Step>
-</Steps>
-
-## Integration pattern: generated URL + redirect
-
-### Backend example (Node.js/Express)
-
-```javascript server.js
-import express from "express";
-
-const app = express();
-app.use(express.json());
-
-app.post("/api/checkout/secure-payment", async (req, res) => {
-  const { orderId, payee, amount, currencyId } = req.body;
-
-  const apiResponse = await fetch("https://api.request.network/v2/secure-payments", {
-    method: "POST",
-    headers: {
-      "x-api-key": process.env.REQUEST_API_KEY,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      requests: [
-        {
-          payee,
-          amount,
-          invoiceCurrency: currencyId,
-          paymentCurrency: currencyId,
-        },
-      ],
-    }),
-  });
-
-  if (!apiResponse.ok) {
-    const errorBody = await apiResponse.text();
-    return res.status(apiResponse.status).json({ error: errorBody });
-  }
-
-  const securePayment = await apiResponse.json();
-
-  // Persist in your DB
-  // Example payload:
-  // {
-  //   orderId,
-  //   requestIds: securePayment.requestIds,
-  //   token: securePayment.token,
-  //   securePaymentUrl: securePayment.securePaymentUrl,
-  //   status: "pending"
-  // }
-
-  return res.status(200).json({
-    orderId,
-    securePaymentUrl: securePayment.securePaymentUrl,
-  });
-});
+  ]
+}
 ```
 
-### Frontend redirect examples
+### Constructing `destinationId`
 
-<CodeGroup>
-```javascript Same tab
-window.location.href = securePaymentUrl;
+`destinationId` is:
+
+```text
+{humanReadableInteropAddress}:{tokenAddress}
 ```
 
-```javascript New tab
-window.open(securePaymentUrl, "_blank", "noopener,noreferrer");
-```
-</CodeGroup>
+Example:
 
-## Payment status updates with webhooks
-
-Use webhook events as your payment status source of truth.
-
-Typical mapping:
-- `payment.confirmed` -> mark order as paid
-- `payment.partial` -> mark order as partially paid
-- `payment.failed` -> mark order as failed
-
-### Webhook handler example (signature verification + reconciliation)
-
-```javascript webhook.js
-import crypto from "node:crypto";
-import express from "express";
-
-const app = express();
-
-app.use(
-  express.raw({
-    type: "application/json",
-    verify: (req, _res, buf) => {
-      req.rawBody = buf;
-    },
-  }),
-);
-
-app.post("/webhooks/request", async (req, res) => {
-  const signature = req.headers["x-request-network-signature"];
-  const secret = process.env.REQUEST_WEBHOOK_SECRET;
-
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(req.rawBody)
-    .digest("hex");
-
-  if (!signature) {
-    return res.status(401).json({ error: "Missing signature" });
-  }
-
-  try {
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature),
-    );
-    if (!isValid) {
-      return res.status(401).json({ error: "Invalid signature" });
-    }
-  } catch {
-    return res.status(401).json({ error: "Invalid signature format" });
-  }
-
-  const event = JSON.parse(req.rawBody.toString("utf8"));
-  const requestId = event.requestId || event.requestID;
-
-  // Find internal record by requestId in your DB, then update order status.
-  // Example:
-  // const checkout = await db.findCheckoutByRequestId(requestId)
-  // if (event.event === "payment.confirmed") await db.markPaid(checkout.orderId)
-
-  return res.status(200).json({ received: true });
-});
+```text
+0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#1f969856:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C
+└──────────── humanReadableInteropAddress ─────────────────┘ └──────────── tokenAddress ──────────────────────┘
 ```
 
-## Expiry handling
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `requests` | `array` | Yes | Array of payment request items |
+| `requests[].destinationId` | `string` | Yes | Composite ID `humanReadableInteropAddress:tokenAddress` |
+| `requests[].amount` | `string` | Yes | Human-readable amount (for example `"10"`) |
+| `feePercentage` | `string` | No | Fee percentage 0-100; if set, `feeAddress` is required |
+| `feeAddress` | `string` | No | Fee recipient address |
 
-Secure payment links expire after one week by default.
+**Example response**
 
-If a payer opens an expired link, create a new secure payment link and redirect again.
+```json 201 Created
+{
+  "requestIds": [
+    "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb"
+  ],
+  "securePaymentUrl": "https://pay.request.network/?token=01KJRA0M9QG8MA4X887908T8A4",
+  "token": "01KJRA0M9QG8MA4X887908T8A4"
+}
+```
+
+Share `securePaymentUrl` with payer.
+
+<Info>
+Secure payment links expire after 7 days or once paid.
+</Info>
+
+For full endpoint schema and errors, see [Secure Payments API Reference](/api-reference/secure-payments).
+
+## Step 6: Check payment status (optional)
+
+Webhooks are recommended as source of truth, but you can also poll by `requestId`.
+
+Endpoint:
+
+```text
+GET https://api.request.network/v2/request/{requestId}
+```
+
+Programmatic calls can use the same credentials model from [Authentication](/api-reference/authentication).
+
+**Paid**
+
+```json 200 OK
+{
+  "hasBeenPaid": true,
+  "requestId": "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb",
+  "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "isListening": false,
+  "txHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+}
+```
+
+**Unpaid**
+
+```json 200 OK
+{
+  "hasBeenPaid": false,
+  "requestId": "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb",
+  "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "isListening": true,
+  "txHash": null
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `hasBeenPaid` | `boolean` | Whether the request has been fully paid |
+| `requestId` | `string` | Request ID |
+| `payee` | `string` | Payee wallet address |
+| `isListening` | `boolean` | Whether the system is still listening for payment |
+| `txHash` | `string \| null` | Payment tx hash |
+
+## Quick reference
+
+| Step | Action | Where |
+| --- | --- | --- |
+| 1 | Sign in with wallet | [dashboard.request.network](https://dashboard.request.network/) |
+| 2 | Create payment destination | [dashboard.request.network](https://dashboard.request.network/) |
+| 3 | Create Client ID | [auth.request.network/open-api](https://auth.request.network/open-api/#tag/client-ids/POST/v1/client-ids) |
+| 4 | Set up webhook | [portal.request.network/dashboard/webhooks](https://portal.request.network/dashboard/webhooks) |
+| 5 | Create payment link | [api.request.network/open-api](https://api.request.network/open-api/#tag/v2secure-payment/POST/v2/secure-payments) |
+| 6 | Check payment status | [api.request.network/open-api](https://api.request.network/open-api) or webhook |
 
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="401 Unauthorized when creating secure payments">
-    - Verify your `x-api-key` or `x-client-id` header
-    - If using Client ID in browser, verify the request origin is in allowed domains
+  <Accordion title="I get 401 or 403 when creating secure payments">
+    - Confirm `x-client-id` is set correctly
+    - Confirm your browser `Origin` is included in `allowedDomains`
+    - Re-authenticate if your wallet session expired
   </Accordion>
 
-  <Accordion title="403 when loading secure payment token">
-    - The token may be expired
-    - Create a fresh secure payment link and retry
+  <Accordion title="Webhook signature validation fails">
+    - Use raw request body bytes for HMAC computation
+    - Use your exact webhook secret from Portal
+    - Compare signatures using a timing-safe method
   </Accordion>
 
-  <Accordion title="409 already completed">
-    - Payment is already completed
-    - Show a paid/completed state in your app instead of retrying payment
+  <Accordion title="Payment link returns expired / already paid">
+    - Links expire after 7 days
+    - A paid link cannot be reused
+    - Create a new secure payment link for a fresh attempt
   </Accordion>
 
-  <Accordion title="Webhook events not updating order status">
-    - Verify HMAC signature validation uses raw request body
-    - Ensure your endpoint returns `2xx` after successful processing
-    - Confirm your DB lookup maps incoming `requestId`/`requestID` to stored request IDs
+  <Accordion title="I do not receive webhook events">
+    - Verify webhook URL is publicly reachable over HTTPS
+    - Return `2xx` quickly from your endpoint
+    - Check retry headers and delivery logs
   </Accordion>
 </AccordionGroup>
 
 ## Related docs
 
 <CardGroup cols={3}>
-  <Card title="Secure Payments API Reference" href="/api-reference/secure-payments" icon="book">
-    Full request and response schema details.
-  </Card>
-
-  <Card title="Webhooks" href="/api-reference/webhooks" icon="webhook">
-    Event types, signing, retries, and payload details.
-  </Card>
-
   <Card title="Authentication" href="/api-reference/authentication" icon="key">
     API key and Client ID setup.
+  </Card>
+  <Card title="Webhooks" href="/api-reference/webhooks" icon="webhook">
+    Event types, signatures, retries, and payload details.
+  </Card>
+  <Card title="Secure Payments API Reference" href="/api-reference/secure-payments" icon="book">
+    Full request/response schema and errors.
   </Card>
 </CardGroup>

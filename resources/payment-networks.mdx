@@ -1,0 +1,65 @@
+---
+title: "Payment Networks"
+description: "Rules that define how Request payments are executed and detected."
+---
+
+## Overview
+
+A payment network defines:
+
+1. What data is required when creating a request
+2. How a payment is executed
+3. How paid balance is computed
+
+## Reference-based payment networks (recommended)
+
+Reference-based networks link payments to requests using a `paymentReference` derived from request data.
+
+Payment proxy contracts:
+
+- Forward funds to the payment recipient
+- Emit events containing payment amount and payment reference
+
+These events are indexed to compute request balances.
+
+<Info>
+The payment recipient address can differ from the payee identity that signed the request.
+</Info>
+
+## Common payment network families
+
+- **ERC20 Fee Proxy**: direct ERC20 payments
+- **ETH Fee Proxy**: direct native token payments
+- **Any-to-ERC20 / Any-to-ETH**: conversion flows (fiat-denominated requests paid in crypto)
+- **Declarative**: manual payment/refund declarations for unsupported rails
+- **Transferable Receivable**: request receivables represented as transferable NFTs
+
+## Advanced payment types
+
+Advanced payment types build on top of payment networks:
+
+- Batch payments
+- Swap-to-Pay
+- Swap-to-Conversion
+- Escrow payments
+- Streaming payments
+
+## Conversion vs Swap-to-Pay vs Swap-to-Conversion
+
+- **Conversion**: request in currency A, payer sends B, payee receives B
+- **Swap-to-Pay**: request in A, payer sends B, payee receives A
+- **Swap-to-Conversion**: request in A, payer sends B, payee receives C
+
+## Related docs
+
+<CardGroup cols={3}>
+  <Card title="Lifecycle of a Request" href="/resources/lifecycle-of-a-request" icon="timeline">
+    How payment networks fit in the request lifecycle.
+  </Card>
+  <Card title="Secure Payments API" href="/api-reference/secure-payments" icon="lock">
+    API-level secure payment integration.
+  </Card>
+  <Card title="Supported Chains and Currencies" href="/resources/supported-chains-and-currencies" icon="globe">
+    Coverage for networks and tokens.
+  </Card>
+</CardGroup>

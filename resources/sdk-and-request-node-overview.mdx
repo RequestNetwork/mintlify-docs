@@ -1,0 +1,51 @@
+---
+title: "SDK and Request Node Overview"
+description: "How the SDK and Request Node interact with IPFS, on-chain storage, and indexing."
+---
+
+## Request Network SDK
+
+The Request Network SDK is a set of npm packages used to interact with the protocol. With the SDK, developers can:
+
+- Create requests
+- Update requests
+- Pay requests
+- Retrieve requests
+- Detect payments
+
+For installation, see [Getting Started](/api-setup/getting-started).
+
+## Request Node
+
+Request Node is a gateway to the protocol layers:
+
+- **IPFS** stores full request contents
+- **Smart contracts** store IPFS CIDs on-chain
+- **The Graph** indexes payment and storage events
+
+Request Node reduces UX friction by relaying writes to protocol layers. End users still sign request contents, while the node handles persistence mechanics.
+
+<Info>
+For production, run your own node. For quick testing, you can use public Request Node gateways.
+</Info>
+
+## How SDK and Request Node work together
+
+Typical flow:
+
+1. Your app uses the SDK to create or read requests.
+2. The SDK talks to a Request Node endpoint.
+3. Request content is persisted to IPFS.
+4. CID is anchored on-chain.
+5. On-chain events are indexed for retrieval and payment detection.
+
+## Related docs
+
+<CardGroup cols={2}>
+  <Card title="Lifecycle of a Request" href="/resources/lifecycle-of-a-request" icon="timeline">
+    End-to-end lifecycle from request creation to payment detection.
+  </Card>
+  <Card title="Payment Networks" href="/resources/payment-networks" icon="network-wired">
+    Understand how payments are processed and detected.
+  </Card>
+</CardGroup>

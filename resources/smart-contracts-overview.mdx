@@ -1,0 +1,60 @@
+---
+title: "Smart Contracts Overview"
+description: "Storage, payment, and token-related contract categories in Request Network."
+---
+
+## Overview
+
+Request Network contracts are grouped into three categories:
+
+- **Storage contracts**: anchor IPFS CIDs and storage-related state
+- **Payment contracts**: process payment flows across supported chains
+- **REQ token and burn mechanism contracts**: support protocol token economics
+
+## Storage contracts
+
+Core storage contracts include:
+
+- `RequestOpenHashSubmitter`
+- `StorageFeeCollector`
+- `RequestHashStorage`
+
+These contracts handle CID declarations and storage-fee-related flows.
+
+## Payment contracts
+
+Payment contracts include proxies and advanced payment primitives such as:
+
+- `ERC20FeeProxy`
+- `EthereumFeeProxy`
+- `ERC20EscrowToPay`
+- `BatchConversionPayments`
+- `BatchNoConversionPayments`
+- `ERC20SwapToPay`
+- `ERC20ConversionProxy`
+- `ETHConversionProxy`
+- `ERC20SwapToConversion`
+- `ERC20TransferableReceivable`
+
+## Single request proxy contracts
+
+For simplified payment flows:
+
+- `ERC20SingleRequestProxy`
+- `EthereumSingleRequestProxy`
+- `SingleRequestProxyFactory`
+
+## Contract sources and addresses
+
+<CardGroup cols={2}>
+  <Card title="Smart Contract Source" href="https://github.com/RequestNetwork/requestNetwork/tree/master/packages/smart-contracts/src/contracts" icon="github">
+    Browse contract implementations in the monorepo.
+  </Card>
+  <Card title="Supported Chains and Currencies" href="/resources/supported-chains-and-currencies" icon="globe">
+    Network context for contract deployment usage.
+  </Card>
+</CardGroup>
+
+<Info>
+For protocol behavior around these contracts, see [Payment Networks](/resources/payment-networks).
+</Info>
