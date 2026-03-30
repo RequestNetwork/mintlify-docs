@@ -1,0 +1,105 @@
+---
+title: "Wallet Authentication (SIWE)"
+description: "Sign-In with Ethereum and Tron wallet authentication for session-based API access"
+---
+
+## Overview
+
+Wallet authentication uses the [Sign-In with Ethereum (SIWE)](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate users via their wallet signature. After verification, the API sets an httpOnly session cookie for subsequent requests.
+
+This is the authentication method used by the [Request Dashboard](https://dashboard.request.network) and is required for managing [payee destinations](/api-features/payee-destinations) and [client IDs](/api-features/client-id-management).
+
+## Supported Wallets
+
+- **EVM wallets** — MetaMask, WalletConnect, Coinbase Wallet, and any wallet supporting `personal_sign`
+- **Tron wallets** — TronLink (addresses starting with `T...`)
+
+The API auto-detects the wallet type from the address format.
+
+## Challenge/Verify Flow
+
+<Steps>
+  <Step title="Request a challenge">
+    Call `POST /v1/auth/wallet/challenge` with the wallet address. The API returns a SIWE-formatted message to sign.
+
+    ```bash
+    curl -X POST "https://auth.request.network/v1/auth/wallet/challenge" \
+      -H "Content-Type: application/json" \
+      -d '{ "address": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7" }'
+    ```
+
+    ```json Response (201)
+    {
+      "challengeId": "01HXEXAMPLE123",
+      "nonce": "a1b2c3d4e5f6",
+      "message": "auth.request.network wants you to sign in with your Ethereum account:\n0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7\n\nSign in to Request Network\n\nURI: https://auth.request.network\nVersion: 1\nChain ID: 1\nNonce: a1b2c3d4e5f6\nIssued At: 2026-03-15T10:00:00.000Z",
+      "expiresAt": "2026-03-15T10:05:00.000Z"
+    }
+    ```
+
+    The challenge expires after 5 minutes.
+  </Step>
+
+  <Step title="Sign the message">
+    Sign the `message` field using the wallet's signing capability.
+
+    **EVM (viem):**
+    ```typescript
+    const signature = await walletClient.signMessage({
+      account,
+      message: challenge.message,
+    });
+    ```
+
+    **Tron (TronLink):**
+    ```typescript
+    const signature = await tronWeb.trx.signMessageV2(challenge.message);
+    ```
+  </Step>
+
+  <Step title="Verify the signature">
+    Submit the signature back to complete authentication. The API sets a session cookie on success.
+
+    ```bash
+    curl -X POST "https://auth.request.network/v1/auth/wallet/verify" \
+      -H "Content-Type: application/json" \
+      -c cookies.txt \
+      -d '{
+        "challengeId": "01HXEXAMPLE123",
+        "nonce": "a1b2c3d4e5f6",
+        "message": "auth.request.network wants you to sign in with your Ethereum account:...",
+        "signature": "0x1234...abcdef"
+      }'
+    ```
+
+    On success, the response sets an httpOnly session cookie. Use this cookie for subsequent API calls.
+  </Step>
+</Steps>
+
+## Session Management
+
+- **Session type:** httpOnly, secure, sameSite=lax cookie
+- **Wallet session timeout:** 15 minutes idle timeout
+- **Logout:** `POST /v1/auth/logout` clears the session cookie
+
+## Email/Password Authentication
+
+For programmatic access without a wallet, the API also supports email/password authentication:
+
+- `POST /v1/auth/register` — Create an account with email and password (8-100 chars)
+- `POST /v1/auth/login` — Login with email and password
+- `POST /v1/auth/logout` — Clear the session
+
+Email/password sessions have a 30-day expiry.
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="shield" href="/api-reference/authentication">
+    API key and Client ID authentication for API integrations.
+  </Card>
+
+  <Card title="Payee Destinations" icon="location-dot" href="/api-features/payee-destinations">
+    Manage receiving routes (requires wallet session).
+  </Card>
+</CardGroup>

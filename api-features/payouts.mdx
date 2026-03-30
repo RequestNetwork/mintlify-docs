@@ -1,0 +1,97 @@
+---
+title: "Payouts"
+description: "Initiate single, batch, and recurring payments directly via the API"
+---
+
+## Overview
+
+Payouts let you initiate payments without a separate request creation step. The API creates the request and returns executable transaction calldata in a single call.
+
+**Three payout modes:**
+- **Single** — Pay one recipient
+- **Batch** — Pay multiple recipients in one transaction (same network)
+- **Recurring** — Automated payment schedules with ERC20 permit signatures
+
+## Single Payout
+
+Create a payment request and get transaction calldata in one call.
+
+```bash
+curl -X POST "https://api.request.network/v2/payouts" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": "100",
+    "invoiceCurrency": "USD",
+    "paymentCurrency": "USDC-base",
+    "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+    "reference": "PAYOUT-001"
+  }'
+```
+
+**Required fields:**
+- `amount` — Human-readable amount
+- `invoiceCurrency` — Invoice currency (e.g., `"USD"`)
+- `paymentCurrency` — Payment currency ID (e.g., `"USDC-base"`)
+- `payee` — Recipient wallet address
+
+**Optional fields:**
+- `reference` — Merchant reference for reconciliation
+- `feePercentage` and `feeAddress` — Platform fee configuration
+- `customerInfo` — Payer information (name, email, address)
+- `payer` — Payer wallet address (required for recurring)
+
+The response includes `requestId` and a `transactions` array with executable calldata.
+
+## Batch Payout
+
+Pay multiple recipients in a single blockchain transaction. All payments must be on the same network.
+
+```bash
+curl -X POST "https://api.request.network/v2/payouts/batch" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requests": [
+      {
+        "amount": "50",
+        "invoiceCurrency": "USDC-base",
+        "paymentCurrency": "USDC-base",
+        "payee": "0xb07d2398d2004378cad234da0ef14f1c94a530e4"
+      },
+      {
+        "amount": "25",
+        "invoiceCurrency": "USDC-base",
+        "paymentCurrency": "USDC-base",
+        "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7"
+      }
+    ],
+    "payer": "0x1234567890123456789012345678901234567890"
+  }'
+```
+
+The response includes approval transactions and a batch payment transaction to execute.
+
+## Recurring Payouts
+
+Create automated payment schedules where the payer authorizes a series of payments with a single ERC-712 signature.
+
+See [Recurring Payments](/api-features/recurring-payments) for the full lifecycle (create, authorize, monitor, manage).
+
+**Endpoints:**
+- `POST /v2/payouts` with `recurrence` object — Create a recurring schedule
+- `POST /v2/payouts/recurring/:id` — Submit the payer's permit signature to activate
+- `GET /v2/payouts/recurring/:id` — Check status and next payment date
+- `PATCH /v2/payouts/recurring/:id` — Cancel or unpause
+
+## Endpoint Reference
+
+<CardGroup cols={2}>
+  <Card title="POST /v2/payouts" icon="paper-plane" href="https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts">
+    Create a single or recurring payout.
+  </Card>
+
+  <Card title="POST /v2/payouts/batch" icon="layer-group" href="https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts/batch">
+    Create a batch payout with multiple recipients.
+  </Card>
+</CardGroup>
