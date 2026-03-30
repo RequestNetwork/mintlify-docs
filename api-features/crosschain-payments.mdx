@@ -1,7 +1,11 @@
 ---
 title: "Crosschain Payments"
-description: "Multi-network payment routing with automatic bridging and optimization"
+description: "Multi-network payment routing with automatic bridging via LiFi"
 ---
+
+<Warning>
+**Breaking change (March 2026):** The crosschain payment flow has been redesigned. The old payment-intent signing flow (`POST /v2/request/payment-intents/:paymentIntentId`) has been removed. Crosschain payments now return executable transaction calldata directly. See updated steps below.
+</Warning>
 
 ## Overview
 
@@ -9,130 +13,183 @@ Crosschain payments allow users to pay a request using a stablecoin from a diffe
 
 ## Benefits
 
-- **Flexibility:** Payers can pay with their preferred currency.
+- **Flexibility:** Payers can pay with their preferred stablecoin on any supported chain.
 - **Cost-Effective:** Automated routing balances cost and speed.
 - **Time-Saving:** Payers don't need to swap or bridge tokens manually.
-- **Simplified UX:** Payment settlement requires only 1 or 2 signatures from the payer.
+- **Simplified UX:** Payment settlement requires only 1 or 2 transactions from the payer.
 
 ## Crosschain Payments Supported Chains and Currencies
 
-For crosschain (and samechain) payments, the Request Network API supports 12 stablecoins: USDC, USDT, and DAI on 4 chains (Ethereum, Arbitrum One, Base, OP Mainnet).
+For crosschain (and samechain) payments, the Request Network API supports USDC and USDT on 4 chains.
 
-### Crosschain Payments Supported Chains
+<Info>
+Bridged USDC (USDC.e) is **not** supported for crosschain payments. Only native USDC is supported.
+</Info>
 
-Crosschain payments are supported on the following blockchain networks:
+### Supported Chains
 
 - Ethereum
 - Arbitrum One
 - Base
 - OP Mainnet
 
-### Crosschain Payments Supported Currencies
+### Supported Currencies
 
 <Warning>
 Crosschain payments work only with mainnet funds (real money). Test networks are not supported.
 </Warning>
 
-The following stablecoins are supported for crosschain payments on both the sending and receiving networks:
-
 - USDC
 - USDT
-- DAI
 
 ## How It Works
-<Steps>
-<Step title="Request creation">
-To enable crosschain payments, the request must be created with:
 
-- `paymentCurrency` in the supported stablecoins and supported networks
-- `amount` greater than 1 (crosschain execution under 1 stablecoin is not allowed)
+<Steps>
+<Step title="Create the request">
+Create a request with a `paymentCurrency` in the supported stablecoins and networks, and `amount` greater than 1 (crosschain execution under 1 stablecoin is not allowed).
 
 Create the request via [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request).
 </Step>
 
-<Step title="Payment route fetching">
-Fetch possible routes with [GET /v2/request/{requestId}/routes](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/routes). The API returns routes based on payer balances.
+<Step title="Fetch payment routes">
+Fetch available routes with [GET /v2/request/{requestId}/routes](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/routes).
 
-The API ranks routes by:
+**Required query parameters:**
+- `wallet` — the payer's wallet address
 
-- transaction fees
-- processing speed
+**Optional query parameters:**
+- `feePercentage` and `feeAddress` — for platform fee inclusion in route calculations
 
-Each route includes fee estimates and breakdowns:
+The API returns routes ranked by fees and speed. Each route includes:
 
-1. **Gas fees** for transfer/approval/execution on the processor side
-2. **Service fees** for crosschain infrastructure
+- `chain` and `token` — the source chain and token
+- `fee` — total fee as a decimal
+- `feeBreakdown[]` — detailed fee components (gas, crosschain, platform)
+- `speed` — `"FAST"` for same-chain, seconds estimate for crosschain
 
-For tokens that do not support EIP-2612, payer approval gas is paid directly by the payer and is not included in route total fees.
+The API may also return samechain routes when the payer has funds on the same chain as `paymentCurrency`.
 
-The API may also return samechain routes when payer funds are on the same chain as `paymentCurrency`.
-</Step>
-
-<Step title="Getting payment calldata">
-Once a route is selected, fetch unsigned payloads using [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay).
-
-- For crosschain routes: returns payment intent + approval payload (permit/calldata)
-- For direct samechain routes: returns payment calldata and approval data only when needed
-</Step>
-
-<Step title="Signing the payment intent">
-Sign the returned payloads with the payer wallet. Approval handling depends on EIP-2612 support.
-
-```typescript
-import { ethers } from "ethers";
-
-const ethersProvider = new ethers.providers.Web3Provider(
-  walletProvider as ethers.providers.ExternalProvider,
-);
-const signer = await ethersProvider.getSigner();
-
-const paymentIntent = JSON.parse(paymentData.paymentIntent);
-const supportsEIP2612 = paymentData.metadata.supportsEIP2612;
-let approvalSignature = undefined;
-let approval = undefined;
-
-if (supportsEIP2612) {
-  approval = JSON.parse(paymentData.approvalPermitPayload);
-
-  approvalSignature = await signer._signTypedData(
-    approval.domain,
-    approval.types,
-    approval.values,
-  );
-} else {
-  const tx = await signer.sendTransaction(paymentData.approvalCalldata);
-  await tx.wait();
+```json Example routes response
+{
+  "routes": [
+    {
+      "id": "REQUEST_NETWORK_PAYMENT",
+      "fee": 0,
+      "feeBreakdown": [],
+      "speed": "FAST",
+      "chain": "BASE",
+      "token": "USDC"
+    },
+    {
+      "id": "ARBITRUM_BASE_USDT_USDC",
+      "fee": 0.001,
+      "feeBreakdown": [
+        {
+          "type": "crosschain",
+          "stage": "sending",
+          "provider": "lifi",
+          "amount": "0.001",
+          "amountInUSD": "0.001",
+          "currency": "USDT"
+        }
+      ],
+      "speed": 300,
+      "chain": "ARBITRUM",
+      "token": "USDT"
+    }
+  ]
 }
-
-const paymentIntentSignature = await signer._signTypedData(
-  paymentIntent.domain,
-  paymentIntent.types,
-  paymentIntent.values,
-);
-
-const signedData = {
-  signedPaymentIntent: {
-    signature: paymentIntentSignature,
-    nonce: paymentIntent.values.nonce.toString(),
-    deadline: paymentIntent.values.deadline.toString(),
-  },
-  signedApprovalPermit: approvalSignature
-    ? {
-        signature: approvalSignature,
-        nonce: approval.values.nonce.toString(),
-        deadline: approval?.values?.deadline
-          ? approval.values.deadline.toString()
-          : approval.values.expiry.toString(),
-      }
-    : undefined,
-};
 ```
 </Step>
 
-<Step title="Sending the signed data">
-Send signed payment data with [POST /v2/request/payment-intents/{paymentIntentId}](https://api.request.network/open-api/#tag/v2request/POST/v2/request/payment-intents/{paymentIntentId}).
+<Step title="Get payment calldata">
+Once the payer selects a route, fetch executable transaction calldata with [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay).
 
-The API processes the payment and sends webhook lifecycle updates, including completion events.
+**Query parameters:**
+- `wallet` — the payer's wallet address
+- `chain` — the source chain from the selected route (e.g., `ARBITRUM`)
+- `token` — the source token from the selected route (e.g., `USDT`)
+
+<Info>
+Both `chain` and `token` must be provided together for crosschain payments. Omit both for same-chain payments.
+</Info>
+
+The API returns a `transactions` array with ready-to-execute calldata:
+
+```json Example crosschain response
+{
+  "transactions": [
+    {
+      "data": "0x095ea7b3...",
+      "to": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "value": "0x0"
+    },
+    {
+      "data": "0xabcdef...",
+      "to": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
+      "value": "0x0"
+    }
+  ],
+  "metadata": {
+    "stepsRequired": 2,
+    "needsApproval": true,
+    "approvalTransactionIndex": 0,
+    "paymentTransactionIndex": 1,
+    "routeType": "crosschain",
+    "quoteExpiresAt": 1742205771,
+    "hasEnoughBalance": true
+  }
+}
+```
+
+**Metadata fields:**
+- `stepsRequired` — number of transactions to execute (1 or 2)
+- `needsApproval` — whether a token approval transaction is needed first
+- `approvalTransactionIndex` — index of the approval tx in the array (or `null`)
+- `paymentTransactionIndex` — index of the payment/bridge tx
+- `routeType` — `"crosschain"` or `"samechain"`
+- `quoteExpiresAt` — unix timestamp when the route quote expires
+- `hasEnoughBalance` — whether the payer has sufficient funds
+</Step>
+
+<Step title="Execute the transactions">
+Send each transaction in the `transactions` array as a standard `eth_sendTransaction`. If `needsApproval` is true, execute the approval transaction first and wait for confirmation before sending the payment transaction.
+
+```typescript
+import { createWalletClient, custom } from "viem";
+import { arbitrum } from "viem/chains";
+
+const walletClient = createWalletClient({
+  chain: arbitrum,
+  transport: custom(window.ethereum),
+});
+
+const [account] = await walletClient.getAddresses();
+
+// Step 1: Send approval transaction (if needed)
+if (metadata.needsApproval) {
+  const approvalTx = transactions[metadata.approvalTransactionIndex];
+  const approvalHash = await walletClient.sendTransaction({
+    account,
+    to: approvalTx.to,
+    data: approvalTx.data,
+    value: BigInt(approvalTx.value || 0),
+  });
+  // Wait for confirmation before proceeding
+  await publicClient.waitForTransactionReceipt({ hash: approvalHash });
+}
+
+// Step 2: Send payment/bridge transaction
+const paymentTx = transactions[metadata.paymentTransactionIndex];
+const paymentHash = await walletClient.sendTransaction({
+  account,
+  to: paymentTx.to,
+  data: paymentTx.data,
+  value: BigInt(paymentTx.value || 0),
+});
+```
+
+After the payer broadcasts the crosschain transaction, payment detection happens automatically. The API monitors the bridge execution and sends [webhook notifications](/api-features/webhooks-events) when the payment is confirmed on the destination chain.
 </Step>
 </Steps>
 

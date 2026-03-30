@@ -1,18 +1,27 @@
 ---
 title: "Secure Payments API Reference"
-description: "Generate secure payment URLs and retrieve token-based payment calldata."
+description: "Generate secure payment URLs, retrieve payment metadata, and get executable calldata."
 ---
 
 ## Endpoints
 
-- `POST /v2/secure-payments`
-- `GET /v2/secure-payments/:token`
+- `POST /v2/secure-payments` — Create a secure payment
+- `GET /v2/secure-payments` — Lookup by request ID
+- `GET /v2/secure-payments/:token` — Get payment metadata
+- `GET /v2/secure-payments/:token/pay` — Get payment calldata
+- `POST /v2/secure-payments/:token/intent` — Record crosschain payment intent
 
 ## Authentication
 
-Both endpoints support:
-- `x-api-key`, or
-- `x-client-id` with browser `Origin`
+| Endpoint | Supported auth |
+|----------|---------------|
+| `POST /v2/secure-payments` | `x-api-key`, `x-client-id` + Origin, or session |
+| `GET /v2/secure-payments` | Session only |
+| `GET /v2/secure-payments/:token` | `x-api-key` or `x-client-id` |
+| `GET /v2/secure-payments/:token/pay` | `x-api-key` or `x-client-id` |
+| `POST /v2/secure-payments/:token/intent` | `x-api-key` or `x-client-id` |
+
+---
 
 ## POST /v2/secure-payments
 
@@ -24,28 +33,28 @@ Create a secure payment entry and return a hosted payment URL.
 Array of payment requests. One item creates a single payment. Multiple items create a batch payment.
 </ParamField>
 
-<ParamField body="requests[].payee" type="string" required>
-Payee EVM address.
+<ParamField body="requests[].destinationId" type="string">
+ERC-7828 composite destination ID encoding payee wallet, chain, and token. Format: `{interopAddress}:{tokenAddress}`. Optional when the authenticated client ID has a bound payee destination.
 </ParamField>
 
 <ParamField body="requests[].amount" type="string" required>
-Human-readable amount.
-</ParamField>
-
-<ParamField body="requests[].invoiceCurrency" type="string" required>
-Invoice currency ID.
-</ParamField>
-
-<ParamField body="requests[].paymentCurrency" type="string" required>
-Payment currency ID.
+Human-readable payment amount (e.g., `"10.50"`). Must be greater than 0.
 </ParamField>
 
 <ParamField body="feePercentage" type="string">
-Optional fee percentage from `0` to `100`.
+Optional fee percentage from `0` to `100` (e.g., `"2.5"` for 2.5%).
 </ParamField>
 
 <ParamField body="feeAddress" type="string">
-Optional fee recipient address.
+Optional fee recipient address. Required when `feePercentage` is set.
+</ParamField>
+
+<ParamField body="reference" type="string">
+Optional merchant reference for reconciliation (max 255 chars).
+</ParamField>
+
+<ParamField body="payerIdentifier" type="string">
+Optional payer identifier (max 255 chars).
 </ParamField>
 
 <RequestExample>
@@ -56,14 +65,13 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
   -d '{
     "requests": [
       {
-        "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
-        "amount": "10",
-        "invoiceCurrency": "FAU-sepolia",
-        "paymentCurrency": "FAU-sepolia"
+        "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#80B12379:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+        "amount": "10"
       }
     ],
     "feePercentage": "2.5",
-    "feeAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7"
+    "feeAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+    "reference": "ORDER-2024-001"
   }'
 ```
 </RequestExample>
@@ -86,9 +94,40 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
 - `401`: unauthorized
 - `429`: rate limited
 
+---
+
+## GET /v2/secure-payments
+
+Lookup a secure payment by request ID. Requires a SIWE wallet session.
+
+### Query parameters
+
+<ParamField query="requestId" type="string" required>
+The request ID to look up.
+</ParamField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "token": "01ABC123DEF456GHI789JKL",
+  "securePaymentUrl": "https://pay.request.network/?token=01ABC123DEF456GHI789JKL",
+  "status": "pending",
+  "paymentType": "single",
+  "createdAt": "2026-03-15T10:00:00.000Z",
+  "expiresAt": "2026-03-15T10:15:00.000Z"
+}
+```
+</ResponseExample>
+
+### Error responses
+
+- `404`: secure payment not found for the given request ID
+
+---
+
 ## GET /v2/secure-payments/:token
 
-Retrieve secure payment status and prepared transactions.
+Retrieve payment metadata and display information. Returns amounts, destination info, status, and optionally crosschain payment options — but **not** executable transaction calldata. Use `/pay` for calldata.
 
 ### Path parameters
 
@@ -99,7 +138,7 @@ Secure payment token returned from `POST /v2/secure-payments`.
 ### Query parameters
 
 <ParamField query="wallet" type="string">
-Optional payer wallet address used to optimize approval checks.
+Payer wallet address. When provided, the response includes `paymentOptions` with balance information across supported chains.
 </ParamField>
 
 <RequestExample>
@@ -114,22 +153,34 @@ curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789
 {
   "paymentType": "single",
   "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
-  "network": "sepolia",
+  "network": "base",
   "amount": "10000000000000000000",
-  "paymentCurrency": "FAU-sepolia",
+  "paymentCurrency": "USDC-base",
   "isNativeCurrency": false,
   "status": "pending",
-  "transactions": [
-    {
-      "to": "0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
-      "data": "0x...",
-      "value": 0
+  "destination": {
+    "destinationId": "0x6923...C7D7@eip155:8453#ABCD1234:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "payeeAddress": "0x6923...C7D7@eip155:8453",
+    "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "walletAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+    "network": "base"
+  },
+  "reference": "ORDER-2024-001",
+  "paymentOptions": {
+    "BASE": {
+      "USDC": {
+        "balance": "150.00",
+        "hasEnoughBalance": true,
+        "neededAmount": "10.00"
+      }
+    },
+    "ARBITRUM": {
+      "USDC": {
+        "balance": "25.00",
+        "hasEnoughBalance": true,
+        "neededAmount": "10.02"
+      }
     }
-  ],
-  "metadata": {
-    "stepsRequired": 1,
-    "needsApproval": false,
-    "paymentTransactionIndex": 0
   }
 }
 ```
@@ -148,11 +199,127 @@ curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789
   "paymentCurrencies": ["FAU-sepolia", "FAU-sepolia"],
   "isNativeCurrency": [false, false],
   "status": "pending",
+  "destinations": [
+    {
+      "destinationId": "...",
+      "payeeAddress": "...",
+      "tokenAddress": "...",
+      "walletAddress": "0xb07d2398d2004378cad234da0ef14f1c94a530e4",
+      "network": "sepolia"
+    }
+  ],
+  "reference": null
+}
+```
+</ResponseExample>
+
+### Error responses
+
+- `403`: token expired or not payable
+- `404`: token not found
+- `409`: secure payment already completed
+- `429`: rate limited
+
+---
+
+## GET /v2/secure-payments/:token/pay
+
+Retrieve executable transaction calldata for the secure payment. For crosschain payments, provide `chain` and `token` query parameters to select the source route.
+
+### Path parameters
+
+<ParamField path="token" type="string" required>
+Secure payment token.
+</ParamField>
+
+### Query parameters
+
+<ParamField query="wallet" type="string">
+Payer wallet address. Used for approval and balance checks.
+</ParamField>
+
+<ParamField query="chain" type="string">
+Source chain for crosschain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`. Must be provided together with `token`.
+</ParamField>
+
+<ParamField query="token" type="string">
+Source token for crosschain payments. Values: `USDC`, `USDT`. Must be provided together with `chain`.
+</ParamField>
+
+<RequestExample>
+```bash cURL (same-chain)
+curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789JKL/pay?wallet=0x1234..." \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```bash cURL (crosschain)
+curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789JKL/pay?wallet=0x1234...&chain=ARBITRUM&token=USDT" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 Single payment calldata
+{
+  "transactions": [
+    {
+      "to": "0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+      "data": "0x...",
+      "value": 0
+    }
+  ],
+  "metadata": {
+    "stepsRequired": 1,
+    "needsApproval": false,
+    "paymentTransactionIndex": 0,
+    "hasEnoughBalance": true,
+    "hasEnoughGas": true
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json 200 Crosschain calldata
+{
+  "transactions": [
+    {
+      "to": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "data": "0x095ea7b3...",
+      "value": "0x0"
+    },
+    {
+      "to": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
+      "data": "0xabcdef...",
+      "value": "0x0"
+    }
+  ],
+  "metadata": {
+    "stepsRequired": 2,
+    "needsApproval": true,
+    "approvalTransactionIndex": 0,
+    "paymentTransactionIndex": 1,
+    "routeType": "crosschain",
+    "quoteExpiresAt": 1742205771,
+    "hasEnoughBalance": true,
+    "sourceAmount": "10.02"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json 200 Batch payment calldata
+{
   "ERC20ApprovalTransactions": [],
   "batchPaymentTransaction": {
     "to": "0x399F5EE127ce7432E4921a61b8CF52b0af52cbfE",
     "data": "0x...",
     "value": 0
+  },
+  "metadata": {
+    "hasEnoughBalance": true,
+    "hasEnoughGas": true
   }
 }
 ```
@@ -160,6 +327,65 @@ curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789
 
 ### Error responses
 
+- `400`: invalid calldata request or unsupported crosschain configuration
+- `403`: token expired or not payable
+- `404`: token not found
+- `409`: secure payment already completed
+- `429`: rate limited
+
+---
+
+## POST /v2/secure-payments/:token/intent
+
+Record a crosschain payment intent after the payer broadcasts the source-chain LiFi transaction. This allows the system to track the bridge execution and trigger payment detection on the destination chain.
+
+### Path parameters
+
+<ParamField path="token" type="string" required>
+Secure payment token.
+</ParamField>
+
+### Request fields
+
+<ParamField body="txHash" type="string" required>
+The source-chain transaction hash (66 characters: `0x` + 64 hex chars).
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+The source chain. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`.
+</ParamField>
+
+<ParamField body="token" type="string" required>
+The source token. Values: `USDC`, `USDT`.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789JKL/intent" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "txHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    "chain": "ARBITRUM",
+    "token": "USDT"
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "intentId": "01HXEXAMPLE123",
+  "paymentReference": "0xb3581f0b0f74cc61",
+  "txHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "isListening": true
+}
+```
+</ResponseExample>
+
+### Error responses
+
+- `400`: invalid or unsupported crosschain payload
 - `403`: token expired or not payable
 - `404`: token not found
 - `409`: secure payment already completed
