@@ -51,43 +51,129 @@ The response returns:
 </Step>
 </Steps>
 
-## Filter Options
+## Query Parameters
+
+At least one search parameter is required.
 
 ### Identity and Transaction Filters
-- `txHash`: find payments by blockchain transaction hash
-- `walletAddress`: find payments where wallet is payer or payee
-- `paymentReference`: search by payment reference
-- `requestId`: search by specific request ID
-- `reference`: search by merchant reference
+
+<ParamField query="txHash" type="string">
+Transaction hash (66 chars: `0x` + 64 hex). Returns all payments in that transaction.
+</ParamField>
+
+<ParamField query="walletAddress" type="string">
+Wallet address (EVM `0x...` or Tron `T...`). Returns payments where the wallet is payer or payee.
+</ParamField>
+
+<ParamField query="paymentReference" type="string">
+Payment reference hex identifier.
+</ParamField>
+
+<ParamField query="requestId" type="string">
+Request Network request ID.
+</ParamField>
+
+<ParamField query="reference" type="string">
+Custom merchant reference string.
+</ParamField>
 
 ### Type and Currency Filters
-- `type`: `direct`, `conversion`, `crosschain`, `recurring`
-- `invoiceCurrency`
-- `paymentCurrency`
 
-### Time and Pagination
-- `fromDate`, `toDate`
-- `limit`, `offset`
+<ParamField query="type" type="string">
+Payment type. Values: `direct`, `conversion`, `crosschain`, `recurring`.
+</ParamField>
 
-<CardGroup cols={2}>
-  <Card title="High-precision Search" icon="filter">
-    Combine request, wallet, currency, and date filters for targeted reconciliation queries.
-  </Card>
-  
-  <Card title="Pagination at Scale" icon="list">
-    Use `limit`/`offset` and `hasMore` to process large result sets safely.
-  </Card>
-</CardGroup>
+<ParamField query="invoiceCurrency" type="string">
+Invoice currency (e.g., `USD`, `EUR`).
+</ParamField>
 
-## Response Data
+<ParamField query="paymentCurrency" type="string">
+Payment currency ID (e.g., `USDC-base`, `ETH-mainnet`).
+</ParamField>
 
-Common fields include payment-level data and linked request metadata:
+### Date Range and Pagination
 
-- payment identifiers and transaction hashes
-- source/destination network and amounts
-- payment type and currency fields
-- fee objects
-- linked request information (`requestId`, `paymentReference`, `hasBeenPaid`, optional `customerInfo`, `reference`)
+<ParamField query="fromDate" type="string">
+Start date in ISO 8601 UTC format (e.g., `2026-01-01T00:00:00.000Z`).
+</ParamField>
+
+<ParamField query="toDate" type="string">
+End date in ISO 8601 UTC format. Must be >= `fromDate`.
+</ParamField>
+
+<ParamField query="limit" type="string">
+Results per page.
+</ParamField>
+
+<ParamField query="offset" type="string">
+Pagination offset.
+</ParamField>
+
+## Response Schema
+
+```json Example response
+{
+  "payments": [
+    {
+      "id": "01HXAMPLE1234567890ABCDEF",
+      "amount": "100.00",
+      "sourceNetwork": "base",
+      "destinationNetwork": "base",
+      "sourceTxHash": "0x1234...abcdef",
+      "destinationTxHash": null,
+      "timestamp": "2026-01-15T10:30:00.000Z",
+      "type": "direct",
+      "currency": "USD",
+      "paymentCurrency": "USDC",
+      "fees": [
+        {
+          "type": "gas",
+          "stage": "sending",
+          "amount": "0.002",
+          "amountInUSD": "0.005",
+          "currency": "ETH",
+          "provider": "request-network"
+        }
+      ],
+      "request": {
+        "requestId": "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb",
+        "paymentReference": "0xb3581f0b0f74cc61",
+        "hasBeenPaid": true,
+        "customerInfo": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com"
+        },
+        "reference": "ORDER-2024-001234"
+      }
+    }
+  ],
+  "pagination": {
+    "total": 157,
+    "limit": 20,
+    "offset": 0,
+    "hasMore": true
+  }
+}
+```
+
+### Payment fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique payment identifier |
+| `amount` | string | Human-readable payment amount |
+| `sourceNetwork` | string | Originating blockchain network |
+| `destinationNetwork` | string | Receiving blockchain network |
+| `sourceTxHash` | string \| null | Source chain transaction hash |
+| `destinationTxHash` | string \| null | Destination chain tx hash (crosschain) |
+| `timestamp` | string | ISO 8601 timestamp |
+| `type` | string | `direct`, `conversion`, `crosschain`, `recurring` |
+| `currency` | string | Invoice currency |
+| `paymentCurrency` | string | Payment currency |
+| `fees` | array | Fee breakdown with type, amount, currency, provider |
+| `recurringPaymentId` | string \| null | Recurring payment ID if applicable |
+| `request` | object | Linked request with requestId, paymentReference, hasBeenPaid, customerInfo, reference |
 
 ## Practical Notes
 
