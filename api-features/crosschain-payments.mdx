@@ -46,7 +46,7 @@ Crosschain payments work only with mainnet funds (real money). Test networks are
 
 <Steps>
 <Step title="Create the request">
-Create a request with a `paymentCurrency` in the supported stablecoins and networks, and `amount` greater than 1 (crosschain execution under 1 stablecoin is not allowed).
+Create a request with a `paymentCurrency` in the supported stablecoins and networks. The `amount` must be greater than 1 USD equivalent (e.g., at least 1.01 USDC) — crosschain routes are not available for amounts under $1 due to bridge minimums.
 
 Create the request via [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request).
 </Step>

@@ -84,6 +84,17 @@ See [Recurring Payments](/api-features/recurring-payments) for the full lifecycl
 - `GET /v2/payouts/recurring/:id` — Check status and next payment date
 - `PATCH /v2/payouts/recurring/:id` — Cancel or unpause
 
+## Error Handling
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid request body — check required fields and currency IDs |
+| `401` | Authentication failed — verify your `x-api-key` header |
+| `404` | Request or recurring payment not found |
+| `429` | Rate limited — back off and retry |
+
+For batch payouts, a `400` may indicate that payments span multiple networks (all must be on the same chain).
+
 ## Endpoint Reference
 
 <CardGroup cols={2}>
