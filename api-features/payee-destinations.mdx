@@ -1,0 +1,140 @@
+---
+title: "Payee Destinations"
+description: "Register and manage receiving routes using ERC-7828 interop addresses"
+---
+
+## Overview
+
+Payee destinations define where payments are received. Each destination encodes a wallet address, chain, and token into a single **ERC-7828 interop address**, creating a unique receiving route.
+
+Destinations are used by:
+- **Secure payments** — to resolve the payee, chain, and token from a `destinationId`
+- **Client IDs** — to bind a receiving route to a client ID for orchestrator flows
+
+## ERC-7828 Address Format
+
+A destination ID combines the interop address with the token address:
+
+```
+{walletAddress}@eip155:{chainId}#{checksum}:{tokenAddress}
+```
+
+**Example:**
+```
+0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:8453#ABCD1234:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+```
+
+This encodes:
+- **Wallet:** `0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7`
+- **Chain:** Base (chainId `8453`)
+- **Token:** USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
+
+## How It Works
+
+<Steps>
+  <Step title="Authenticate with wallet">
+    Destinations require a SIWE wallet session. See [Wallet Authentication](/api-reference/wallet-authentication) for the challenge/verify flow.
+  </Step>
+
+  <Step title="Create a destination">
+    Call `POST /v1/payee-destination` with the token address and chain ID. The API generates the full destination ID with interop address.
+
+    ```bash
+    curl -X POST "https://auth.request.network/v1/payee-destination" \
+      -H "Cookie: session=YOUR_SESSION_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "chainId": 8453
+      }'
+    ```
+  </Step>
+
+  <Step title="Use the destination ID">
+    The returned `destinationId` can be used in:
+    - `POST /v2/secure-payments` — as `requests[].destinationId`
+    - Client ID creation — as `payeeDestinationId` to bind the receiving route
+  </Step>
+</Steps>
+
+## Endpoints
+
+All endpoints require a SIWE wallet session (httpOnly cookie).
+
+### POST /v1/payee-destination
+
+Create a new payee destination or reactivate an existing one.
+
+<ParamField body="tokenAddress" type="string" required>
+ERC20 token contract address (EVM `0x...` or Tron `T...` format).
+</ParamField>
+
+<ParamField body="chainId" type="number" required>
+Chain ID for the receiving network (e.g., `8453` for Base, `1` for Ethereum).
+</ParamField>
+
+```json Response (201)
+{
+  "id": "01HXEXAMPLE123",
+  "destinationId": "0x6923...C7D7@eip155:8453#ABCD1234:0x8335...2913",
+  "walletAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "chainId": 8453,
+  "binaryInteropAddress": "0x...",
+  "humanReadableInteropAddress": "0x6923...C7D7@eip155:8453#ABCD1234",
+  "claimed": true,
+  "active": true,
+  "createdAt": "2026-03-15T10:00:00.000Z"
+}
+```
+
+### PUT /v1/payee-destination
+
+Update the token address and/or chain on the active destination.
+
+<ParamField body="tokenAddress" type="string" required>
+New ERC20 token contract address.
+</ParamField>
+
+<ParamField body="chainId" type="number" required>
+New chain ID.
+</ParamField>
+
+### GET /v1/payee-destination
+
+Returns the active payee destination for the authenticated wallet, or `null` if none exists.
+
+### GET /v1/payee-destination/lookup
+
+Lookup a destination by its composite ID.
+
+<ParamField query="destinationId" type="string" required>
+The full destination ID in ERC-7828 format.
+</ParamField>
+
+### PATCH /v1/payee-destination/deactivate
+
+Deactivate the current destination.
+
+<ParamField body="destinationId" type="string" required>
+The destination ID to deactivate.
+</ParamField>
+
+```json Response (200)
+{
+  "success": true,
+  "message": "Destination deactivated"
+}
+```
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Client ID Management" icon="key" href="/api-features/client-id-management">
+    Bind destinations to client IDs for orchestrator flows.
+  </Card>
+
+  <Card title="Secure Payments API" icon="lock" href="/api-reference/secure-payments">
+    Use destination IDs when creating secure payments.
+  </Card>
+</CardGroup>

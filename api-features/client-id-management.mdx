@@ -1,0 +1,139 @@
+---
+title: "Client ID Management"
+description: "Create and manage Client IDs for frontend authentication, domain whitelisting, and orchestrator flows"
+---
+
+## Overview
+
+Client IDs enable frontend/browser-side authentication with the Request Network API. Unlike API keys (which are for server-to-server calls), Client IDs are designed to be used in client-side code with domain restrictions.
+
+**Key differences from API keys:**
+
+| | API Key | Client ID |
+|---|---------|-----------|
+| **Use case** | Backend integrations | Frontend/browser apps |
+| **Auth header** | `x-api-key` | `x-client-id` + `Origin` |
+| **Domain restriction** | None | Optional whitelist |
+| **Fee configuration** | Per-request | Configurable per client ID |
+
+## Backend vs Frontend Client IDs
+
+- **Frontend Client IDs** — have `allowedDomains` set. The API validates the `Origin` header against the whitelist.
+- **Backend Client IDs** — have empty `allowedDomains`. No domain validation is performed. Useful for server-side orchestrators that need client ID scoping without browser restrictions.
+
+## Orchestrator Pattern
+
+When a Client ID is bound to a [payee destination](/api-features/payee-destinations), requests created with that Client ID automatically resolve the payee from the destination. This enables orchestrator flows where a third party creates payment requests on behalf of a merchant without knowing the merchant's wallet details.
+
+```
+Orchestrator (with Client ID) → POST /v2/request (no payee field)
+  → API resolves payee from Client ID's bound destination
+  → Payment goes to merchant's configured wallet
+```
+
+## CRUD Operations
+
+Client IDs can be managed through the auth API (session-based) or the request API (API key-based).
+
+### Create a Client ID
+
+```bash
+curl -X POST "https://auth.request.network/v1/client-ids" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "label": "My Checkout Widget",
+    "allowedDomains": ["https://mystore.com", "https://staging.mystore.com"],
+    "payeeDestinationId": "0x6923...C7D7@eip155:8453#ABCD1234:0x8335...2913"
+  }'
+```
+
+<ParamField body="label" type="string" required>
+Display name for the Client ID (1-100 characters).
+</ParamField>
+
+<ParamField body="allowedDomains" type="string[]">
+List of allowed origins (max 10). Must be HTTPS, except `http://localhost` and `http://127.0.0.1`. Leave empty for backend Client IDs.
+</ParamField>
+
+<ParamField body="feePercentage" type="string">
+Default fee percentage for requests created with this Client ID (0-100).
+</ParamField>
+
+<ParamField body="feeAddress" type="string">
+Fee recipient address. Required when `feePercentage` is set.
+</ParamField>
+
+<ParamField body="payeeDestinationId" type="string">
+ERC-7828 destination ID to bind to this Client ID. Enables the orchestrator pattern.
+</ParamField>
+
+```json Response (201)
+{
+  "id": "01HXEXAMPLE123",
+  "clientId": "ci_abc123def456",
+  "label": "My Checkout Widget",
+  "allowedDomains": ["https://mystore.com", "https://staging.mystore.com"],
+  "feePercentage": null,
+  "feeAddress": null,
+  "status": "active",
+  "createdAt": "2026-03-15T10:00:00.000Z"
+}
+```
+
+### List Client IDs
+
+```bash
+curl -X GET "https://auth.request.network/v1/client-ids" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN"
+```
+
+### Get a Client ID
+
+```bash
+curl -X GET "https://auth.request.network/v1/client-ids/01HXEXAMPLE123" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN"
+```
+
+### Update a Client ID
+
+```bash
+curl -X PUT "https://auth.request.network/v1/client-ids/01HXEXAMPLE123" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "allowedDomains": ["https://mystore.com", "https://new-domain.com"],
+    "label": "Updated Label"
+  }'
+```
+
+All fields are optional. You can update `label`, `allowedDomains`, `feePercentage`, `feeAddress`, `payeeDestinationId`, and `status`.
+
+### Revoke a Client ID
+
+```bash
+curl -X DELETE "https://auth.request.network/v1/client-ids/01HXEXAMPLE123" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN"
+```
+
+<Warning>
+Revoking a Client ID is permanent and cannot be undone.
+</Warning>
+
+## Webhook Scoping
+
+Webhooks can be scoped to specific Client IDs. When a webhook is created with a `clientId`, it only receives events for requests created with that Client ID.
+
+See [Webhooks](/api-features/webhooks-events) for details.
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="shield" href="/api-reference/authentication">
+    How to use Client IDs for API authentication.
+  </Card>
+
+  <Card title="Payee Destinations" icon="location-dot" href="/api-features/payee-destinations">
+    Create destinations to bind to Client IDs.
+  </Card>
+</CardGroup>
