@@ -137,7 +137,8 @@ The API returns a `transactions` array with ready-to-execute calldata:
     "paymentTransactionIndex": 1,
     "routeType": "crosschain",
     "quoteExpiresAt": 1742205771,
-    "hasEnoughBalance": true
+    "hasEnoughBalance": true,
+    "sourceAmount": "10.02"
   }
 }
 ```
@@ -150,6 +151,11 @@ The API returns a `transactions` array with ready-to-execute calldata:
 - `routeType` — `"crosschain"` or `"samechain"`
 - `quoteExpiresAt` — unix timestamp when the route quote expires
 - `hasEnoughBalance` — whether the payer has sufficient funds
+- `sourceAmount` — the amount the payer needs to send on the source chain (includes bridge fees)
+
+<Info>
+The API always includes approval transactions in crosschain calldata responses, even if the payer already has sufficient token allowance. This ensures USDT-style tokens (which require resetting allowance to zero before setting a new one) work correctly.
+</Info>
 </Step>
 
 <Step title="Execute the transactions">

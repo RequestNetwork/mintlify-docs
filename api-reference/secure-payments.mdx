@@ -138,7 +138,7 @@ Secure payment token returned from `POST /v2/secure-payments`.
 ### Query parameters
 
 <ParamField query="wallet" type="string">
-Payer wallet address. When provided, the response includes `paymentOptions` with balance information across supported chains.
+Payer wallet address. When provided, the response includes `paymentOptions` with balance information across supported chains. Optional for Tron payments (the API uses a fallback address if omitted).
 </ParamField>
 
 <RequestExample>
@@ -239,7 +239,7 @@ Secure payment token (ULID returned from `POST /v2/secure-payments`).
 ### Query parameters
 
 <ParamField query="wallet" type="string">
-Payer wallet address. Used for approval and balance checks.
+Payer wallet address. Used for approval and balance checks. Optional for Tron payments (the API uses a fallback address if omitted).
 </ParamField>
 
 <ParamField query="chain" type="string">
