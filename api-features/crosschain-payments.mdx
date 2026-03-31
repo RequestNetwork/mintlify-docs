@@ -167,7 +167,7 @@ const walletClient = createWalletClient({
 const [account] = await walletClient.getAddresses();
 
 // Step 1: Send approval transaction (if needed)
-if (metadata.needsApproval) {
+if (metadata.needsApproval && metadata.approvalTransactionIndex != null) {
   const approvalTx = transactions[metadata.approvalTransactionIndex];
   const approvalHash = await walletClient.sendTransaction({
     account,

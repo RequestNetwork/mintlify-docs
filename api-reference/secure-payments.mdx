@@ -226,10 +226,14 @@ curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789
 
 Retrieve executable transaction calldata for the secure payment. For crosschain payments, provide `chain` and `token` query parameters to select the source route.
 
+<Info>
+The `:token` in the URL path is the secure payment token (a ULID identifier). The `token` query parameter is the source currency symbol (`USDC` or `USDT`) for crosschain route selection. These are different values.
+</Info>
+
 ### Path parameters
 
 <ParamField path="token" type="string" required>
-Secure payment token.
+Secure payment token (ULID returned from `POST /v2/secure-payments`).
 </ParamField>
 
 ### Query parameters
@@ -239,11 +243,11 @@ Payer wallet address. Used for approval and balance checks.
 </ParamField>
 
 <ParamField query="chain" type="string">
-Source chain for crosschain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`. Must be provided together with `token`.
+Source chain for crosschain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`. Must be provided together with the `token` query parameter.
 </ParamField>
 
 <ParamField query="token" type="string">
-Source token for crosschain payments. Values: `USDC`, `USDT`. Must be provided together with `chain`.
+Source currency for crosschain payments. Values: `USDC`, `USDT`. Must be provided together with `chain`.
 </ParamField>
 
 <RequestExample>
