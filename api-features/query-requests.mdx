@@ -26,6 +26,9 @@ Typical fields include:
 - `paymentReference`
 - `txHash`
 - `isListening`
+- `requestAmount` — the original requested amount in invoice currency
+- `detectionSource` — how the payment was confirmed (`"request-network"` or `"lifi"`)
+- `note` — additional context for non-standard settlements (e.g., LiFi fallback)
 - optional metadata such as `customerInfo` and `reference`
 </Step>
 
