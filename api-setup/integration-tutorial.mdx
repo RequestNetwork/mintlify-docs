@@ -452,17 +452,16 @@ As you may know, it's impossible for our webhooks to call your locally running s
 <img src="/images/api-setup/integration-tutorial/ngrok-terminal.webp" alt="ngrok terminal" />
 </Frame>
 
-Next up, go back to the [Request Dashboard](https://dashboard.request.network) and add a new webhook. In the case above it's the URL from ngrok with the `/webhooks` appendix (https://34c701d1d7f9.ngrok-free.app/webhooks).
+Next up, register the webhook via the Auth API. The URL is the ngrok URL from above with `/webhooks` appended (e.g. `https://34c701d1d7f9.ngrok-free.app/webhooks`):
 
-<Frame>
-<img src="/images/api-setup/integration-tutorial/webhook-step-1.webp" alt="Add webhook step 1" />
-</Frame>
+```bash
+curl -X POST "https://auth.request.network/v1/webhook" \
+  -H "Content-Type: application/json" \
+  -H "x-client-id: $RN_API_KEY" \
+  -d '{ "url": "https://34c701d1d7f9.ngrok-free.app/webhooks" }'
+```
 
-<Frame>
-<img src="/images/api-setup/integration-tutorial/webhook-step-2.webp" alt="Add webhook step 2" />
-</Frame>
-
-Next thing, copy over the signing secret and add it to your `.env` file, then restart the app.
+The response includes a one-time `secret` value — copy it and add to your `.env` file, then restart the app.
 
 ```
 // .env
@@ -471,7 +470,16 @@ RN_API_URL=https://api.request.network/v2
 RN_WEBHOOK_SECRET=<THE_SECRET_WE_JUST_CREATED>
 ```
 
-If you want to test it out, click the `Send test event` button and observe your server's logs. Your output should look something like the following:
+If you want to test it out, fire a test delivery and observe your server's logs:
+
+```bash
+curl -X POST "https://auth.request.network/v1/webhook/test" \
+  -H "Content-Type: application/json" \
+  -H "x-client-id: $RN_API_KEY" \
+  -d '{ "eventType": "payment.confirmed" }'
+```
+
+Your output should look something like the following:
 
 ```
 Webhook received: payment.confirmed for request req_test123456789abcdef {
@@ -525,9 +533,9 @@ Full webhook data: {
 
 #### Testing webhooks live
 
-Once your application is deployed, you will need to add a new webhook via the [Request Dashboard](https://dashboard.request.network) just like we did above, but use your deployment URL's webhook route.
+Once your application is deployed, register a new webhook via `POST /v1/webhook` using your deployment's webhook route — same `curl` as above with the production URL.
 
-Then copy over the secret to your deployment's variables and you can test your handlers just as we did above!
+Then copy the returned secret to your deployment's environment variables and you can test your handlers just as we did above.
 
 #### Responding to payment confirmation events
 

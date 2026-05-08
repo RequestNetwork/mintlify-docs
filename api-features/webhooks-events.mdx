@@ -52,7 +52,7 @@ graph LR
 - **Test webhook identification:** `x-request-network-test` header for development
 
 ### Development Tools
-- **Dashboard testing:** Send test webhooks from the [Request Dashboard](https://dashboard.request.network)
+- **Test deliveries:** Fire test events via `POST /v1/webhook/test` (Auth API) — see [Webhooks reference](/api-reference/webhooks#testing)
 - **ngrok integration:** Receive webhooks locally during development
 - **Comprehensive logging:** Request API logs all delivery failures with attempt details
 
@@ -75,7 +75,7 @@ graph LR
     Working webhook handlers with Express.js and Next.js
   </Card>
 
-  <Card title="Request Dashboard" href="https://dashboard.request.network" icon="browser">
-    Configure webhooks and test delivery
+  <Card title="Auth API webhook endpoints" href="https://auth.request.network/open-api/#tag/webhook" icon="webhook">
+    POST /v1/webhook to create, GET/PUT/DELETE to manage, /test to fire test deliveries
   </Card>
 </CardGroup>

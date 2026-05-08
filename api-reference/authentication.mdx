@@ -10,7 +10,7 @@ Request Network API supports two authentication modes:
 - `x-api-key` for server-side integrations
 - `x-client-id` for browser/client integrations (with `Origin` header)
 
-Use this page as the canonical auth reference. Credentials and webhooks are managed in the [Request Dashboard](https://dashboard.request.network).
+Use this page as the canonical auth reference. Client IDs are managed in the [Request Dashboard](https://dashboard.request.network); webhooks are managed programmatically via the [Auth API](https://auth.request.network/open-api/#tag/webhook) (`POST /v1/webhook` with the `x-client-id` header).
 
 ## Choose the Right Method
 
