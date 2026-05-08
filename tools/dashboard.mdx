@@ -11,18 +11,18 @@ The **Request Network Dashboard** ([dashboard.request.network](https://dashboard
 
 ## Sign-in
 
-When the Tron feature flag is enabled, the login screen offers EVM and Tron as parallel tabs. Without the flag, only EVM sign-in is shown.
+The login screen offers EVM and Tron as parallel tabs.
 
 <Tabs>
 <Tab title="EVM">
-Connect MetaMask, Coinbase Wallet, or WalletConnect. The Dashboard issues a SIWE challenge; you sign with `personal_sign`.
+Connect MetaMask, Coinbase Wallet, or WalletConnect. Sign the SIWE message when prompted to start your session.
 
 <Frame>
   <img src="/images/dashboard/login-evm.webp" alt="Dashboard sign-in (EVM)" />
 </Frame>
 </Tab>
 <Tab title="Tron">
-Connect TronLink, Guarda, Trust, or WalletConnect-Tron. The auth-api detects your `T...` address and issues a Tron-formatted challenge; you sign with `tronWeb.trx.signMessageV2`.
+Connect TronLink, Guarda, Trust, or WalletConnect-Tron. Sign the message when prompted to start your session.
 
 <Frame>
   <img src="/images/dashboard/login-tron.webp" alt="Dashboard sign-in (Tron)" />
@@ -30,7 +30,7 @@ Connect TronLink, Guarda, Trust, or WalletConnect-Tron. The auth-api detects you
 </Tab>
 </Tabs>
 
-The session is a wallet-bound cookie with a 15-minute idle timeout, shared across `dashboard.request.network`, `auth.request.network`, and `api.request.network`.
+Your session is a wallet-bound cookie with a 15-minute idle timeout, shared across `dashboard.request.network`, `auth.request.network`, and `api.request.network` — sign in once and you're authorised across all three.
 
 ## Payment destinations
 
@@ -102,7 +102,7 @@ The Dashboard UI today supports single-recipient payouts only on both EVM and Tr
 ## What the Dashboard does *not* do
 
 - It is not an admin / merchant control panel for downstream platforms — it's a user dashboard for your own wallet.
-- It does not manage webhooks today — webhooks are managed via the [auth-api](https://auth.request.network/open-api).
+- It does not manage webhooks today — webhooks are managed via the [Auth API](https://auth.request.network/open-api).
 - It does not host the payer-side checkout — that's [Secure Payment](/tools/secure-payments) at `pay.request.network`.
 
 ## Open the Dashboard
