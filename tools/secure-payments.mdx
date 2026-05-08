@@ -1,0 +1,146 @@
+---
+title: "Secure Payment"
+description: "pay.request.network — the hosted payment link app payers open to settle a Request Network payment. Defense-in-depth, multi-chain, EVM + Tron."
+---
+
+**Secure Payment** ([pay.request.network](https://pay.request.network)) is the hosted page your payers land on when they click a payment link. It's a defense-in-depth checkout: trusted contract addresses are hardcoded, every transaction is decoded and verified client-side, and the payer can pay from any of 8 supported chains in any supported wallet.
+
+<Frame>
+  <img src="/images/secure-payments/payment-options.webp" alt="Secure Payment options view" />
+</Frame>
+
+## Why it exists
+
+The Secure Payment page is intentionally separated from the merchant frontend so a compromised merchant site or API endpoint can't trick a payer into signing the wrong transaction. The page:
+
+- Loads payment metadata from the Request API using a one-time token
+- Validates every contract address against a hardcoded trusted set
+- Decodes the transaction calldata and shows the payer what they're about to sign
+- Resolves payee addresses to ENS where available
+- Refuses to broadcast if anything looks off
+
+## What the payer sees
+
+<Steps>
+  <Step title="Open the link">
+    The payer clicks a `pay.request.network/?token=...` URL you generated via [`POST /v2/secure-payments`](/api-reference/secure-payments). The page loads payment details (amount, recipient, reference).
+  </Step>
+
+  <Step title="Connect a wallet">
+    The connect modal lists EVM and Tron wallets side by side.
+
+    <Frame>
+      <img src="/images/secure-payments/connect-wallet.webp" alt="Connect wallet modal — EVM" />
+    </Frame>
+
+    <Frame>
+      <img src="/images/secure-payments/connect-wallet-tron.webp" alt="Connect wallet modal — Tron" />
+    </Frame>
+  </Step>
+
+  <Step title="Choose a chain and token">
+    The page reads the connected wallet's balances across supported chains and surfaces every chain × token combo with a sufficient balance. Same-chain payments show no swap; cross-chain shows a Li.Fi banner.
+
+    <Frame>
+      <img src="/images/secure-payments/payment-options-crosschain.webp" alt="Cross-chain payment options" />
+    </Frame>
+  </Step>
+
+  <Step title="Approve and sign">
+    For ERC-20s, an approval transaction precedes the payment. The page shows a stepper (connect → confirm → setup → pay) and an optional **Advanced** view that decodes the calldata for inspection.
+
+    <Frame>
+      <img src="/images/secure-payments/advanced-view.webp" alt="Advanced view with decoded calldata" />
+    </Frame>
+  </Step>
+
+  <Step title="Confirm">
+    The success screen shows the source and destination transaction hashes, with explorer links per chain. For cross-chain payments, a Li.Fi badge is displayed.
+
+    <Frame>
+      <img src="/images/secure-payments/payment-success.webp" alt="Payment success screen" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Wallet support
+
+| EVM wallets | Tron wallets |
+| --- | --- |
+| MetaMask | TronLink |
+| Coinbase Wallet | Guarda |
+| WalletConnect (any wallet that supports it) | Trust Wallet |
+| Any injected EIP-1193 provider (Rabby, Phantom-EVM, Bitget, OKX, Ledger, …) | WalletConnect-Tron |
+
+EVM and Tron are presented as co-equal columns — neither is hidden behind a more-options click.
+
+<Note>
+TronLink also injects an EVM provider that converts Tron addresses to EVM-style. Secure Payment **filters this out** of the EVM wallet list because it would mis-route Tron payments — Tron is handled exclusively via the TronWeb integration.
+</Note>
+
+## Cross-chain via Li.Fi
+
+When the payer's selected source chain differs from the destination chain, Secure Payment routes through Li.Fi. The UI displays:
+
+- "You'll be paying across chain via [Li.Fi](https://li.fi/)" on the options view
+- The bridge fee in the cost breakdown
+- A Li.Fi badge on the success screen
+
+Supported source chains for Li.Fi swap-to-pay: Ethereum, Arbitrum One, Optimism, Base, Polygon, BSC, Tron.
+
+## Tron support
+
+Tron is fully supported as both a **source** and a **destination** for single-recipient payments:
+
+| Direction | Same-chain | Cross-chain (Li.Fi) |
+| --- | --- | --- |
+| Tron → Tron (USDT/USDC) | ✓ | — |
+| EVM → Tron | — | ✓ |
+| Tron → EVM | — | ✓ |
+
+<Warning>
+**Multi-recipient Tron Secure Payments are not supported.** A Secure Payment link with multiple `requests[]` entries pointing at Tron destinations is rejected at creation time with a 400. EVM batches up to 200 payees per link work as expected.
+</Warning>
+
+## Error states
+
+The Secure Payment app handles a few well-defined error states with clear copy:
+
+| State | Message |
+| --- | --- |
+| Link expired (>7 days, or already paid expired) | "You are coming too late. Please contact the recipient to send you a new payment link." |
+| Token not found / invalid URL | "This URL is invalid. Please check the link and try again, or contact the recipient of this payment." |
+| Already paid | "If that is not the case, please check the link and try again, or contact the recipient of this payment." |
+| Calldata validation fails | "There is an issue with this payment call data. Please contact the recipient to send you a new payment link." |
+
+## What Secure Payment does *not* do
+
+- It does **not** persist transaction history beyond the immediate confirmation screen — explorers and webhook events are the source of truth.
+- It does **not** provide a payee-side dashboard — that's [Dashboard](/tools/dashboard) at `dashboard.request.network`.
+- It does **not** accept payments without a backing Request — the link must originate from `POST /v2/secure-payments`.
+
+## Open Secure Payment
+
+<Card title="Open pay.request.network" href="https://pay.request.network" icon="arrow-up-right-from-square">
+Try a payment link in the live app.
+</Card>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Multi-chain checkout" href="/use-cases/multi-chain-checkout" icon="shuffle">
+    The payer experience and how it routes across chains.
+  </Card>
+
+  <Card title="Programmatic payment links" href="/use-cases/programmatic-payment-links" icon="code">
+    The API call that mints these links.
+  </Card>
+
+  <Card title="Secure Payments reference" href="/api-reference/secure-payments" icon="lock">
+    Full request/response schemas.
+  </Card>
+
+  <Card title="Dashboard" href="/tools/dashboard" icon="gauge">
+    The payee-side companion.
+  </Card>
+</CardGroup>

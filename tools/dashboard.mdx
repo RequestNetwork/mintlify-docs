@@ -1,0 +1,124 @@
+---
+title: "Dashboard"
+description: "dashboard.request.network — sign in with your wallet to manage payment destinations, Client IDs, incoming payment requests, and outgoing payouts."
+---
+
+The **Request Network Dashboard** ([dashboard.request.network](https://dashboard.request.network)) is the no-code home for everything you do with Request Network as a receiver: setting up where you want to be paid, generating API credentials, sending and receiving payment links. Sign in with an EVM or Tron wallet — no email, no password.
+
+<Frame>
+  <img src="/images/dashboard/home-with-destination.webp" alt="Dashboard home with active payment destination" />
+</Frame>
+
+## Sign-in
+
+EVM and Tron are co-equal sign-in methods. The login screen offers parallel tabs:
+
+<Tabs>
+<Tab title="EVM">
+Connect MetaMask, Coinbase Wallet, WalletConnect, or any injected EIP-1193 provider. The Dashboard issues a SIWE challenge; you sign with `personal_sign`.
+
+<Frame>
+  <img src="/images/dashboard/login-evm.webp" alt="Dashboard sign-in (EVM)" />
+</Frame>
+</Tab>
+<Tab title="Tron">
+Connect TronLink, Guarda, Trust, or WalletConnect-Tron. The auth-api detects your `T...` address and issues a Tron-formatted challenge; you sign with `tronWeb.trx.signMessageV2`.
+
+<Frame>
+  <img src="/images/dashboard/login-tron.webp" alt="Dashboard sign-in (Tron)" />
+</Frame>
+</Tab>
+</Tabs>
+
+The session is a 15-minute idle-timeout cookie shared across `dashboard.request.network`, `auth.request.network`, and `api.request.network`.
+
+## Payment destinations
+
+A **payment destination** registers where you want to receive payments. It's a single chain × token × wallet combo, encoded as an [ERC-7828 humanReadableInteropAddress](/api-features/payee-destinations).
+
+<Frame>
+  <img src="/images/dashboard/create-destination.webp" alt="Create payment destination dialog" />
+</Frame>
+
+Supported chain × token combinations (8 networks):
+
+| Chain | Tokens |
+| --- | --- |
+| Ethereum, Arbitrum One, Optimism, Base, Polygon, BSC | USDC, USDT |
+| **Tron** | USDC, USDT (TRC-20) |
+| Sepolia (testnet) | FAU, USDC, USDT |
+
+You can switch your active destination at any time via **Manage Destination → Update Receiving Route**.
+
+## Client ID management
+
+Client IDs are the credential the Dashboard (and your own apps) use to call the API on your behalf. Each Client ID can be:
+
+- **Domain-restricted** (frontend use) — set `allowedDomains` to one or more HTTPS origins
+- **Backend-only** — leave `allowedDomains` empty for server-side use
+- **Fee-aware** — set a default `feePercentage` and `feeAddress`
+- **Operator-aware** — bind `operatorWalletAddress` for commerce payment flows
+- **Destination-bound** — bind `payeeDestinationId` for orchestrator patterns
+
+<Frame>
+  <img src="/images/dashboard/manage-destination.webp" alt="Manage destination and Client IDs" />
+</Frame>
+
+<Frame>
+  <img src="/images/dashboard/generate-client-id.webp" alt="Generate Client ID dialog" />
+</Frame>
+
+For full field reference, see [Client ID Management](/api-features/client-id-management).
+
+## Get Paid
+
+The **Get Paid** tab is your incoming-payments view. Create a request — amount, currency, optional reference and payer identifier — and the Dashboard generates a `pay.request.network` link to share.
+
+<Frame>
+  <img src="/images/dashboard/get-paid-list.webp" alt="Get Paid list" />
+</Frame>
+
+Each request shows status (Pending / Paid), the on-chain transaction hash once paid, and a copyable payment URL. Works identically for EVM and Tron destinations (single recipient on Tron).
+
+<Frame>
+  <img src="/images/dashboard/get-paid-detail.webp" alt="Request detail with payment link" />
+</Frame>
+
+## Pay (outgoing)
+
+The **Pay** tab is your outgoing-payments view. Create a payment to one or more recipients on the same chain, sign the resulting transaction, and the Dashboard tracks settlement.
+
+<Frame>
+  <img src="/images/dashboard/pay-list.webp" alt="Pay list (outgoing payouts)" />
+</Frame>
+
+| Outgoing flow | EVM | Tron |
+| --- | --- | --- |
+| Single payout | ✓ | ✓ |
+| Batch payout (one signature, many recipients) | ✓ | ✗ |
+
+For Tron payouts, send single payments per recipient. EVM batch payouts are documented at [Batch payouts](/use-cases/batch-payouts).
+
+## What the Dashboard does *not* do
+
+- It is not an admin / merchant control panel for downstream platforms — it's a user dashboard for your own wallet.
+- It does not manage webhooks today — webhooks are managed via the [auth-api](https://auth.request.network/open-api).
+- It does not host the payer-side checkout — that's [Secure Payment](/tools/secure-payments) at `pay.request.network`.
+
+## Open the Dashboard
+
+<Card title="Open dashboard.request.network" href="https://dashboard.request.network" icon="arrow-up-right-from-square">
+Sign in with your EVM or Tron wallet to start.
+</Card>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" href="/use-cases/quickstart" icon="rocket">
+    End-to-end walkthrough using the Dashboard.
+  </Card>
+
+  <Card title="Secure Payment" href="/tools/secure-payments" icon="lock">
+    The payer-facing companion at pay.request.network.
+  </Card>
+</CardGroup>

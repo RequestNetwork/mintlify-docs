@@ -1,0 +1,128 @@
+---
+title: "Multi-chain checkout"
+description: "Let payers pay from any chain and any token. Receive on your preferred chain. Cross-chain swaps are routed through Li.Fi."
+---
+
+## Why multi-chain matters
+
+When you create a Secure Payment link, you fix the **destination** — the chain and token you want to receive on. The payer doesn't have to match it. They can hold USDC on Optimism, USDT on Polygon, or USDT on Tron, and Request Network's Secure Payment app will route the payment through Li.Fi to land in your destination token.
+
+This means your customers don't need to bridge anything before paying. They open the link, the app shows them every chain/token combination they hold a balance in, and they pick one.
+
+**Audience:** any merchant/integrator whose customers don't know or don't want to know about chains. E-commerce, SaaS, marketplaces.
+
+## Supported source chains
+
+Cross-chain swap-to-pay routes through Li.Fi. Source chains the Secure Payment app can pay *from*:
+
+- Ethereum (`ETHEREUM`)
+- Arbitrum One (`ARBITRUM`)
+- Optimism (`OPTIMISM`)
+- Base (`BASE`)
+- Polygon (`POLYGON`)
+- BNB Smart Chain (`BNB`)
+- **Tron** (paid same-chain or as a cross-chain leg)
+
+The destination chain can be any of the above plus Sepolia (testnet). USDC and USDT are the standard payment currencies; Sepolia adds FAU.
+
+<Note>
+The Secure Payment UI displays a Li.Fi banner on the payment options screen when the payer's selected chain differs from your destination — so customers know exactly when a swap is happening.
+</Note>
+
+## What the payer experiences
+
+<Steps>
+  <Step title="Open the link">
+    Customer clicks the `pay.request.network` URL.
+
+    <Frame>
+      <img src="/images/secure-payments/connect-wallet.webp" alt="Connect wallet modal (EVM)" />
+    </Frame>
+  </Step>
+
+  <Step title="Connect a wallet">
+    Any EVM wallet (MetaMask, Coinbase, WalletConnect, plus injected wallets like Rabby, Phantom-EVM) **or** any Tron wallet (TronLink, Guarda, Trust, WalletConnect-Tron). The modal lists both alongside.
+
+    <Frame>
+      <img src="/images/secure-payments/connect-wallet-tron.webp" alt="Tron wallet selection" />
+    </Frame>
+  </Step>
+
+  <Step title="Pick a chain and token">
+    The app shows all the payer's holdings across supported chains, with USD-equivalent balances and a banner indicating same-chain vs cross-chain.
+
+    <Frame>
+      <img src="/images/secure-payments/payment-options-crosschain.webp" alt="Cross-chain payment options with Li.Fi" />
+    </Frame>
+  </Step>
+
+  <Step title="Approve and pay">
+    For ERC-20s, an approval transaction precedes the payment. Both transactions are signed by the payer in their wallet. For cross-chain, the source-chain bridge transaction is signed; the destination-chain settlement is monitored by the API and reported via webhook.
+  </Step>
+
+  <Step title="Confirmation">
+    The success screen shows the source and destination transaction hashes (linked to the appropriate explorer per chain) and a Li.Fi badge for cross-chain payments.
+
+    <Frame>
+      <img src="/images/secure-payments/payment-success.webp" alt="Payment success screen" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Tron specifics
+
+Tron is supported as both a source and a destination for single-recipient payments:
+
+| Direction | Supported? | Notes |
+| --- | --- | --- |
+| Tron → Tron (USDT/USDC) | ✓ | Same-chain, no swap |
+| EVM → Tron (USDT/USDC) | ✓ | Routed via Li.Fi |
+| Tron → EVM (USDT/USDC) | ✓ | Routed via Li.Fi |
+| **Multi-recipient on Tron** | ✗ | Batch is EVM-only — see below |
+
+<Warning>
+Multi-recipient (batch) Secure Payment links are EVM-only. If your destination is Tron and you submit multiple `requests[]`, the API returns a 400 with `Batch payments are not supported for TRON networks.`
+</Warning>
+
+## What you don't have to do
+
+- **No bridging UX of your own** — Li.Fi is integrated end-to-end inside the Secure Payment page
+- **No quote management** — quotes are fetched per session, surfaced in the UI, refreshed if they expire before the payer signs
+- **No source-chain config** — supplying a destination is enough; the Secure Payment app derives the rest from the payer's wallet
+
+## Code: nothing changes
+
+Creating a multi-chain-capable link uses the same `POST /v2/secure-payments` call as same-chain — there are no extra parameters. The payer choosing a different source chain happens in the hosted UI, not in your API call.
+
+```typescript
+await fetch("https://api.request.network/v2/secure-payments", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-client-id": process.env.RN_CLIENT_ID!,
+  },
+  body: JSON.stringify({
+    requests: [
+      {
+        destinationId: process.env.MERCHANT_DESTINATION!,
+        amount: "100",
+      },
+    ],
+    reference: order.id,
+  }),
+});
+```
+
+For the full request schema, see [`POST /v2/secure-payments`](/api-reference/secure-payments).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Secure Payment tour" href="/tools/secure-payments" icon="lock">
+    Full feature reference for pay.request.network.
+  </Card>
+
+  <Card title="Programmatic payment links" href="/use-cases/programmatic-payment-links" icon="code">
+    The API call that mints these links.
+  </Card>
+</CardGroup>
