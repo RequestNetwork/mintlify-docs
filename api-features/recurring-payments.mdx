@@ -66,18 +66,22 @@ sequenceDiagram
 
 ## Supported Networks
 
-Recurring payments are supported on the following blockchain networks:
+Recurring payments rely on ERC-20 permit (`EIP-2612`) signatures and are therefore **EVM-only**.
 
 **Mainnet:**
 - Ethereum
-- Polygon
-- Arbitrum
-- Gnosis
+- Arbitrum One
+- Optimism
 - Base
-- Binance Smart Chain
+- Polygon
+- BNB Smart Chain
 
 **Testnet:**
 - Sepolia
+
+<Note>
+Tron does not support ERC-20 permit semantics, so recurring payments are not available on Tron. For Tron, send single payouts on a schedule from your own backend.
+</Note>
 
 ## Supported currencies
 
