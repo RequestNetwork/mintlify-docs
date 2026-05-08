@@ -9,8 +9,8 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 
 ## Webhook Configuration
 
-### Setup in Portal
-1. Navigate to **Platform Settings → Webhooks** in [Request Portal](https://portal.request.network)
+### Setup in Dashboard
+1. Navigate to **Platform Settings → Webhooks** in [Request Dashboard](https://dashboard.request.network)
 2. Click **Add webhook**
 3. In the dialog that opens, enter URL and click **Create webhook**
 4. Click copy button to copy **Signing Secret** to clipboard (see [Authentication](/api-reference/authentication) for API key setup)
@@ -20,7 +20,7 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 Use [ngrok](https://ngrok.com/docs/traffic-policy/getting-started/agent-endpoints/cli) to receive webhooks locally:
 ```bash
 ngrok http 3000
-# Use the HTTPS URL (e.g., https://abc123.ngrok.io/webhook) in Portal
+# Use the HTTPS URL (e.g., https://abc123.ngrok.io/webhook) in the Dashboard
 ```
 
 ## Event Types
@@ -252,7 +252,7 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
 
 ## Implementation Examples
 
-For a complete working example, see the [EasyInvoice demo](/use-cases/invoicing) which implements webhook handling for payment notifications.
+For a complete working example, see [Webhook reconciliation](/use-cases/webhook-reconciliation) which implements webhook handling for payment notifications.
 
 <Tabs>
 <Tab title="Express.js">
@@ -369,7 +369,7 @@ export async function POST(request: Request) {
 ## Testing
 
 ### Portal Testing
-1. Go to **Platform Settings → Webhooks** in Request Portal
+1. Go to **Platform Settings → Webhooks** in Request Dashboard
 2. Create a webhook if you haven't already
 3. Select the webhook event type and click **Send test event**
 4. Monitor your endpoint logs for test requests
@@ -424,23 +424,15 @@ app.post("/webhook", (req, res) => {
     High-level webhook concepts and workflow
   </Card>
 
-  <Card title="EasyInvoice Demo" href="/use-cases/invoicing">
+  <Card title="Webhook reconciliation" href="/use-cases/webhook-reconciliation">
     Complete webhook implementation example
   </Card>
 
   <Card title="Authentication" href="/api-reference/authentication">
-    API key setup and webhook security
+    API credential setup and webhook security
   </Card>
 
-  <Card title="Payment Processing" href="/api-features/payment-processing">
-    Understanding payment lifecycle events
-  </Card>
-
-  <Card title="Request Portal" href="https://portal.request.network" icon="browser">
-    Configure webhooks and manage API keys
-  </Card>
-
-  <Card title="Request Scan" href="https://scan.request.network" icon="magnifying-glass">
-    Explore transactions and request details
+  <Card title="Request Dashboard" href="https://dashboard.request.network" icon="browser">
+    Configure webhooks and manage Client IDs
   </Card>
 </CardGroup>

@@ -11,10 +11,10 @@ Get started with Request Network in just a few minutes. This guide will walk you
 
 <Steps>
   <Step title="Create Account">
-    Sign up for a free Request Network account at [portal.request.network](https://portal.request.network)
+    Sign up for a free Request Network account at [dashboard.request.network](https://dashboard.request.network)
   </Step>
   <Step title="Get API Keys">
-    Generate your API keys from the portal dashboard
+    Generate your Client ID from the Dashboard
   </Step>
   <Step title="Create Your First Request">
     Use the API to create a payment request
@@ -26,10 +26,10 @@ Get started with Request Network in just a few minutes. This guide will walk you
 
 ## Account Setup
 
-### Request Portal Registration
+### Request Dashboard Registration
 
 <Card title="Create Your Account" icon="user">
-Sign up at [portal.request.network](https://portal.request.network) to get started. All accounts include:
+Sign up at [dashboard.request.network](https://dashboard.request.network) to get started. All accounts include:
 - Free API access with generous limits
 - API documentation and tools
 - Community support
@@ -37,7 +37,7 @@ Sign up at [portal.request.network](https://portal.request.network) to get start
 
 ### API Key Generation
 
-1. Log in to [Request Portal](https://portal.request.network)
+1. Log in to [Request Dashboard](https://dashboard.request.network)
 2. Navigate to "API Keys" section
 3. Click "Create new key"
 4. Copy and securely store the key
@@ -207,7 +207,7 @@ Since webhooks can't reach your local server directly, use [ngrok](https://ngrok
 ngrok http 3000
 ```
 
-Copy the HTTPS URL (e.g., `https://abc123.ngrok.io/webhooks`) and add it in the [API Portal](https://portal.request.network) under Webhooks section.
+Copy the HTTPS URL (e.g., `https://abc123.ngrok.io/webhooks`) and add it in the [Dashboard](https://dashboard.request.network) under the Webhooks section.
 
 Copy the webhook signing secret to your `.env`:
 
@@ -290,7 +290,7 @@ Now that you've made your first API call, explore more features:
   <Accordion title="Webhook not receiving events">
     - Verify webhook URL is publicly accessible
     - Check webhook signature verification
-    - Ensure webhook is enabled in the portal
+    - Ensure webhook is enabled in the Dashboard
   </Accordion>
 </AccordionGroup>
 

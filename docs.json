@@ -38,16 +38,7 @@
           {
             "group": "🚀 Get Started",
             "pages": [
-              "use-cases/welcome",
-              "use-cases/payment-processing-demo"
-            ]
-          },
-          {
-            "group": "🎯 Use Cases",
-            "pages": [
-              "use-cases/payment-detection",
-              "use-cases/invoicing",
-              "use-cases/checkout"
+              "use-cases/welcome"
             ]
           }
         ]
@@ -60,9 +51,7 @@
             "pages": [
               "api-setup/getting-started",
               "api-setup/integration-tutorial",
-              "request-network-api/api-portal-manage-api-keys-and-webhooks",
-              "api-features/client-id-management",
-              "api-setup/migrate-to-v2"
+              "api-features/client-id-management"
             ]
           },
           {
@@ -157,15 +146,7 @@
             "group": "🌐 Developer Resources",
             "pages": [
               "resources/supported-chains-and-currencies",
-              "resources/near-blockchain",
               "resources/token-list"
-            ]
-          },
-          {
-            "group": "🛠️ Tools & Examples",
-            "pages": [
-              "request-network-api/easyinvoice-api-demo-app",
-              "resources/request-scan"
             ]
           },
           {
@@ -199,8 +180,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Get your API Key",
-      "href": "https://portal.request.network"
+      "label": "Open Dashboard",
+      "href": "https://dashboard.request.network"
     }
   },
   "contextual": {
@@ -240,12 +221,12 @@
             "href": "https://discord.com/invite/FsVAR3ny3f"
           },
           {
-            "label": "Portal",
-            "href": "https://portal.request.network"
+            "label": "Dashboard",
+            "href": "https://dashboard.request.network"
           },
           {
-            "label": "Scan",
-            "href": "https://scan.request.network"
+            "label": "Pay",
+            "href": "https://pay.request.network"
           },
           {
             "label": "Status",

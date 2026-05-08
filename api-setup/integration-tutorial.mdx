@@ -162,29 +162,13 @@ export default defineConfig({
 
 Then run `npm install` and when that's done, run `npm run db:push`.
 
-### Get your API key
+### Get your API credentials
 
-Before starting your integration, you need to sign up on our API portal, which you can access via this [link](https://portal.request.network/).
-
-On our API portal dashboard, you can easily create an API key.
-
-<Frame>
-<img src="/images/api-setup/integration-tutorial/api-portal-step-1.webp" alt="API Portal Step 1" />
-</Frame>
-
-<Frame>
-<img src="/images/api-setup/integration-tutorial/api-portal-step-2.webp" alt="API Portal Step 2" />
-</Frame>
-
-<Frame>
-<img src="/images/api-setup/integration-tutorial/api-portal-step-3.webp" alt="API Portal Step 3" />
-</Frame>
-
-Now copy over its value to your `.env` file
+Sign in to the [Request Dashboard](https://dashboard.request.network) with your wallet and create a Client ID. The Client ID is your API credential — copy it into your `.env` file.
 
 ```
 // .env
-RN_API_KEY=<insert-you-api-key>
+RN_API_KEY=<insert-your-client-id>
 RN_API_URL=https://api.request.network/v2 
 ```
 
@@ -468,7 +452,7 @@ As you may know, it's impossible for our webhooks to call your locally running s
 <img src="/images/api-setup/integration-tutorial/ngrok-terminal.webp" alt="ngrok terminal" />
 </Frame>
 
-Next up, go back to the [API portal](https://portal.request.network) and add a new webhook. In the case above it's the URL from ngrok with the `/webhooks` appendix (https://34c701d1d7f9.ngrok-free.app/webhooks).
+Next up, go back to the [Request Dashboard](https://dashboard.request.network) and add a new webhook. In the case above it's the URL from ngrok with the `/webhooks` appendix (https://34c701d1d7f9.ngrok-free.app/webhooks).
 
 <Frame>
 <img src="/images/api-setup/integration-tutorial/webhook-step-1.webp" alt="Add webhook step 1" />
@@ -541,7 +525,7 @@ Full webhook data: {
 
 #### Testing webhooks live
 
-Once your application is deployed, you will need to add a new webhook via the [API portal](https://portal.request.network) just like we did above, but use your deployment URL's webhook route.
+Once your application is deployed, you will need to add a new webhook via the [Request Dashboard](https://dashboard.request.network) just like we did above, but use your deployment URL's webhook route.
 
 Then copy over the secret to your deployment's variables and you can test your handlers just as we did above!
 
