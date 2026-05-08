@@ -5,9 +5,23 @@ description: "Chain and currency coverage for Secure Payment Pages."
 
 ## Coverage model
 
-Secure Payment Pages use the same chain and currency coverage as standard Request API request flows.
+Secure Payment Pages support the same 8 networks as Request API destinations:
 
-This means supported options are the networks and currencies available through the API token list and request creation endpoints.
+| Type | Networks |
+| --- | --- |
+| EVM | Ethereum (`mainnet`), Arbitrum One, Optimism, Base, Polygon (`matic`), BNB Smart Chain (`bsc`) |
+| Non-EVM | **Tron** |
+| Testnet | Sepolia |
+
+Stablecoins (USDC, USDT) are supported on every mainnet, including **Tron** (USDT and USDC, TRC-20). FAU is available on Sepolia for testing.
+
+For a payer's perspective, a Secure Payment link can be paid from any of these chains — when the source chain differs from the merchant's destination chain, the swap is routed through Li.Fi.
+
+<Warning>
+Batch secure payment links — multiple payees in a single hosted link — are EVM-only. Tron Secure Payment links are single-recipient.
+</Warning>
+
+For the canonical chain × currency table and feature-support matrix, see [Supported Chains and Currencies](/resources/supported-chains-and-currencies).
 
 ## Supported currencies
 

@@ -52,6 +52,21 @@ Each token in the list contains the following information:
 }
 ```
 
+Tron tokens use the same shape — `network: "tron"`, `chainId: 728126428`, `type: "TRC20"`, and base58 addresses (`T...`):
+
+```json
+{
+  "id": "USDT-tron",
+  "name": "Tether USD",
+  "symbol": "USDT",
+  "decimals": 6,
+  "address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+  "network": "tron",
+  "type": "TRC20",
+  "chainId": 728126428
+}
+```
+
 | Field | Description |
 |-------|-------------|
 | `id` | Unique identifier, typically `SYMBOL-network` (e.g., `USDC-mainnet`) |
@@ -59,7 +74,7 @@ Each token in the list contains the following information:
 | `symbol` | Token symbol |
 | `decimals` | Number of decimal places |
 | `address` | Token contract address |
-| `network` | Network name (e.g., `mainnet`, `matic`, `bsc`, `tron`) |
+| `network` | Network name. Supported destination networks: `mainnet`, `arbitrum-one`, `optimism`, `base`, `matic`, `bsc`, `tron`, `sepolia` |
 | `type` | Currency type (e.g., `ERC20`, `ETH`, `ISO4217`) |
 | `hash` | For ERC20 tokens, same as `address`. For native tokens, a calculated hash. |
 | `chainId` | Chain ID of the network |

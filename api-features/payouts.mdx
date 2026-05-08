@@ -14,8 +14,10 @@ Payouts let you initiate payments without a separate request creation step. The 
 
 ## Single Payout
 
-Create a payment request and get transaction calldata in one call.
+Create a payment request and get transaction calldata in one call. Single payouts work on **all 8 supported networks (EVM and Tron)**.
 
+<Tabs>
+<Tab title="EVM (USDC on Base)">
 ```bash
 curl -X POST "https://api.request.network/v2/payouts" \
   -H "x-api-key: YOUR_API_KEY" \
@@ -28,12 +30,28 @@ curl -X POST "https://api.request.network/v2/payouts" \
     "reference": "PAYOUT-001"
   }'
 ```
+</Tab>
+<Tab title="Tron (USDT on Tron)">
+```bash
+curl -X POST "https://api.request.network/v2/payouts" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": "100",
+    "invoiceCurrency": "USD",
+    "paymentCurrency": "USDT-tron",
+    "payee": "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
+    "reference": "PAYOUT-001"
+  }'
+```
+</Tab>
+</Tabs>
 
 **Required fields:**
 - `amount` — Human-readable amount
 - `invoiceCurrency` — Invoice currency (e.g., `"USD"`)
-- `paymentCurrency` — Payment currency ID (e.g., `"USDC-base"`)
-- `payee` — Recipient wallet address
+- `paymentCurrency` — Payment currency ID (e.g., `"USDC-base"`, `"USDT-tron"`)
+- `payee` — Recipient wallet address (EVM `0x...` or Tron `T...`)
 
 **Optional fields:**
 - `reference` — Merchant reference for reconciliation
@@ -46,6 +64,10 @@ The response includes `requestId` and a `transactions` array with executable cal
 ## Batch Payout
 
 Pay multiple recipients in a single blockchain transaction. All payments must be on the same network.
+
+<Warning>
+**EVM-only.** Batch payouts work on EVM chains. Tron batch payouts are not supported — the API rejects them with `Batch payments are not supported for TRON networks.` For Tron, submit individual `POST /v2/payouts` calls per recipient.
+</Warning>
 
 ```bash
 curl -X POST "https://api.request.network/v2/payouts/batch" \

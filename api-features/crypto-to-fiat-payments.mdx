@@ -72,7 +72,7 @@ This four-step approach is required due to current API limitations - more stream
 Many `/payer` endpoints in the Request Network API require a `clientUserId` as a path parameter. This value is an **arbitrary identifier** chosen by your platform to represent a user (the payer) in your own system.
 
 * **You control the format:** The `clientUserId` can be any unique string that makes sense for your application. It can be a UUID, email address, database ID, or anything unique per user on your platform.
-* **EasyInvoice Example:** In the EasyInvoice demo app, `clientUserId` is set to the user's email address.
+* **Common pattern:** Many integrations set `clientUserId` to the user's email address or an internal user ID.
 * **Why is this useful?** This approach allows you to integrate the Request Network API without having to change your existing user management logic. You simply pass your own identifier to the API, and all payer-related compliance, agreement, and payment detail records will be associated with that value.
 
 **Example usage:**
@@ -181,15 +181,14 @@ RequestAPI-->>Platform: Request created
 
 ### **Design Rationale & UX Constraints**
 
-While it is technically possible to create a crypto-to-fiat request before the payer has completed KYC, EasyInvoice intentionally requires the payer to complete KYC first. This decision is based on several practical and UX considerations:
+While it is technically possible to create a crypto-to-fiat request before the payer has completed KYC, the recommended pattern is to require KYC first. This is based on several practical and UX considerations:
 
-* **Bank Account Association:** The payee’s bank account ("payment details") must be linked to a specific payer, which can only be done after the payer completes KYC. This ensures compliance and accurate association of payment details.
-* **Validation Complexity:** Although the payee could submit their bank account details in advance, the platform cannot validate or approve these details until the payer’s KYC is complete. This would introduce additional communication steps and potential confusion.
-* **UI Simplicity:** EasyInvoice integrates payee bank account registration directly into the Create Invoice form. If the user clicks "Create" before the bank account is approved, a loading indicator appears until approval is granted. This avoids the need for a separate bank account management page and keeps the user experience straightforward.
-* **Protocol Fit**: The crypto-to-fiat feature is integrated at the API level, not at the Request Network protocol level. Creating a request on the protocol does not require bank account details, because the protocol itself only handles crypto payments. The additional bank account and offramp logic is layered on top via the API, which transfers crypto to Request Tech, who then executes the offramp and sends fiat to the payee’s bank account. This separation adds some complexity, so the UI is intentionally kept simple.
-* **Future Flexibility:** While some clients may want to allow payees to create requests before payer KYC, this is not currently supported in EasyInvoice to avoid increased complexity. We may revisit this if there is sufficient market demand.
+* **Bank Account Association:** The payee's bank account ("payment details") must be linked to a specific payer, which can only be done after the payer completes KYC. This ensures compliance and accurate association of payment details.
+* **Validation Complexity:** Although the payee could submit their bank account details in advance, the platform cannot validate or approve these details until the payer's KYC is complete. This would introduce additional communication steps and potential confusion.
+* **UI Simplicity:** Embedding payee bank account registration directly in the request creation form (with a pending state until approval) keeps the UX straightforward and avoids a separate bank account management page.
+* **Protocol Fit:** The crypto-to-fiat feature is integrated at the API level, not at the Request Network protocol level. Creating a request on the protocol does not require bank account details, because the protocol itself only handles crypto payments. The additional bank account and offramp logic is layered on top via the API, which transfers crypto to Request Tech, who then executes the offramp and sends fiat to the payee's bank account.
 
-This approach ensures a smooth, compliant, and user-friendly experience, even if it means some technical possibilities are not exposed in the current UI.
+This approach ensures a smooth, compliant, and user-friendly experience.
 
 ### Relevant Endpoints
 

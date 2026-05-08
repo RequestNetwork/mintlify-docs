@@ -29,7 +29,7 @@ ngrok http 3000
 See [Payload Examples](#payload-examples) below for detailed webhook structures.
 </Info>
 
-### Payment Events
+### Payment Events (core)
 
 | Event | Description | Context | Primary Use |
 |-------|-------------|---------|-------------|
@@ -37,6 +37,24 @@ See [Payload Examples](#payload-examples) below for detailed webhook structures.
 | `payment.partial` | Partial payment received for request | Installments, partial orders | Update balance, allow additional payments |
 | `payment.failed` | Payment execution failed | Recurring payments, cross-chain transfers | Notify failure, retry logic, pause subscriptions |
 | `payment.refunded` | Payment has been refunded to payer | Cross-chain payment failures, refund scenarios | Update order status, notify customer |
+
+### Payment Events (Client ID-scoped)
+
+Emitted **in addition to** the core events when the originating request was created with a Client ID. Payload includes extra `clientId` and `origin` fields.
+
+| Event | Description |
+|-------|-------------|
+| `payment.confirmed.client_id` | Same as `payment.confirmed`, scoped to a Client ID |
+| `payment.partial.client_id` | Same as `payment.partial`, scoped to a Client ID |
+
+### Payment Events (Checkout / Secure Payment-scoped)
+
+Emitted **in addition to** the core events when the request was created via a Secure Payment / checkout flow.
+
+| Event | Description |
+|-------|-------------|
+| `payment.confirmed.checkout` | Same as `payment.confirmed`, originating from a Secure Payment link |
+| `payment.partial.checkout` | Same as `payment.partial`, originating from a Secure Payment link |
 
 ### Processing Events
 
