@@ -1,0 +1,112 @@
+---
+title: "Compliance-gated payments (KYT)"
+description: "Screen every payer wallet for sanctions and risk before accepting a payment. Built into payment destinations — opt-in per receiving route."
+---
+
+## What you'll build
+
+A receiving setup where every wallet that tries to pay you is screened against sanctions and risk lists before the payment can settle. If a wallet fails screening, the payment is blocked — the payer never reaches the sign step. You configure this **per payment destination**, so you can keep some flows compliance-gated and others permissive.
+
+**Audience:** regulated fintech, marketplaces with compliance obligations, B2B platforms with KYC/AML requirements, any merchant who needs to refuse payments from sanctioned or high-risk addresses.
+
+This is a **Know Your Transaction (KYT)** policy, not a Know Your Customer (KYC) flow. There's no document upload or identity verification on the payer side — just a wallet-address screening.
+
+## How it works
+
+When you create a payment destination via the [Auth API](https://auth.request.network/open-api/#tag/payee-destination), you can attach a **payment access policy** that turns KYT screening on for that destination:
+
+1. Payer opens your payment link.
+2. Before the payment options view loads, Request Network's compliance gate screens the connected wallet (and, for smart-account payments, the parent EOA as well).
+3. If the screening **passes**, the payment continues normally.
+4. If the screening **fails**, the secure payment page shows a policy-failure view and the payer cannot reach the sign step.
+
+You can also choose how much information is visible to the payer until the wallet has passed screening — see [Privacy options](#privacy-options) below.
+
+## Configure a KYT-gated destination
+
+Pass an `accessPolicy` object when creating a payee destination:
+
+```bash
+curl -X POST "https://auth.request.network/v1/payee-destination" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tokenAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "chainId": 1,
+    "accessPolicy": {
+      "mode": "kyt_all_wallets",
+      "hideUntilApproved": true,
+      "hidePayeeAddress": true
+    }
+  }'
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mode` | `"off"` \| `"kyt_all_wallets"` | `off` is the default (no screening). `kyt_all_wallets` screens every payer wallet that connects. |
+| `hideUntilApproved` | `boolean` | When `true`, the payment metadata (amount, currency, recipient) is hidden until the payer's wallet has passed screening. |
+| `hidePayeeAddress` | `boolean` | When `true`, the payee wallet address is masked throughout the payer flow — no ENS resolution, no copy button, no explorer link. |
+
+Both privacy flags are independent of `mode` — you can show payment details upfront and still gate the actual payment behind screening, or hide everything until the gate clears.
+
+<Note>
+Existing payment destinations without an `accessPolicy` keep behaving exactly as before — there is no implicit screening. KYT only activates when you opt a destination in.
+</Note>
+
+## Privacy options
+
+`hideUntilApproved` and `hidePayeeAddress` solve two different concerns:
+
+- **`hideUntilApproved`** — useful when the payment terms themselves are sensitive (commercial pricing, B2B contracts). The payer connects a wallet, gets screened, and only sees the amount/recipient if their wallet clears.
+- **`hidePayeeAddress`** — useful when you want to keep your receiving wallet from being scraped and re-used by the payer outside this payment flow. The payer can still pay (the secure payment app builds the transaction with the real address), but they don't see the address copy/explorer-link affordances.
+
+You can combine both for the strictest setup, or use either independently.
+
+## What payers experience
+
+| Scenario | Payer view |
+| --- | --- |
+| Wallet passes screening | Standard payment flow — connect, pick chain/token, sign. |
+| Wallet fails screening | Policy-failure view; sign button is disabled. The payer is told the payment cannot proceed and to contact you for an alternative. |
+| Screening in progress | Brief loading state between wallet connect and payment options view. |
+
+For **smart-account payments** on EVM, the gate screens both the connected EOA and the smart-account wallet — both must pass before payment proceeds.
+
+## Update or remove a policy
+
+Change the policy on an existing destination by re-issuing the create call (the active destination is updated in place) or by calling `PUT /v1/payee-destination`:
+
+```bash
+curl -X PUT "https://auth.request.network/v1/payee-destination" \
+  -H "Cookie: session=YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tokenAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "chainId": 1,
+    "accessPolicy": { "mode": "off", "hideUntilApproved": false, "hidePayeeAddress": false }
+  }'
+```
+
+Setting `mode: "off"` reverts the destination to standard, unscreened behavior. Existing payment links you've already created against that destination will use whatever policy is in effect at the moment a payer connects.
+
+## When KYT screening doesn't replace your own checks
+
+KYT screens individual **wallet addresses** against external sanctions and risk lists. It does not:
+
+- Verify payer identity (use KYC tooling for that).
+- Prove origin of funds — addresses can pass screening but still be linked to off-platform behavior you'd flag yourself.
+- Replace transaction-monitoring on your side after the fact.
+
+Treat KYT as a first-line filter that blocks the most obvious cases, layered with whatever else your compliance program requires.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Payee destinations" href="/api-features/payee-destinations" icon="location-dot">
+    Full payee-destination reference, including the `accessPolicy` field.
+  </Card>
+
+  <Card title="Quickstart" href="/use-cases/quickstart" icon="rocket">
+    The end-to-end flow this fits into.
+  </Card>
+</CardGroup>

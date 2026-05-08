@@ -100,6 +100,12 @@ Tron is fully supported as both a **source** and a **destination** for single-re
 **Multi-recipient Tron Secure Payments are not supported.** A Secure Payment link with multiple `requests[]` entries pointing at Tron destinations is rejected at creation time with a 400. EVM batches up to 200 payees per link work as expected.
 </Warning>
 
+## Compliance-gated payments (KYT)
+
+When the merchant has enabled a Know Your Transaction policy on the receiving destination, the secure payment app screens the connected wallet before showing payment options. Wallets that fail the screen see a policy-failure view and cannot reach the sign step. Optional privacy flags can also keep the payment amount and the payee address masked until the screening passes.
+
+See [Compliance-gated payments](/use-cases/compliance-gated-payments) for the merchant-side configuration.
+
 ## Smart accounts (gasless on EVM)
 
 For supported EVM destinations, Secure Payment can route payments through an [Account Abstraction](https://www.alchemy.com/overviews/what-is-account-abstraction) smart account so the payer doesn't need to hold gas-token balance. The flow is invisible to the payer beyond a slightly different transaction signature step. The integration uses Pimlico for bundling and Alchemy gas policies for sponsorship — see [Secure payment pages](/api-features/secure-payment-pages#smart-account-payments) for the full spec.
