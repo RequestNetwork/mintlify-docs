@@ -41,19 +41,11 @@ The Secure Payment UI displays a Li.Fi banner on the payment options screen when
   </Step>
 
   <Step title="Connect a wallet">
-    Any EVM wallet (MetaMask, Coinbase, WalletConnect, plus injected wallets like Rabby, Phantom-EVM) **or** any Tron wallet (TronLink, Guarda, Trust, WalletConnect-Tron). The modal lists both alongside.
-
-    <Frame>
-      <img src="/images/secure-payments/connect-wallet-tron.webp" alt="Tron wallet selection" />
-    </Frame>
+    Any EVM wallet (MetaMask, Coinbase, WalletConnect, plus injected wallets like Rabby, Phantom-EVM) **or** any Tron wallet (TronLink, Guarda, Trust, WalletConnect-Tron). The modal lists both alongside — when the destination is Tron, Tron wallets replace the EVM list.
   </Step>
 
   <Step title="Pick a chain and token">
-    The app shows all the payer's holdings across supported chains, with USD-equivalent balances and a banner indicating same-chain vs cross-chain.
-
-    <Frame>
-      <img src="/images/secure-payments/payment-options-crosschain.webp" alt="Cross-chain payment options with Li.Fi" />
-    </Frame>
+    The app shows all the payer's holdings across supported chains, with USD-equivalent balances. When the payer's selected source chain matches the destination, the banner reads "You'll be paying on the same chain as your recipient". When they differ, it reads "You'll be paying across chain via Li.Fi" (in pink) — that's the cross-chain swap path.
   </Step>
 
   <Step title="Approve and pay">

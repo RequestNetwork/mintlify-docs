@@ -33,17 +33,11 @@ The Secure Payment page is intentionally separated from the merchant frontend so
       <img src="/images/secure-payments/connect-wallet.webp" alt="Connect wallet modal — EVM" />
     </Frame>
 
-    <Frame>
-      <img src="/images/secure-payments/connect-wallet-tron.webp" alt="Connect wallet modal — Tron" />
-    </Frame>
+    When the destination is on Tron, the same modal shows Tron wallets (TronLink, Guarda, Trust, WalletConnect-Tron) instead of the EVM list — try a [Tron-destination payment link](https://pay.request.network) to see it.
   </Step>
 
   <Step title="Choose a chain and token">
-    The page reads the connected wallet's balances across supported chains and surfaces every chain × token combo with a sufficient balance. Same-chain payments show no swap; cross-chain shows a Li.Fi banner.
-
-    <Frame>
-      <img src="/images/secure-payments/payment-options-crosschain.webp" alt="Cross-chain payment options" />
-    </Frame>
+    The page reads the connected wallet's balances across supported chains and surfaces every chain × token combo with a sufficient balance. The same-chain options view is shown at the top of this page; for cross-chain payments the layout is identical except the banner reads "You'll be paying across chain via Li.Fi" (in pink) instead of "You'll be paying on the same chain as your recipient" (in slate).
   </Step>
 
   <Step title="Approve and sign">
