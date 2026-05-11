@@ -96,11 +96,19 @@ Chain ID for the receiving network (e.g., `8453` for Base, `1` for Ethereum).
 <ParamField body="accessPolicy" type="object">
 Optional KYT (Know Your Transaction) compliance policy applied to payments into this destination. When set, every payer wallet that connects to a payment link backed by this destination is screened before the payment can proceed. See [Compliance-gated payments](/use-cases/compliance-gated-payments) for the full guide.
 
-| Sub-field | Type | Description |
-| --- | --- | --- |
-| `mode` | `"off"` \| `"kyt_all_wallets"` | `off` (default): no screening. `kyt_all_wallets`: every payer wallet is screened. |
-| `hideUntilApproved` | `boolean` | When `true`, payment metadata is hidden in the payer UI until the wallet passes screening. |
-| `hidePayeeAddress` | `boolean` | When `true`, the payee address is masked in the payer UI (no copy / no explorer link). |
+<Expandable title="accessPolicy fields">
+  <ParamField body="mode" type='"off" | "kyt_all_wallets"'>
+    `off` (default): no screening. `kyt_all_wallets`: every payer wallet is screened.
+  </ParamField>
+
+  <ParamField body="hideUntilApproved" type="boolean">
+    When `true`, payment metadata is hidden in the payer UI until the wallet passes screening.
+  </ParamField>
+
+  <ParamField body="hidePayeeAddress" type="boolean">
+    When `true`, the payee address is masked in the payer UI (no copy / no explorer link).
+  </ParamField>
+</Expandable>
 </ParamField>
 
 ```json Response (201)

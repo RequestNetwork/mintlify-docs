@@ -157,7 +157,10 @@ async function captureShot(browser: Browser, shot: Shot): Promise<"ok" | "manual
       return "manual";
     }
 
-    await page.goto(shot.url, { waitUntil: "networkidle", timeout: 15_000 });
+    // Vite/HMR holds a persistent WebSocket open, so "networkidle" would
+    // always time out against dev servers. "load" + the settle delay below
+    // is faster and works against both dev and production builds.
+    await page.goto(shot.url, { waitUntil: "load", timeout: 15_000 });
 
     if (shot.setup) {
       const result = await shot.setup(page);

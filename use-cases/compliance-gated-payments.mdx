@@ -15,10 +15,18 @@ This is a **Know Your Transaction (KYT)** policy, not a Know Your Customer (KYC)
 
 When you create a payment destination via the [Auth API](https://auth.request.network/open-api/#tag/payee-destination), you can attach a **payment access policy** that turns KYT screening on for that destination:
 
-1. Payer opens your payment link.
-2. Before the payment options view loads, Request Network's compliance gate screens the connected wallet (and, for smart-account payments, the parent EOA as well).
-3. If the screening **passes**, the payment continues normally.
-4. If the screening **fails**, the secure payment page shows a policy-failure view and the payer cannot reach the sign step.
+<Steps>
+  <Step title="Payer opens your payment link" />
+  <Step title="Wallet screening">
+    Before the payment options view loads, Request Network's compliance gate screens the connected wallet (and, for smart-account payments, the parent EOA as well).
+  </Step>
+  <Step title="Screening passes">
+    The payment continues normally.
+  </Step>
+  <Step title="Screening fails">
+    The secure payment page shows a policy-failure view and the payer cannot reach the sign step.
+  </Step>
+</Steps>
 
 You can also choose how much information is visible to the payer until the wallet has passed screening — see [Privacy options](#privacy-options) below.
 

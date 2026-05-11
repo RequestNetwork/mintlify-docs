@@ -63,7 +63,6 @@
             "pages": [
               "api-setup/getting-started",
               "api-setup/integration-tutorial",
-              "tools/dashboard",
               "api-features/client-id-management"
             ]
           },
