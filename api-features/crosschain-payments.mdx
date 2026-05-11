@@ -47,7 +47,7 @@ Crosschain payments work only with mainnet funds (real money). Test networks are
 
 <Steps>
 <Step title="Create the request">
-Create a request with a `paymentCurrency` in the supported stablecoins and networks. The `amount` must be greater than 1 USD equivalent (e.g., at least 1.01 USDC) — crosschain routes are not available for amounts under $1 due to bridge minimums.
+Create a request with a `paymentCurrency` in the supported stablecoins and networks. The `amount` must be greater than 1 USD equivalent (e.g., at least 1.01 USDC) — crosschain routes are not available for amounts of $1 or less due to bridge minimums.
 
 Create the request via [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request).
 </Step>
@@ -163,12 +163,17 @@ The API always includes approval transactions in crosschain calldata responses, 
 Send each transaction in the `transactions` array as a standard `eth_sendTransaction`. If `needsApproval` is true, execute the approval transaction first and wait for confirmation before sending the payment transaction.
 
 ```typescript
-import { createWalletClient, custom } from "viem";
+import { createWalletClient, createPublicClient, custom, http } from "viem";
 import { arbitrum } from "viem/chains";
 
 const walletClient = createWalletClient({
   chain: arbitrum,
   transport: custom(window.ethereum),
+});
+
+const publicClient = createPublicClient({
+  chain: arbitrum,
+  transport: http(),
 });
 
 const [account] = await walletClient.getAddresses();

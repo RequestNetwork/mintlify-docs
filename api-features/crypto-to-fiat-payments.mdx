@@ -29,7 +29,7 @@ The sandbox provides a complete testing environment where you can:
 * Work with mock bank account data and fiat payment status
 
 <Warning>
-I**mportant: Other Payment Types Use Real Funds**
+**Important: Other Payment Types Use Real Funds**
 
 The "Crypto-to-fiat Sandbox" setting for API keys only affects crypto-to-fiat payments. Other payment types can process *real* funds with any API key, even Sandbox API keys.
 </Warning>
@@ -104,14 +104,14 @@ participant RequestAPI
 participant RequestTech
 
 Payer->>Platform: Submit KYC data via KYC Form
-Platform->>RequestAPI: POST /payer (KYC data)
+Platform->>RequestAPI: POST /v2/payer (KYC data)
 RequestAPI->>RequestTech: Forward KYC
 RequestTech-->>RequestAPI: KYC status update (webhook)
 Note over Platform: Wait for KYC "approved"
 RequestAPI-->>Platform: webhook: compliance.updated (kycStatus: pending/approved/rejected/failed)
 Platform->>Payer: Show iframe for agreement signature
 Payer->>Platform: Completes signature
-Platform->>RequestAPI: PATCH /payer/{payerId} (agreement_status: completed)
+Platform->>RequestAPI: PATCH /v2/payer/{clientUserId} (agreement_status: completed)
 RequestAPI-->>Platform: webhook: compliance.updated (agreementStatus: completed)
 ```
 
@@ -124,7 +124,7 @@ RequestAPI-->>Platform: webhook: compliance.updated (agreementStatus: completed)
 
 ### Relevant Endpoints
 
-* `POST /payer`: Submit KYC application.
+* `POST /v2/payer`: Submit KYC application.
 * `GET /payer/{clientUserId}`: Get compliance status for a payer.
 * `PATCH /payer/{clientUserId}`: Update agreement status after signature.
 
@@ -164,7 +164,7 @@ participant RequestAPI
 participant RequestTech
 
 Payee->>Platform: Submit bank info via Bank Account Form
-Platform->>RequestAPI: POST /payer/{payerId}/payment-details (bank info)
+Platform->>RequestAPI: POST /v2/payer/{clientUserId}/payment-details (bank info)
 RequestAPI->>RequestTech: Forward payment details
 RequestTech-->>RequestAPI: payment_detail_update (webhook)
 Note over Platform: Wait for payment detail "approved"
@@ -227,6 +227,7 @@ participant Platform
 participant RequestAPI
 participant RequestTech
 participant Blockchain
+participant PayeeBank as Payee Bank
 
 Platform->>RequestAPI: GET payment calldata for request/{requestId}/pay
 Platform->>Payer: Prompt to sign and send transaction
@@ -234,7 +235,7 @@ Payer->>Blockchain: Send crypto to Request Tech
 Blockchain-->>RequestTech: Payment received
 RequestTech-->>RequestAPI: offramp_update (webhook)
 RequestAPI-->>Platform: webhook: payment.processing/payment.failed (subStatus: initiated, ongoing_checks, sending_fiat, fiat_sent, failed, etc.)
-RequestTech->>Payee Bank: Offramp and deposit fiat
+RequestTech->>PayeeBank: Offramp and deposit fiat
 RequestTech-->>RequestAPI: offramp_update (fiat sent)
 RequestAPI-->>Platform: webhook: payment.processing (subStatus: fiat_sent)
 RequestAPI-->>Platform: webhook: payment.confirmed (fiat delivered)

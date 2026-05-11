@@ -86,7 +86,7 @@ data = response.json()
 secure_payment_url = data["securePaymentUrl"]
 ```
 
-```bash cURL
+```curl cURL
 curl -X POST "https://api.request.network/v2/secure-payments" \
   -H "Content-Type: application/json" \
   -H "x-client-id: $RN_CLIENT_ID" \
