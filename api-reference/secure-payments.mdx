@@ -62,6 +62,14 @@ Optional merchant reference for reconciliation (max 255 chars).
 Optional payer identifier (max 255 chars).
 </ParamField>
 
+<ParamField body="redirectUrl" type="string">
+Optional `http(s)` URL the payer is redirected to after a successful payment. Only safe URLs are accepted: scheme must be `http` or `https`, and the value must not contain HTML/script payload characters (`<`, `>`, `"`, `'`, ` `` `, whitespace). The URL is rendered as a button on the success screen — the payer clicks it to return to your site (no auto-redirect).
+</ParamField>
+
+<ParamField body="redirectLabel" type="string">
+Optional button label for the redirect (1–255 chars). Defaults to **"Go Back and Close"** when omitted. Cannot include HTML control characters (`<`, `>`, `&`, `"`, `'`, `` ` ``). **Cannot be set without `redirectUrl`** — the API rejects with 400 `redirectLabel cannot be provided without redirectUrl`.
+</ParamField>
+
 <RequestExample>
 ```bash cURL
 curl -X POST "https://api.request.network/v2/secure-payments" \
@@ -76,7 +84,9 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
     ],
     "feePercentage": "2.5",
     "feeAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
-    "reference": "ORDER-2024-001"
+    "reference": "ORDER-2024-001",
+    "redirectUrl": "https://merchant.example.com/order/2024-001/thank-you",
+    "redirectLabel": "Back to merchant"
   }'
 ```
 </RequestExample>
@@ -143,6 +153,14 @@ Optional fee percentage from `0` to `100`.
 Optional fee recipient address. Required when `feePercentage` is set.
 </ParamField>
 
+<ParamField body="redirectUrl" type="string">
+Optional `http(s)` URL rendered as a button on the success screen for the signer to return to your app. Same validation rules as on `POST /v2/secure-payments` — see [above](#post-v2secure-payments).
+</ParamField>
+
+<ParamField body="redirectLabel" type="string">
+Optional button label (1–255 chars). Defaults to **"Go Back and Close"**. Cannot be set without `redirectUrl`.
+</ParamField>
+
 <RequestExample>
 ```bash cURL (EVM payout)
 curl -X POST "https://api.request.network/v2/secure-payments/payouts" \
@@ -154,7 +172,8 @@ curl -X POST "https://api.request.network/v2/secure-payments/payouts" \
     "network": "base",
     "currency": "USDC-base",
     "amount": "250",
-    "reference": "INVOICE-2026-042"
+    "reference": "INVOICE-2026-042",
+    "redirectUrl": "https://merchant.example.com/payouts/done"
   }'
 ```
 

@@ -109,6 +109,34 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
 
 The response includes `securePaymentUrl` — share it with the customer. They open it on `pay.request.network`, connect a wallet, and pay.
 
+## Send the customer back to your site after payment
+
+Pass `redirectUrl` (and optionally `redirectLabel`) when creating the payment link. After a successful payment, the success screen renders a button that opens your URL — the payer clicks it to return to your site. There is no auto-redirect; the button is an explicit user action.
+
+```typescript
+await fetch("https://api.request.network/v2/secure-payments", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-client-id": process.env.RN_CLIENT_ID!,
+  },
+  body: JSON.stringify({
+    requests: [{ destinationId: process.env.MERCHANT_DESTINATION!, amount: "100" }],
+    reference: order.id,
+    redirectUrl: `https://yourshop.com/orders/${order.id}/thank-you`,
+    redirectLabel: "Back to your order",
+  }),
+});
+```
+
+**Validation rules:**
+- `redirectUrl` must be `http(s)`. Other schemes (`javascript:`, `data:`, etc.) and HTML/script payload characters are rejected with `400 redirectUrl must be a safe http(s) URL with no script/HTML payload`.
+- `redirectLabel` is 1–255 chars and rejects HTML control characters (`<`, `>`, `&`, `"`, `'`, `` ` ``).
+- `redirectLabel` cannot be set without `redirectUrl` — the API rejects with `400 redirectLabel cannot be provided without redirectUrl`.
+- If you don't pass `redirectLabel`, the button reads **"Go Back and Close"**.
+
+The same fields are accepted on `POST /v2/secure-payments/payouts` for hosted payout links.
+
 ## EVM and Tron destinations side-by-side
 
 Tron is a drop-in replacement for any EVM destination as long as you submit a single recipient per call. The shape is identical; only the `destinationId` and addresses change format.
