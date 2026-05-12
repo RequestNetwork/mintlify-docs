@@ -5,7 +5,7 @@ description: "Pay many recipients in one signed transaction. Marketplaces paying
 
 ## What you'll build
 
-A workflow for paying many recipients at once with a single payer signature — gas-amortized, atomic, on EVM. Either pay programmatically by getting calldata and broadcasting it yourself, or hand the payer a hosted batch URL on `pay.request.network`.
+A workflow for paying many recipients at once with a single payer signature — gas-sponsored, atomic, on EVM. Either hand the payer a hosted batch URL on `pay.request.network` (recommended), or pay programmatically by getting calldata and broadcasting it yourself.
 
 **Audience:** marketplaces paying out sellers, agencies paying contractors, refund campaigns, payroll-adjacent flows, any scenario where you'd otherwise sign N transactions back-to-back.
 
@@ -17,16 +17,53 @@ A workflow for paying many recipients at once with a single payer signature — 
 
 | Mode | Endpoint | What you get back |
 | --- | --- | --- |
-| **Direct execution** | [`POST /v2/payouts/batch`](/api-features/payouts#batch-payout) | Approval calldata + a single batch payment transaction you broadcast from your wallet |
-| **Hosted batch link** | [`POST /v2/secure-payments`](/api-reference/secure-payments) with multiple `requests[]` | A `pay.request.network` URL the payer opens, signs once, and pays everyone |
+| **Hosted Batch Link** (recommended) | [`POST /v2/secure-payments`](/api-reference/secure-payments) with multiple `requests[]` | A `pay.request.network` URL the payer opens, signs once, and pays everyone |
+| **Direct Execution** (advanced) | [`POST /v2/payouts/batch`](/api-features/payouts#batch-payout) | Approval calldata + a single batch payment transaction you broadcast from your wallet |
 
-Pick **direct execution** when your backend signs payouts (you control the payer wallet). Pick **hosted batch link** when the payer is a human who needs a UI.
+Pick **hosted batch link** for most scenarios — the payer reviews recipients and the transaction on the Secure Payment Page before signing. Pick **direct execution** only when your backend already signs payouts in fully automated environments with appropriate security controls.
 
 ## Prerequisites
 
 Same as the [Quickstart](/use-cases/quickstart) — you need a Client ID. Webhooks are optional but recommended so you get notified when each leg of the batch settles.
 
-## Mode 1 — Direct execution
+## Mode 1 — Hosted Batch Link (Recommended & Safer Approach)
+
+Using the hosted Secure Payment Page hosted on a decentralized protocol allows operators to review and verify transactions before execution, reducing operational risk.
+
+The Hosted Batch Link supports **cross-chain execution from a single wallet connection**. Users can pay batches across the top supported EVM chains without switching environments or executing separate transactions per chain. The Secure Payment Page handles routing and cross-chain execution automatically, allowing operators to initiate payouts from one connected destination while supporting payments across multiple EVM networks.
+
+Mint a hosted link with multiple `requests[]` and share it with whoever signs payouts:
+
+```typescript
+const response = await fetch(
+  "https://api.request.network/v2/secure-payments",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-client-id": process.env.RN_CLIENT_ID!,
+    },
+    body: JSON.stringify({
+      requests: contractors.map((c) => ({
+        destinationId: c.destinationId,
+        amount: c.amount,
+      })),
+      reference: `payroll-${period}`,
+    }),
+  },
+);
+
+const { securePaymentUrl } = await response.json();
+// Send securePaymentUrl to whoever signs payouts
+```
+
+The Secure Payment Page shows the full payee list, total amount, and a single approval-then-pay flow. The payer signs once.
+
+## Mode 2 — Direct Execution (Advanced & Self-Secure)
+
+Direct execution removes the transaction review layer and may increase operational risk in case of calldata manipulation or wallet compromise. Recommended only for advanced automated environments with appropriate security controls.
+
+Direct execution currently supports **same-chain batch payouts only**. For example, Ethereum-to-Ethereum payouts require execution directly on Ethereum. To execute payouts across multiple chains, operators must execute one transaction per chain and interact with the corresponding contract deployment on each network individually.
 
 `POST /v2/payouts/batch` accepts up to 200 payment requests. All must be on the same EVM network. Mixed payment types (ERC-20 + native) are allowed within the batch.
 
@@ -84,34 +121,13 @@ const batchTx = await signer.sendTransaction(batchPaymentTransaction);
 await batchTx.wait();
 ```
 
-## Mode 2 — Hosted batch link
+## Wallet infrastructure compatibility
 
-If you don't want to handle calldata in your app, mint a hosted link with multiple `requests[]` and let the payer open it.
+<Note>
+At the moment, the Secure Payment Page and Dashboard are not compatible with Safe multisigs.
 
-```typescript
-const response = await fetch(
-  "https://api.request.network/v2/secure-payments",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-client-id": process.env.RN_CLIENT_ID!,
-    },
-    body: JSON.stringify({
-      requests: contractors.map((c) => ({
-        destinationId: c.destinationId,
-        amount: c.amount,
-      })),
-      reference: `payroll-${period}`,
-    }),
-  },
-);
-
-const { securePaymentUrl } = await response.json();
-// Send securePaymentUrl to whoever signs payouts
-```
-
-The Secure Payment app shows the full payee list, total amount, and a single approval-then-pay flow. The payer signs once.
+For corporate treasury management and operational wallet infrastructure, we recommend using vault providers such as Utila, DFNS, or Fireblocks. Request Network is fully compatible with WalletConnect-based wallet infrastructure.
+</Note>
 
 ## Real-world examples
 
