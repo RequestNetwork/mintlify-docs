@@ -5,7 +5,7 @@ description: "Supported chains and currency coverage across Request Network API 
 
 ## Request Network API Supported Chains and Currencies
 
-Overall, Request Network API supports 500+ currencies across major EVM chains.
+Overall, Request Network API supports 500+ currencies across EVM-compatible chains and select non-EVM support (Tron).
 
 ## ERC20, Native, and Conversion Payments Supported Chains
 
@@ -21,6 +21,8 @@ EVM chains supported for core payment flows include:
 - Fantom
 - zkSync Era
 - Sepolia
+
+For non-EVM support, Request Network API also supports Tron for USDT TRC-20 payments.
 
 ## ERC20 and Native Payments Supported Currencies
 
@@ -50,6 +52,20 @@ For Conversion Payments, supported **payment currencies** include:
 - USDT
 - DAI
 - FAU (Sepolia)
+
+## Tron Supported Network and Currency
+
+<Card title="Tron" icon="bolt">
+- **Availability:** Mainnet only
+- **Native Token:** TRX
+- **Supported Token:** USDT (TRC-20)
+- **Network ID:** `tron`
+- **Best For:** High-volume USDT transfers with low fees
+</Card>
+
+<Warning>
+Tron uses TRC-20 (not ERC-20). Wallet addresses use the `T...` format.
+</Warning>
 
 To fetch supported payment currencies for an invoice currency:
 
@@ -92,6 +108,47 @@ Typical fields include:
 - `network`
 - `type`
 - `chainId`
+
+## Currency Codes and Examples
+
+<CodeGroup>
+```javascript Native and ERC20 examples
+"ETH-mainnet"
+"USDC-mainnet"
+"USDC-base"
+"USDT-arbitrum-one"
+"DAI-optimism"
+```
+
+```javascript Tron example
+"USDT-tron"
+```
+
+```javascript Fiat invoice currency examples
+"USD"
+"EUR"
+"GBP"
+```
+</CodeGroup>
+
+## API Query Examples
+
+<CodeGroup>
+```bash Get all currencies
+curl -X GET 'https://api.request.network/v2/currencies' \
+  -H 'x-api-key: YOUR_API_KEY'
+```
+
+```bash Filter by network and symbol
+curl -X GET 'https://api.request.network/v2/currencies?network=base&symbol=USDC&firstOnly=true' \
+  -H 'x-api-key: YOUR_API_KEY'
+```
+
+```bash Get conversion routes for invoice currency
+curl -X GET 'https://api.request.network/v2/currencies/USD/conversion-routes' \
+  -H 'x-api-key: YOUR_API_KEY'
+```
+</CodeGroup>
 
 ## Endpoints
 
