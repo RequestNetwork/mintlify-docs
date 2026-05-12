@@ -42,8 +42,10 @@ The checksum portion (`#ABCD1234`) is generated automatically by the API when yo
   </Step>
 
   <Step title="Create a destination">
-    Call `POST /v1/payee-destination` with the token address and chain ID. The API generates the full destination ID with interop address.
+    Call `POST /v1/payee-destination` with the token address and chain ID. The API generates the full destination ID with interop address. EVM and Tron destinations use the same endpoint and shape — only the address format and chain ID differ.
 
+    <Tabs>
+    <Tab title="EVM (USDC on Base)">
     ```bash
     curl -X POST "https://auth.request.network/v1/payee-destination" \
       -H "Cookie: session=YOUR_SESSION_TOKEN" \
@@ -53,6 +55,19 @@ The checksum portion (`#ABCD1234`) is generated automatically by the API when yo
         "chainId": 8453
       }'
     ```
+    </Tab>
+    <Tab title="Tron (USDT-TRC20)">
+    ```bash
+    curl -X POST "https://auth.request.network/v1/payee-destination" \
+      -H "Cookie: session=YOUR_SESSION_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "tokenAddress": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        "chainId": 728126428
+      }'
+    ```
+    </Tab>
+    </Tabs>
   </Step>
 
   <Step title="Use the destination ID">

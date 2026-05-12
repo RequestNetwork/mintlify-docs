@@ -7,6 +7,10 @@ description: "Process multiple payments in a single transaction for gas optimiza
 
 Batch payments enable you to process multiple payment requests efficiently in a single blockchain transaction, reducing gas costs and simplifying multi-recipient workflows.
 
+<Warning>
+**EVM-only.** Batch payments — both inbound (one transaction paying multiple payees) and outbound (one signed batch payout) — are supported on EVM chains only. The API rejects Tron batch requests with `Batch payments are not supported for TRON networks. Please submit individual payment requests.` For Tron, submit single-recipient payments or payouts instead.
+</Warning>
+
 **Two Types of Batch Payments:**
 
 ### Batch Pay Invoices
@@ -187,32 +191,8 @@ Common error scenarios and their solutions:
 - **Invalid Addresses**: Validate all payee addresses before batch submission
 - **Gas Limit Exceeded**: Reduce batch size if hitting network gas limits
 
-## Demo Application
-
-See the batch payment feature in action in our EasyInvoice demo application:
-
-### EasyInvoice Batch Pay Invoices
-
-<iframe
-  className="w-full aspect-video rounded-xl"
-  src="https://www.youtube.com/embed/BsbENNP00AI"
-  title="EasyInvoice Batch Pay Invoices"
-  frameBorder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
-
-### EasyInvoice: Batch Payouts
-
-<iframe
-  className="w-full aspect-video rounded-xl"
-  src="https://www.youtube.com/embed/craVMSj8PRs"
-  title="EasyInvoice Batch Payouts"
-  frameBorder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+## Related
 
 For detailed information on all available endpoints and their parameters, see the full [Request Network API Reference](https://api.request.network/open-api).
 
-For implementation details, see [Batch payouts](/use-cases/batch-payouts).
+For an end-to-end walkthrough of paying many recipients at once, see [Batch payouts](/use-cases/batch-payouts).

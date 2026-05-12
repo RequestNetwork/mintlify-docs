@@ -31,6 +31,15 @@ Orchestrator (with Client ID) → POST /v2/request (no payee field)
   → Payment goes to merchant's configured wallet
 ```
 
+## Two ways to manage Client IDs
+
+| Method | Best for |
+| --- | --- |
+| **Dashboard** ([dashboard.request.network](https://dashboard.request.network)) | Most users — sign in with your wallet, generate a Client ID, set allowed domains, copy the value |
+| **Auth API** (`POST /v1/client-ids`) | Automation, dynamic provisioning, multi-tenant orchestration |
+
+Both paths use the same Client ID — there is no functional difference.
+
 ## CRUD Operations
 
 Client IDs can be managed through the auth API (session-based) or the request API (API key-based).
@@ -66,6 +75,18 @@ Fee recipient address. Required when `feePercentage` is set.
 
 <ParamField body="payeeDestinationId" type="string">
 ERC-7828 destination ID to bind to this Client ID. Enables the orchestrator pattern.
+</ParamField>
+
+<ParamField body="operatorWalletAddress" type="string">
+Optional Ethereum address of a smart wallet with delegated operator permissions. Used in commerce payment (authorize/capture) flows.
+</ParamField>
+
+<ParamField body="defaultPreApprovalExpiry" type="number">
+Default pre-approval duration in seconds. Overrides per-request value when set.
+</ParamField>
+
+<ParamField body="defaultAuthorizationExpiry" type="number">
+Default authorization duration in seconds. Overrides per-request value when set.
 </ParamField>
 
 ```json Response (201)
@@ -107,7 +128,7 @@ curl -X PUT "https://auth.request.network/v1/client-ids/01HXEXAMPLE123" \
   }'
 ```
 
-All fields are optional. You can update `label`, `allowedDomains`, `feePercentage`, `feeAddress`, `payeeDestinationId`, and `status`.
+All fields are optional. You can update `label`, `allowedDomains`, `feePercentage`, `feeAddress`, `payeeDestinationId`, `operatorWalletAddress`, `defaultPreApprovalExpiry`, `defaultAuthorizationExpiry`, and `status`.
 
 ### Revoke a Client ID
 

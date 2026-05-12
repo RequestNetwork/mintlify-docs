@@ -5,40 +5,72 @@ description: "Supported chains and currency coverage across Request Network API 
 
 ## Request Network API Supported Chains and Currencies
 
-Overall, Request Network API supports 500+ currencies across EVM-compatible chains and select non-EVM support (Tron).
+Request Network supports payment destinations on **8 networks** — 7 EVM chains and **Tron**. EVM and Tron are co-equal first-class networks for sign-in, payment destinations, payment links, and single payouts. The one current asymmetry: **batch payments (incoming or outgoing) are EVM-only** — the API rejects Tron batch requests.
 
-## ERC20, Native, and Conversion Payments Supported Chains
+## Supported networks
 
-EVM chains supported for core payment flows include:
+### Mainnet
 
-**Mainnet:**
-- Ethereum
-- Arbitrum One
-- OP Mainnet
-- Base
-- Polygon
-- BSC
-- Avalanche
-- Fantom
-- Gnosis
-- Mantle
-- zkSync Era
+| Network | Chain ID | Network ID | USDC | USDT | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Ethereum | `1` | `mainnet` | ✓ | ✓ | |
+| Arbitrum One | `42161` | `arbitrum-one` | ✓ | ✓ | Also supports USDT0 |
+| Optimism | `10` | `optimism` | ✓ | ✓ | |
+| Base | `8453` | `base` | ✓ | ✓ | |
+| Polygon | `137` | `matic` | ✓ | ✓ | |
+| BNB Smart Chain | `56` | `bsc` | ✓ | ✓ | |
+| **Tron** | `728126428` | `tron` | ✓ | ✓ | TRC-20 tokens, `T...` addresses |
 
-**Testnet:**
-- Sepolia
+### Testnet
 
-For non-EVM support, Request Network API also supports Tron for USDT TRC-20 payments.
+| Network | Chain ID | Network ID | Tokens |
+| --- | --- | --- | --- |
+| Sepolia | `11155111` | `sepolia` | FAU, USDC, USDT |
+
+For canonical token addresses on each chain, see [TOKENS_PER_CHAIN](https://github.com/RequestNetwork/request-api/blob/main/src/constants/chains.ts) in the Request API repository.
+
+## Feature support per chain
+
+| Feature | EVM (7 chains) | Tron |
+| --- | --- | --- |
+| Wallet sign-in (Dashboard) | ✓ | ✓ |
+| Payment destinations (ERC-7828) | ✓ | ✓ |
+| Single incoming payments | ✓ | ✓ |
+| **Batch incoming payments** | ✓ | ✗ |
+| Single outgoing payouts | ✓ | ✓ |
+| **Batch outgoing payouts** | ✓ | ✗ |
+| Conversion payments (fiat-denominated) | ✓ | ✓ |
+| Cross-chain swap-to-pay (Li.Fi) | ✓ | ✓ |
+| Recurring payments | ✓ | ✓ |
+
+<Warning>
+Batch payments (one transaction paying multiple recipients, or one signed batch payout) are supported on EVM only. Submitting a batch with Tron payees returns a 400 with: `Batch payments are not supported for TRON networks. Please submit individual payment requests.`
+</Warning>
+
+## Tron specifics
+
+<Card title="Tron" icon="bolt">
+- **Mainnet only** — no Tron testnet support
+- **Native token:** TRX (used for energy/bandwidth fees)
+- **Stablecoins:** USDT (`TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`), USDC (`TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8`)
+- **Address format:** Base58, prefix `T`
+- **Wallets:** TronLink, Guarda, Trust, WalletConnect-Tron
+</Card>
+
+<Info>
+Tron wallet addresses are not interchangeable with EVM addresses. The API uses ERC-7828 `humanReadableInteropAddress` to disambiguate — Tron destinations resolve under the `eip155:728126428` namespace.
+</Info>
 
 ## ERC20 and Native Payments Supported Currencies
 
-For ERC20 and native payments, Request Network API supports 500+ tokens.
+For ERC20 and native payments, Request Network exposes a broader catalog of 500+ tokens (the Request Network Token List). The destinations and secure payment flows above use the curated subset on the canonical 8 networks.
 
 <Card title="Request Network Token List" href="/resources/token-list#token-list-structure" icon="list">
 Access the full token catalog with token IDs, symbols, and network mapping.
 </Card>
 
 <Info>
-The token list is a superset and may include tokens on chains outside your current payment flow. Cross-reference token entries with supported chains.
+The token list is a superset and may include tokens on chains outside the destination flow. For payment destinations and secure payment links, use the 8 networks listed above.
 </Info>
 
 ## Conversion Payments Supported Currencies
@@ -57,20 +89,6 @@ For Conversion Payments, supported **payment currencies** include:
 - USDT
 - DAI
 - FAU (Sepolia)
-
-## Tron Supported Network and Currency
-
-<Card title="Tron" icon="bolt">
-- **Availability:** Mainnet only
-- **Native Token:** TRX
-- **Supported Token:** USDT (TRC-20)
-- **Network ID:** `tron`
-- **Best For:** High-volume USDT transfers with low fees
-</Card>
-
-<Warning>
-Tron uses TRC-20 (not ERC-20). Wallet addresses use the `T...` format. The `wallet` parameter is optional for Tron payments — the API uses a fallback address when omitted.
-</Warning>
 
 To fetch supported payment currencies for an invoice currency:
 
@@ -122,11 +140,12 @@ Typical fields include:
 "USDC-mainnet"
 "USDC-base"
 "USDT-arbitrum-one"
-"DAI-optimism"
+"USDT0-arbitrum-one"
 ```
 
-```javascript Tron example
+```javascript Tron examples
 "USDT-tron"
+"USDC-tron"
 ```
 
 ```javascript Fiat invoice currency examples
@@ -145,7 +164,7 @@ curl -X GET 'https://api.request.network/v2/currencies' \
 ```
 
 ```bash Filter by network and symbol
-curl -X GET 'https://api.request.network/v2/currencies?network=base&symbol=USDC&firstOnly=true' \
+curl -X GET 'https://api.request.network/v2/currencies?network=tron&symbol=USDT&firstOnly=true' \
   -H 'x-api-key: YOUR_API_KEY'
 ```
 

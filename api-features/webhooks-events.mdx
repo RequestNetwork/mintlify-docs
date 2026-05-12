@@ -9,31 +9,20 @@ Webhooks provide real-time notifications when payment and request events occur, 
 
 ## Event Categories
 
-<CardGroup cols={2}>
-  <Card title="Payment Events" icon="credit-card">
-    **Core events:** confirmed, partial, failed, refunded
+The Request Network webhook system emits **12 event types** across four categories:
 
-    Immediate notification when payments are processed or fail
-  </Card>
+| Category | Events |
+| --- | --- |
+| **Payment** (core) | `payment.confirmed`, `payment.partial`, `payment.failed`, `payment.refunded` |
+| **Payment** (Client ID-scoped) | `payment.confirmed.client_id`, `payment.partial.client_id` |
+| **Payment** (Checkout-scoped) | `payment.confirmed.checkout`, `payment.partial.checkout` |
+| **Processing** (crypto-to-fiat) | `payment.processing` (with `subStatus`) |
+| **Request** | `request.recurring` |
+| **Compliance / Bank** | `compliance.updated`, `payment_detail.updated` |
 
-  <Card title="Processing Events" icon="spinner">
-    **Crypto-to-fiat:** payment.processing with detailed subStatus
+The `.client_id` and `.checkout` variants are emitted in addition to the base `.confirmed` / `.partial` events when the request was created via a Client ID or as a checkout / secure payment, respectively. They include extra metadata (`clientId`, `origin`).
 
-    Track multi-step fiat conversion progress
-  </Card>
-
-  <Card title="Request Events" icon="file-invoice">
-    **Recurring:** request.recurring
-
-    Automatic subscription renewal generation
-  </Card>
-
-  <Card title="Compliance Events" icon="shield-check">
-    **KYC & verification:** compliance.updated, payment_detail.updated
-
-    User verification and bank account status changes
-  </Card>
-</CardGroup>
+For full payload schemas and headers, see the [Webhooks reference](/api-reference/webhooks).
 
 ## How It Works
 

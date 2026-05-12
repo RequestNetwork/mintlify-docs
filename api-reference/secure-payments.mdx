@@ -5,11 +5,16 @@ description: "Generate secure payment URLs, retrieve payment metadata, and get e
 
 ## Endpoints
 
-- `POST /v2/secure-payments` — Create a secure payment
+- `POST /v2/secure-payments` — Create a secure payment (incoming, single or batch on EVM; single only on Tron)
+- `POST /v2/secure-payments/payouts` — Create a hosted secure payout link (outgoing payment to a recipient)
 - `GET /v2/secure-payments` — Lookup by request ID
 - `GET /v2/secure-payments/:token` — Get payment metadata
 - `GET /v2/secure-payments/:token/pay` — Get payment calldata
 - `POST /v2/secure-payments/:token/intent` — Record crosschain payment intent
+
+<Warning>
+Batch incoming and batch payouts are EVM-only. Tron requests with multiple `requests[]` items return a 400 with `Batch payments are not supported for TRON networks. Please submit individual payment requests.`
+</Warning>
 
 ## Authentication
 
@@ -91,6 +96,98 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
 ### Error responses
 
 - `400`: invalid body or unsupported secure payment configuration
+- `401`: unauthorized
+- `429`: rate limited
+
+---
+
+## POST /v2/secure-payments/payouts
+
+Create a hosted **secure payout link** — an outgoing single-recipient payment URL the payer (you) opens to sign and broadcast the transaction. Useful for sending payments to contractors, vendors, or any external recipient when you want a hosted UI instead of executing calldata yourself.
+
+### Request fields
+
+<ParamField body="recipient" type="string" required>
+Recipient wallet address. EVM `0x...` or Tron `T...` format.
+</ParamField>
+
+<ParamField body="creatorWalletAddress" type="string" required>
+Wallet that created the payout (typically the payer wallet).
+</ParamField>
+
+<ParamField body="network" type="string" required>
+Destination network. Values: `mainnet`, `arbitrum-one`, `optimism`, `base`, `matic`, `bsc`, `tron`, `sepolia`.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+Payment currency in `<symbol>-<network>` form, e.g. `USDC-base`, `USDT-tron`, `FAU-sepolia`.
+</ParamField>
+
+<ParamField body="amount" type="string" required>
+Human-readable amount (e.g., `"100"`).
+</ParamField>
+
+<ParamField body="reference" type="string">
+Optional merchant reference (max 255 chars).
+</ParamField>
+
+<ParamField body="recipientIdentifier" type="string">
+Optional recipient identifier (max 255 chars).
+</ParamField>
+
+<ParamField body="feePercentage" type="string">
+Optional fee percentage from `0` to `100`.
+</ParamField>
+
+<ParamField body="feeAddress" type="string">
+Optional fee recipient address. Required when `feePercentage` is set.
+</ParamField>
+
+<RequestExample>
+```bash cURL (EVM payout)
+curl -X POST "https://api.request.network/v2/secure-payments/payouts" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipient": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+    "creatorWalletAddress": "0x2e2E5C79F571ef1658d4C2d3684a1FE97DD30570",
+    "network": "base",
+    "currency": "USDC-base",
+    "amount": "250",
+    "reference": "INVOICE-2026-042"
+  }'
+```
+
+```bash cURL (Tron payout)
+curl -X POST "https://api.request.network/v2/secure-payments/payouts" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipient": "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
+    "creatorWalletAddress": "TKb9mFPjUgCbrQpenCm4Z3T7ELNrLWurfm",
+    "network": "tron",
+    "currency": "USDT-tron",
+    "amount": "250",
+    "reference": "INVOICE-2026-042"
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "requestIds": [
+    "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"
+  ],
+  "securePaymentUrl": "https://pay.request.network/?token=01PAYOUT123ABCDEF456",
+  "token": "01PAYOUT123ABCDEF456"
+}
+```
+</ResponseExample>
+
+### Error responses
+
+- `400`: invalid body, unsupported network/currency, or batch attempt on Tron
 - `401`: unauthorized
 - `429`: rate limited
 
@@ -228,6 +325,8 @@ Retrieve executable transaction calldata for the secure payment. For crosschain 
 
 <Info>
 The `:token` in the URL path is the secure payment token (a ULID identifier). The `token` query parameter is the source currency symbol (`USDC` or `USDT`) for crosschain route selection. These are different values.
+
+For **Tron** secure payments, do not pass `chain` or `token` query parameters — the calldata is generated for the Tron network directly. Tron payments are single-recipient and same-chain only.
 </Info>
 
 ### Path parameters
@@ -243,7 +342,7 @@ Payer wallet address. Used for approval and balance checks. Optional for Tron pa
 </ParamField>
 
 <ParamField query="chain" type="string">
-Source chain for crosschain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`. Must be provided together with the `token` query parameter.
+Source chain for crosschain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`, `POLYGON`, `BNB`. Must be provided together with the `token` query parameter. Crosschain swap-to-pay is EVM-source only.
 </ParamField>
 
 <ParamField query="token" type="string">
