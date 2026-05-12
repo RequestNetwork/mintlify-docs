@@ -3,13 +3,9 @@ title: "Getting Started"
 description: "Quick setup guide to get your API keys and start building with Request Network"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Welcome to Request Network
 
-Get started with Request Network in just a few minutes. This guide will walk you through setting up your account, obtaining API keys, and making your first API call.
+Get started with Request Network in just a few minutes. This guide will walk you through setting up your account, obtaining API keys, and making your first payment.
 
 ## Quick Setup
 
@@ -18,13 +14,13 @@ Get started with Request Network in just a few minutes. This guide will walk you
     Sign up for a free Request Network account at [portal.request.network](https://portal.request.network)
   </Step>
   <Step title="Get API Keys">
-    Generate your API keys for both testnet (development) and mainnet (production)
+    Generate your API keys from the portal dashboard
   </Step>
-  <Step title="Choose Integration">
-    Select your integration approach based on your use case
+  <Step title="Create Your First Request">
+    Use the API to create a payment request
   </Step>
-  <Step title="Make First Call">
-    Test your setup with a simple API call
+  <Step title="Process Payment">
+    Get payment calldata and execute the transaction
   </Step>
 </Steps>
 
@@ -32,288 +28,245 @@ Get started with Request Network in just a few minutes. This guide will walk you
 
 ### Request Portal Registration
 
-<CardGroup cols={2}>
-  <Card title="Developer Account" icon="code">
-    **For Developers:**
-    - Free account with generous limits
-    - Access to testnet for development
-    - API documentation and tools
-    - Community support
-    
-    [Sign Up →](https://portal.request.network)
-  </Card>
-  
-  <Card title="Enterprise Account" icon="building">
-    **For Enterprises:**
-    - Higher rate limits
-    - Priority support
-    - Custom integrations
-    - SLA guarantees
-    
-    [Contact Sales →](https://request.network/contact)
-  </Card>
-</CardGroup>
+<Card title="Create Your Account" icon="user">
+Sign up at [portal.request.network](https://portal.request.network) to get started. All accounts include:
+- Free API access with generous limits
+- API documentation and tools
+- Community support
+</Card>
 
 ### API Key Generation
 
-<Tabs>
-  <Tab title="Testnet Keys">
-    **Development Environment:**
-    1. Log in to Request Portal
-    2. Navigate to "API Keys" section
-    3. Click "Generate New Key"
-    4. Select "Testnet" environment
-    5. Name your key (e.g., "Development")
-    6. Copy and securely store the key
-    
-    <Warning>
-    **Testnet vs Mainnet**
-    
-    Always start development on testnet. Testnet uses test cryptocurrencies with no real value.
-    </Warning>
-  </Tab>
-  
-  <Tab title="Production Keys">
-    **Production Environment:**
-    1. Complete account verification
-    2. Generate new API key
-    3. Select "Mainnet" environment
-    4. Configure production settings
-    5. Set up monitoring and alerts
-    
-    <Info>
-    **Security Best Practices**
-    
-    - Store API keys in environment variables
-    - Never commit keys to version control
-    - Use different keys for different environments
-    - Rotate keys regularly
-    </Info>
-  </Tab>
-</Tabs>
+1. Log in to [Request Portal](https://portal.request.network)
+2. Navigate to "API Keys" section
+3. Click "Create new key"
+4. Copy and securely store the key
 
-## Choose Your Path
+<Warning>
+**Security Best Practices**
 
-Select the integration approach that best fits your needs:
+- Store API keys in environment variables
+- Never commit keys to version control
+- Rotate keys regularly
+</Warning>
 
-<CardGroup cols={3}>
-  <Card 
-    title="📄 Invoicing" 
-    href="/use-cases/invoicing"
-    icon="receipt"
-  >
-    **Best for:** Professional invoicing, B2B payments
-    
-    Get started with invoice creation and payment collection in under 5 minutes.
-  </Card>
-  
-  <Card 
-    title="💰 Payouts" 
-    href="/use-cases/payouts"
-    icon="send"
-  >
-    **Best for:** Vendor payments, contractor payouts
-    
-    Send instant crypto payments to multiple recipients with batch processing.
-  </Card>
-  
-  <Card 
-    title="🛒 Checkout" 
-    href="/use-cases/checkout"
-    icon="shopping-cart"
-  >
-    **Best for:** E-commerce, digital goods
-    
-    Accept crypto payments in your online store with 80+ wallet support.
-  </Card>
-</CardGroup>
+## Your First Integration
 
-<CardGroup cols={2}>
-  <Card 
-    title="💼 Payroll" 
-    href="/use-cases/payroll"
-    icon="users"
-  >
-    **Best for:** Employee payments, bulk processing
-    
-    Automate payroll with batch payments and recurring schedules.
-  </Card>
-  
-  <Card 
-    title="🔄 Subscriptions" 
-    href="/use-cases/subscriptions"
-    icon="repeat"
-  >
-    **Best for:** SaaS billing, recurring revenue
-    
-    Set up automated subscription billing with flexible payment cycles.
-  </Card>
-</CardGroup>
+Let's create a simple Node.js server that integrates with the Request Network API to create payments and track their status.
 
-## Quick Test
+### Project Setup
 
-Verify your setup with a simple API call:
+Create a new project and install dependencies:
 
-<CodeGroup>
-```bash cURL (EVM)
-curl -X POST https://api.request.network/v2/requests \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "currency": "USD",
-    "expectedAmount": "100",
-    "payeeIdentity": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
-    "reason": "Test invoice"
-  }'
+```bash
+mkdir request-api-demo
+cd request-api-demo
+npm init -y
+npm install dotenv
 ```
 
-```bash cURL (Tron)
-curl -X POST https://api.request.network/v2/requests \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "currency": "USDT-tron",
-    "expectedAmount": "50",
-    "payeeIdentity": "TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE",
-    "reason": "USDT payment on Tron"
-  }'
+Create a `.env` file:
+
+```bash
+RN_API_KEY=your_api_key_here
+RN_API_URL=https://api.request.network/v2
 ```
 
-```javascript Node.js
-const axios = require('axios');
+### Create a Payment
 
-async function createTestRequest() {
+Create an `index.js` file:
+
+```javascript
+require('dotenv').config();
+
+async function createPayment() {
   try {
-    const response = await axios.post('https://api.request.network/v2/requests', {
-      currency: 'USD',
-      expectedAmount: '100',
-      payeeIdentity: '0x627306090abaB3A6e1400e9345bC60c78a8BEf57',
-      reason: 'Test invoice'
-    }, {
+    const response = await fetch(`${process.env.RN_API_URL}/payouts`, {
+      method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.REQUEST_NETWORK_API_KEY}`,
+        'X-Api-Key': process.env.RN_API_KEY,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        payee: '0x...', // Your wallet address
+        amount: '0.1',
+        invoiceCurrency: 'ETH-sepolia-sepolia',
+        paymentCurrency: 'ETH-sepolia-sepolia'
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error:', errorText);
+      return;
+    }
+
+    const data = await response.json();
+    console.log('Payment created:', {
+      requestId: data.requestId,
+      paymentReference: data.paymentReference,
+      transactions: data.transactions,
+      metadata: data.metadata
     });
     
-    console.log('Request created:', response.data.requestId);
-    return response.data;
+    return data;
     
   } catch (error) {
-    console.error('Error creating request:', error.response?.data || error.message);
+    console.error('Error:', error.message);
   }
 }
 
-createTestRequest();
+createPayment();
 ```
 
-```python Python
-import requests
-import os
+Run it:
 
-def create_test_request():
-    url = "https://api.request.network/v2/requests"
-    
-    headers = {
-        "Authorization": f"Bearer {os.getenv('REQUEST_NETWORK_API_KEY')}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "currency": "USD",
-        "expectedAmount": "100",
-        "payeeIdentity": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
-        "reason": "Test invoice"
-    }
-    
-    try:
-        response = requests.post(url, json=data, headers=headers)
-        response.raise_for_status()
-        
-        print(f"Request created: {response.json()['requestId']}")
-        return response.json()
-        
-    except requests.exceptions.RequestException as e:
-        print(f"Error creating request: {e}")
-
-create_test_request()
+```bash
+node index.js
 ```
-</CodeGroup>
+
+The response will include:
+- `requestId` — Unique identifier for the request
+- `paymentReference` — Used to track the payment
+- `transactions` — Array of transaction calldata to execute
+- `metadata` — Additional info like `stepsRequired` and `needsApproval`
+
+### Understanding the Response
+
+```json
+{
+  "requestId": "011d9f76e07a678b8321ccfaa300efd4d80832652b8bbc07ea4069ca71006210b5",
+  "paymentReference": "0xe23a6b02059c2b30",
+  "transactions": [
+    {
+      "data": "0xb868980b000000000000000000000000...",
+      "to": "0xe11BF2fDA23bF0A98365e1A4c04A87C9339e8687",
+      "value": {
+        "type": "BigNumber",
+        "hex": "0x02c68af0bb140000"
+      }
+    }
+  ],
+  "metadata": {
+    "stepsRequired": 1,
+    "needsApproval": false,
+    "paymentTransactionIndex": 0
+  }
+}
+```
+
+<Info>
+**Note:** The `amount` is in human-readable format. No BigNumber conversions needed!
+</Info>
+
+### Setting Up Webhooks
+
+To track payment status in real-time, set up a webhook endpoint:
+
+```javascript
+const crypto = require('crypto');
+
+// Webhook handler
+app.post('/webhooks', async (req, res) => {
+  const signature = req.headers['x-request-network-signature'];
+  const webhookSecret = process.env.RN_WEBHOOK_SECRET;
+
+  // Verify signature
+  const expectedSignature = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(JSON.stringify(req.body))
+    .digest('hex');
+
+  if (signature !== expectedSignature) {
+    return res.status(401).send({ error: 'Invalid signature' });
+  }
+
+  const { requestId, event } = req.body;
+  console.log(`Webhook: ${event} for request ${requestId}`);
+  
+  // Handle different events
+  switch (event) {
+    case 'payment.confirmed':
+      console.log('Payment confirmed!');
+      // Update your database, send email, etc.
+      break;
+    case 'payment.pending':
+      console.log('Payment pending...');
+      break;
+  }
+
+  res.send({ code: 200, message: 'Webhook received' });
+});
+```
+
+#### Testing Webhooks Locally
+
+Since webhooks can't reach your local server directly, use [ngrok](https://ngrok.com/):
+
+```bash
+ngrok http 3000
+```
+
+Copy the HTTPS URL (e.g., `https://abc123.ngrok.io/webhooks`) and add it in the [API Portal](https://portal.request.network) under Webhooks section.
+
+Copy the webhook signing secret to your `.env`:
+
+```bash
+RN_WEBHOOK_SECRET=your_webhook_secret_here
+```
 
 ## Environment Configuration
 
-### Environment Variables
-
-Set up your environment variables for secure API key management:
+Set up environment variables for secure API key management:
 
 <CodeGroup>
 ```bash .env
 # Request Network Configuration
-REQUEST_NETWORK_API_KEY=your_api_key_here
-REQUEST_NETWORK_ENVIRONMENT=testnet
+RN_API_KEY=your_api_key_here
+RN_API_URL=https://api.request.network/v2
 
 # Webhook Configuration (optional)
-REQUEST_WEBHOOK_SECRET=your_webhook_secret_here
-REQUEST_WEBHOOK_URL=https://your-domain.com/webhooks/request-network
-
-# Application Configuration
-PORT=3000
-NODE_ENV=development
+RN_WEBHOOK_SECRET=your_webhook_secret_here
 ```
 
 ```javascript config.js
 module.exports = {
   requestNetwork: {
-    apiKey: process.env.REQUEST_NETWORK_API_KEY,
-    environment: process.env.REQUEST_NETWORK_ENVIRONMENT || 'testnet',
-    webhookSecret: process.env.REQUEST_WEBHOOK_SECRET,
-    webhookUrl: process.env.REQUEST_WEBHOOK_URL
-  },
-  app: {
-    port: process.env.PORT || 3000,
-    environment: process.env.NODE_ENV || 'development'
+    apiKey: process.env.RN_API_KEY,
+    apiUrl: process.env.RN_API_URL || 'https://api.request.network/v2',
+    webhookSecret: process.env.RN_WEBHOOK_SECRET,
   }
 };
 ```
 </CodeGroup>
 
-## Development Tools
+## What's Next?
 
-### Request Portal Features
+Now that you've made your first API call, explore more features:
 
-<CardGroup cols={2}>
-  <Card title="API Explorer" icon="play">
-    **Interactive Testing:**
-    - Test API endpoints directly in browser
-    - Real-time response preview
-    - Code generation for multiple languages
-    - Request/response logging
+<CardGroup cols={3}>
+  <Card 
+    title="📚 API Features" 
+    href="/api-features/create-requests"
+    icon="book"
+  >
+    Learn about different payment types and features
   </Card>
   
-  <Card title="Webhook Testing" icon="webhook">
-    **Webhook Development:**
-    - Test webhook delivery
-    - Inspect webhook payloads
-    - Retry failed webhooks
-    - Webhook logs and analytics
-  </Card>
-</CardGroup>
-
-<CardGroup cols={2}>
-  <Card title="Transaction Monitor" icon="activity">
-    **Real-time Monitoring:**
-    - Live transaction tracking
-    - Payment status updates
-    - Error monitoring and alerts
-    - Performance metrics
+  <Card 
+    title="🔍 Payment Detection" 
+    href="/api-features/payment-detection"
+    icon="radar"
+  >
+    Understand how payments are tracked
   </Card>
   
-  <Card title="Analytics Dashboard" icon="chart-bar">
-    **Usage Analytics:**
-    - API usage statistics
-    - Payment volume tracking
-    - Success/failure rates
-    - Performance insights
+  <Card 
+    title="⚡ Integration Tutorial" 
+    href="/api-setup/integration-tutorial"
+    icon="graduation-cap"
+  >
+    Complete tutorial with backend + frontend
   </Card>
 </CardGroup>
 
@@ -322,57 +275,25 @@ module.exports = {
 ### Common Issues
 
 <AccordionGroup>
-  <Accordion title="Authentication Errors">
-    **401 Unauthorized:**
+  <Accordion title="401 Unauthorized">
     - Verify API key is correct
-    - Check environment (testnet vs mainnet)
-    - Ensure API key has required permissions
-    - Verify Authorization header format
+    - Check that you're using the right header: `X-Api-Key`
+    - Ensure the key hasn't been revoked
   </Accordion>
   
-  <Accordion title="Rate Limiting">
-    **429 Too Many Requests:**
-    - Implement exponential backoff
-    - Check your current rate limits
-    - Consider upgrading to higher limits
-    - Optimize API call frequency
+  <Accordion title="400 Bad Request">
+    - Check required fields: `payee`, `amount`, `invoiceCurrency`, `paymentCurrency`
+    - Ensure `amount` is a string (e.g., "0.1")
+    - Verify currency IDs are valid
   </Accordion>
   
-  <Accordion title="Network Issues">
-    **Connection Problems:**
-    - Check network connectivity
-    - Verify API endpoint URLs
-    - Test with different networks
-    - Check firewall settings
+  <Accordion title="Webhook not receiving events">
+    - Verify webhook URL is publicly accessible
+    - Check webhook signature verification
+    - Ensure webhook is enabled in the portal
   </Accordion>
 </AccordionGroup>
 
-## What's Next?
-
-Now that you're set up, explore the features that matter most to your use case:
-
-<CardGroup cols={3}>
-  <Card 
-    title="📚 API Reference" 
-    href="/api-reference/authentication"
-    icon="book"
-  >
-    Detailed API endpoint documentation
-  </Card>
-  
-  <Card 
-    title="⚙️ API Features" 
-    href="/api-features/payment-types"
-    icon="cog"
-  >
-    Learn about payment types and advanced capabilities
-  </Card>
-  
-  <Card 
-    title="🛠️ Payment Types" 
-    href="/api-features/payment-types-overview"
-    icon="puzzle-piece"
-  >
-    Learn about payment types and integration options
-  </Card>
-</CardGroup>
+<Check>
+**You're all set!** You've created your first payment request with Request Network. For a complete working example with frontend, check out the [Integration Tutorial](/api-setup/integration-tutorial).
+</Check>
