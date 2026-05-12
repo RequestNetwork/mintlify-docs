@@ -125,6 +125,8 @@ Pagination offset.
       "type": "direct",
       "currency": "USD",
       "paymentCurrency": "USDC",
+      "detectionSource": "request-network",
+      "note": null,
       "fees": [
         {
           "type": "gas",
@@ -172,6 +174,8 @@ Pagination offset.
 | `currency` | string | Invoice currency |
 | `paymentCurrency` | string | Payment currency |
 | `fees` | array | Fee breakdown with type, amount, currency, provider |
+| `detectionSource` | string \| null | How the payment was confirmed: `"request-network"` or `"lifi"` |
+| `note` | string \| null | Additional context for non-standard settlements (e.g., LiFi fallback) |
 | `recurringPaymentId` | string \| null | Recurring payment ID if applicable |
 | `request` | object | Linked request with requestId, paymentReference, hasBeenPaid, customerInfo, reference |
 

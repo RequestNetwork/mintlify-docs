@@ -20,7 +20,7 @@ Crosschain payments allow users to pay a request using a stablecoin from a diffe
 
 ## Crosschain Payments Supported Chains and Currencies
 
-For crosschain (and samechain) payments, the Request Network API supports USDC and USDT on 4 chains.
+For crosschain (and samechain) payments, the Request Network API supports USDC and USDT on 5 chains.
 
 <Info>
 Bridged USDC (USDC.e) is **not** supported for crosschain payments. Only native USDC is supported.
@@ -32,6 +32,7 @@ Bridged USDC (USDC.e) is **not** supported for crosschain payments. Only native 
 - Arbitrum One
 - Base
 - OP Mainnet
+- Polygon
 
 ### Supported Currencies
 
@@ -46,7 +47,7 @@ Crosschain payments work only with mainnet funds (real money). Test networks are
 
 <Steps>
 <Step title="Create the request">
-Create a request with a `paymentCurrency` in the supported stablecoins and networks, and `amount` greater than 1 (crosschain execution under 1 stablecoin is not allowed).
+Create a request with a `paymentCurrency` in the supported stablecoins and networks. The `amount` must be greater than 1 USD equivalent (e.g., at least 1.01 USDC) — crosschain routes are not available for amounts under $1 due to bridge minimums.
 
 Create the request via [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request).
 </Step>
@@ -137,7 +138,8 @@ The API returns a `transactions` array with ready-to-execute calldata:
     "paymentTransactionIndex": 1,
     "routeType": "crosschain",
     "quoteExpiresAt": 1742205771,
-    "hasEnoughBalance": true
+    "hasEnoughBalance": true,
+    "sourceAmount": "10.02"
   }
 }
 ```
@@ -150,6 +152,11 @@ The API returns a `transactions` array with ready-to-execute calldata:
 - `routeType` — `"crosschain"` or `"samechain"`
 - `quoteExpiresAt` — unix timestamp when the route quote expires
 - `hasEnoughBalance` — whether the payer has sufficient funds
+- `sourceAmount` — the amount the payer needs to send on the source chain (includes bridge fees)
+
+<Info>
+The API always includes approval transactions in crosschain calldata responses, even if the payer already has sufficient token allowance. This ensures USDT-style tokens (which require resetting allowance to zero before setting a new one) work correctly.
+</Info>
 </Step>
 
 <Step title="Execute the transactions">
@@ -167,7 +174,7 @@ const walletClient = createWalletClient({
 const [account] = await walletClient.getAddresses();
 
 // Step 1: Send approval transaction (if needed)
-if (metadata.needsApproval) {
+if (metadata.needsApproval && metadata.approvalTransactionIndex != null) {
   const approvalTx = transactions[metadata.approvalTransactionIndex];
   const approvalHash = await walletClient.sendTransaction({
     account,

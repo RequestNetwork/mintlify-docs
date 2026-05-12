@@ -64,19 +64,21 @@ Secure payment pages support crosschain payments. When a payer connects their wa
 
 **Supported crosschain currencies:** USDC, USDT
 
-**Supported crosschain chains:** Ethereum, Arbitrum, Base, OP Mainnet
+**Supported crosschain chains:** Ethereum, Arbitrum, Base, OP Mainnet, Polygon
 
 See [Crosschain Payments](/api-features/crosschain-payments) for details on crosschain routing via LiFi.
 
 ## Smart Account Payments
 
-The secure payment page supports gas-sponsored payments via [Alchemy Account Kit](https://accountkit.alchemy.com/) smart accounts (ERC-4337). When available, payers can use a smart account to execute payments without paying gas fees.
+The secure payment page supports gas-sponsored payments via [Safe](https://safe.global/) smart accounts (ERC-4337), bundled and sponsored through [Pimlico](https://pimlico.io/). When available, payers can use a smart account to execute payments without paying gas fees.
 
 **How it works:**
 
 1. The payer approves a spending cap from their EOA wallet to the smart account
 2. The smart account batches the `transferFrom` (EOA to smart account) and the payment transaction into a single UserOperation
-3. Gas is sponsored via an Alchemy gas policy — the payer pays zero gas
+3. Gas is sponsored via Pimlico's paymaster — the payer pays zero gas
+
+**Supported chains for smart account payments:** Ethereum, Base, Arbitrum, Optimism, Polygon, BSC, and Sepolia (testnet).
 
 <Info>
 Smart account payments are a client-side feature of the hosted secure payment page. There is no separate API for smart accounts — the same `GET /v2/secure-payments/:token/pay` endpoint provides the transaction calldata.

@@ -65,6 +65,14 @@ All crosschain payments using Request Network API use the **ERC-20 Fee Proxy con
 4. Payment detection system identifies the transaction
 5. Request status updated automatically
 
+### LiFi Fallback Settlements
+
+In rare cases, a crosschain bridge may deliver funds to the destination chain but fail to execute the final payment contract call. When this happens, the system detects the LiFi fallback settlement and confirms the payment automatically.
+
+Fallback-confirmed payments include:
+- `detectionSource` set to `"lifi"`
+- A `note` field explaining that funds were delivered via fallback settlement
+
 ## Webhook Notifications
 
 Configure webhooks to receive real-time notifications for payment events:

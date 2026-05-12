@@ -55,13 +55,13 @@ curl -X POST "https://api.request.network/v2/payouts/batch" \
     "requests": [
       {
         "amount": "50",
-        "invoiceCurrency": "USDC-base",
+        "invoiceCurrency": "USD",
         "paymentCurrency": "USDC-base",
         "payee": "0xb07d2398d2004378cad234da0ef14f1c94a530e4"
       },
       {
         "amount": "25",
-        "invoiceCurrency": "USDC-base",
+        "invoiceCurrency": "USD",
         "paymentCurrency": "USDC-base",
         "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7"
       }
@@ -83,6 +83,17 @@ See [Recurring Payments](/api-features/recurring-payments) for the full lifecycl
 - `POST /v2/payouts/recurring/:id` — Submit the payer's permit signature to activate
 - `GET /v2/payouts/recurring/:id` — Check status and next payment date
 - `PATCH /v2/payouts/recurring/:id` — Cancel or unpause
+
+## Error Handling
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid request body — check required fields and currency IDs |
+| `401` | Authentication failed — verify your `x-api-key` header |
+| `404` | Request or recurring payment not found |
+| `429` | Rate limited — back off and retry |
+
+For batch payouts, a `400` may indicate that payments span multiple networks (all must be on the same chain).
 
 ## Endpoint Reference
 
