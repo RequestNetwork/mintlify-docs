@@ -1,182 +1,121 @@
 ---
 title: "Platform Fees"
-description: "Collect platform fees automatically from payments using feePercentage and feeAddress"
+description: "Configure platform fees with feePercentage and feeAddress"
 ---
-
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
 
 ## Overview
 
-Platform fees enable service providers to collect their own fees from payment requests. The Request Network API supports percentage-based fees that are automatically calculated and collected during payment.
+Platform fees let your product collect an additional fee during payment execution.
 
-## How It Works
+To configure a platform fee, pass:
 
-```mermaid
-graph LR
-    A[Payment Amount: $100] --> B[Calculate Fee: 2.5%]
-    B --> C[Fee Amount: $2.50]
-    C --> D[Total Paid: $102.50]
-    D --> E[Merchant Gets: $100]
-    D --> F[Platform Gets: $2.50]
-```
+- `feePercentage`
+- `feeAddress`
 
-**Fee Collection:**
-- **Automatic:** Fees calculated and collected during payment
-- **Percentage-Based:** Platform defines `feePercentage` at payment time
-- **Smart Contract Level:** API converts percentage to fixed `feeAmount` for smart contract
-- **Separate Recipient:** Fees sent to specified `feeAddress`
+Use this page for setup and integration patterns. For protocol-level fees charged by Request Network, see [Protocol Fees](/api-features/protocol-fees).
 
-## Fee Configuration
+## Required Parameters
 
-Platform fees are configured when initiating a payment via:
-- `POST /v2/request/{requestId}/pay` - For request-based payments
-- `POST /v2/payouts` - For direct payouts
-
-### Fee Parameters
-
-<ParamField body="feePercentage" type="string">
-  Fee percentage to apply at payment time (e.g., '2.5' for 2.5%)
+<ParamField query="feePercentage" type="string">
+Fee percentage to apply at payment time (for example `"2.5"` for 2.5%).
 </ParamField>
 
-<ParamField body="feeAddress" type="string">
-  Ethereum address to receive the platform fee
+<ParamField query="feeAddress" type="string">
+Wallet address that receives the platform fee.
 </ParamField>
-
-## Implementation
-
-### Request-Based Payment with Fee
-
-```javascript
-// Step 1: Create a payment request
-const createResponse = await fetch('https://api.request.network/v2/request', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${apiKey}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    amount: '100',
-    invoiceCurrency: 'USD',
-    paymentCurrency: 'USDC-matic',
-    payee: merchantAddress
-  })
-});
-
-const { requestId } = await createResponse.json();
-
-// Step 2: Initiate payment with platform fee
-const payResponse = await fetch(`https://api.request.network/v2/request/${requestId}/pay`, {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${apiKey}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    feePercentage: '2.5',           // 2.5% platform fee
-    feeAddress: platformFeeAddress  // Your platform's fee collection address
-  })
-});
-```
-
-### Direct Payout with Fee
-
-```javascript
-// Direct payout with platform fee
-const payoutResponse = await fetch('https://api.request.network/v2/payouts', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${apiKey}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    amount: '100',
-    invoiceCurrency: 'USD',
-    paymentCurrency: 'USDC-matic',
-    payee: vendorAddress,
-    feePercentage: '2.5',           // 2.5% platform fee
-    feeAddress: platformFeeAddress  // Your platform's fee collection address
-  })
-});
-```
-
-## Fee Calculation
-
-The API automatically handles the conversion from percentage to fixed amount:
-
-1. **Platform specifies:** `feePercentage: '2.5'` (2.5%)
-2. **API calculates:** For $100 payment → $2.50 fee
-3. **Smart contract receives:** `feeAmount: '2500000'` (in token decimals)
-4. **Total transaction:** $102.50 (merchant gets $100, platform gets $2.50)
-
-## Use Cases
-
-<CardGroup cols={2}>
-  <Card title="SaaS Platforms" icon="building">
-    Collect commission on customer payments processed through your platform
-  </Card>
-  
-  <Card title="Payment Processors" icon="credit-card">
-    Add processing fees to cover operational costs and generate revenue
-  </Card>
-  <Card title="Marketplaces" icon="store">
-    Collect marketplace fees from vendor transactions
-  </Card>
-  
-  <Card title="Service Platforms" icon="handshake">
-    Monetize payment infrastructure for your users
-  </Card>
-</CardGroup>
-
-## Fee Transparency
-
-Fee amounts are included in payment responses and can be queried for complete transparency:
-
-- Payment calldata includes calculated fee amount
-- Payment status includes fee breakdown
-- Fee amounts shown in both crypto and USD equivalents (where applicable)
-
-## Important Notes
-
-<Note>
-**API vs Smart Contract Level**
-
-- **API Level:** You specify `feePercentage` (e.g., "2.5") and `feeAddress`
-- **Smart Contract Level:** API calculates and sends fixed `feeAmount` in token units
-- **Your integration:** Only needs to handle percentage-based fees via API
-</Note>
 
 <Warning>
-**Fee Address Validation**
-
-Ensure the `feeAddress` is a valid Ethereum address that you control. Fees are sent automatically and cannot be recovered if sent to an incorrect address.
+`feePercentage` and `feeAddress` must be provided together. If one is missing, validation fails.
 </Warning>
 
-## What's Next?
+## Validation Rules
 
-<CardGroup cols={3}>
-  <Card 
-    title="Fee Breakdowns" 
-    href="/api-features/fee-breakdowns"
-    icon="receipt"
-  >
-    View detailed fee breakdown information
+- `feePercentage` must be a number between `0` and `100`
+- `feeAddress` must be a valid blockchain address
+- For v2 request payment calls, these are query parameters
+
+## Endpoint Usage
+
+Use platform fee parameters on these endpoints:
+
+- [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/{requestId}/pay)
+- [POST /v2/payouts](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts)
+- [POST /v2/payouts/batch](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts/batch)
+
+## How to Add Platform Fees
+
+<Steps>
+<Step title="Choose your fee policy">
+Set the percentage and receiver address used by your platform.
+</Step>
+
+<Step title="Pass fee parameters on payment call">
+Add `feePercentage` and `feeAddress` to the payment endpoint call.
+</Step>
+
+<Step title="Execute payment as usual">
+The API returns payment payloads that include fee handling. Your app executes the returned transactions as usual.
+</Step>
+</Steps>
+
+## Integration Examples
+
+### Request-based payment
+
+```bash cURL
+curl -X GET 'https://api.request.network/v2/request/{requestId}/pay?feePercentage=2.5&feeAddress=0x742d35CC6634c0532925a3B844BC9e7595f8fA40' \
+  -H 'x-api-key: YOUR_API_KEY'
+```
+
+### Direct payout
+
+```bash cURL
+curl -X POST 'https://api.request.network/v2/payouts' \
+  -H 'x-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+    "amount": "100",
+    "invoiceCurrency": "USD",
+    "paymentCurrency": "USDC-base",
+    "feePercentage": "2.5",
+    "feeAddress": "0x742d35CC6634c0532925a3B844BC9e7595f8fA40"
+  }'
+```
+
+### Batch payout
+
+```bash cURL
+curl -X POST 'https://api.request.network/v2/payouts/batch' \
+  -H 'x-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "payer": "0x2e2E5C79F571ef1658d4C2d3684a1FE97DD30570",
+    "feePercentage": "2.5",
+    "feeAddress": "0x742d35CC6634c0532925a3B844BC9e7595f8fA40",
+    "requests": [
+      {
+        "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+        "amount": "10",
+        "invoiceCurrency": "USD",
+        "paymentCurrency": "USDC-base"
+      }
+    ]
+  }'
+```
+
+## Related Pages
+
+<CardGroup cols={2}>
+  <Card title="Protocol Fees" href="/api-features/protocol-fees">
+    Understand Request Network protocol-level fees.
   </Card>
-  
-  <Card 
-    title="Payment Types" 
-    href="/api-features/payment-types-overview"
-    icon="credit-card"
-  >
-    Explore different payment types that support fees
-  </Card>
-  
-  <Card 
-    title="API Reference" 
-    href="/api-reference/authentication"
-    icon="book"
-  >
-    Complete API endpoint documentation
+
+  <Card title="Fee Breakdowns" href="/api-features/fee-breakdowns">
+    Inspect fee line items returned by API responses.
   </Card>
 </CardGroup>
+
+## API Reference
+
+For full schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
