@@ -35,12 +35,12 @@ Sign up at [dashboard.request.network](https://dashboard.request.network) to get
 - Community support
 </Card>
 
-### API Key Generation
+### Client ID Generation
 
 1. Log in to [Request Dashboard](https://dashboard.request.network)
-2. Navigate to "API Keys" section
-3. Click "Create new key"
-4. Copy and securely store the key
+2. Open your payment destination's **Client IDs** section
+3. Click **Generate New Client ID**
+4. Copy and securely store the Client ID
 
 <Warning>
 **Security Best Practices**
@@ -68,7 +68,7 @@ npm install dotenv
 Create a `.env` file:
 
 ```bash
-RN_API_KEY=your_api_key_here
+RN_CLIENT_ID=your_client_id_here
 RN_API_URL=https://api.request.network/v2
 ```
 
@@ -84,7 +84,7 @@ async function createPayment() {
     const response = await fetch(`${process.env.RN_API_URL}/payouts`, {
       method: 'POST',
       headers: {
-        'X-Api-Key': process.env.RN_API_KEY,
+        'x-client-id': process.env.RN_CLIENT_ID,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -165,6 +165,10 @@ To track payment status in real-time, set up a webhook endpoint:
 
 ```javascript
 const crypto = require('crypto');
+const express = require('express');
+
+const app = express();
+app.use(express.json());
 
 // Webhook handler
 app.post('/webhooks', async (req, res) => {
@@ -212,7 +216,7 @@ Copy the HTTPS URL (e.g., `https://abc123.ngrok.io/webhooks`) and register it vi
 ```bash
 curl -X POST "https://auth.request.network/v1/webhook" \
   -H "Content-Type: application/json" \
-  -H "x-client-id: $RN_API_KEY" \
+  -H "x-client-id: $RN_CLIENT_ID" \
   -d '{ "url": "https://abc123.ngrok.io/webhooks" }'
 ```
 
@@ -229,7 +233,7 @@ Set up environment variables for secure API key management:
 <CodeGroup>
 ```bash .env
 # Request Network Configuration
-RN_API_KEY=your_api_key_here
+RN_CLIENT_ID=your_client_id_here
 RN_API_URL=https://api.request.network/v2
 
 # Webhook Configuration (optional)
@@ -239,7 +243,7 @@ RN_WEBHOOK_SECRET=your_webhook_secret_here
 ```javascript config.js
 module.exports = {
   requestNetwork: {
-    apiKey: process.env.RN_API_KEY,
+    clientId: process.env.RN_CLIENT_ID,
     apiUrl: process.env.RN_API_URL || 'https://api.request.network/v2',
     webhookSecret: process.env.RN_WEBHOOK_SECRET,
   }
@@ -283,9 +287,9 @@ Now that you've made your first API call, explore more features:
 
 <AccordionGroup>
   <Accordion title="401 Unauthorized">
-    - Verify API key is correct
-    - Check that you're using the right header: `X-Api-Key`
-    - Ensure the key hasn't been revoked
+    - Verify Client ID is correct
+    - Check that you're using the right header: `x-client-id`
+    - Ensure the Client ID hasn't been revoked
   </Accordion>
   
   <Accordion title="400 Bad Request">

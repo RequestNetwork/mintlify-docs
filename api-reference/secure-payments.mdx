@@ -63,7 +63,7 @@ Optional payer identifier (max 255 chars).
 </ParamField>
 
 <ParamField body="redirectUrl" type="string">
-Optional `http(s)` URL the payer is redirected to after a successful payment. Only safe URLs are accepted: scheme must be `http` or `https`, and the value must not contain HTML/script payload characters (`<`, `>`, `"`, `'`, ` `` `, whitespace). The URL is rendered as a button on the success screen — the payer clicks it to return to your site (no auto-redirect).
+Optional `http(s)` URL displayed as a button on the success screen. After a successful payment the payer can click the button to return to your site — there is no auto-redirect. Only safe URLs are accepted: scheme must be `http` or `https`, and the value must not contain HTML/script payload characters (`<`, `>`, `"`, `'`, `` ` ``, whitespace).
 </ParamField>
 
 <ParamField body="redirectLabel" type="string">
@@ -230,7 +230,7 @@ The request ID to look up.
   "status": "pending",
   "paymentType": "single",
   "createdAt": "2026-03-15T10:00:00.000Z",
-  "expiresAt": "2026-03-15T10:15:00.000Z"
+  "expiresAt": "2026-03-22T10:00:00.000Z"
 }
 ```
 </ResponseExample>

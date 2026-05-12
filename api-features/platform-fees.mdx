@@ -32,7 +32,7 @@ Wallet address that receives the platform fee.
 
 - `feePercentage` must be a number between `0` and `100`
 - `feeAddress` must be a valid blockchain address
-- For v2 request payment calls, these are query parameters
+- On `GET /v2/request/{requestId}/pay` these are **query** parameters; on `POST /v2/payouts` and `POST /v2/payouts/batch` they're **body** parameters
 
 ## Endpoint Usage
 

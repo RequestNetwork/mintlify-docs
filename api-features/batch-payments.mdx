@@ -93,8 +93,7 @@ const batchPayResponse = await fetch('https://api.request.network/v2/payouts/bat
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'x-platform-id': 'your-platform-id'
+    'x-client-id': 'your-client-id'
   },
   body: JSON.stringify({
     requestIds: [
@@ -104,6 +103,10 @@ const batchPayResponse = await fetch('https://api.request.network/v2/payouts/bat
     payer: "0x2e2E5C79F571ef1658d4C2d3684a1FE97DD30570"
   })
 });
+
+if (!batchPayResponse.ok) {
+  throw new Error(`API error: ${batchPayResponse.status}`);
+}
 
 const { batchPaymentTransaction, ERC20ApprovalTransactions } = await batchPayResponse.json();
 
@@ -130,8 +133,7 @@ const batchPayResponse = await fetch('https://api.request.network/v2/payouts/bat
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'x-platform-id': 'your-platform-id'
+    'x-client-id': 'your-client-id'
   },
   body: JSON.stringify({
     requests: [
@@ -151,6 +153,10 @@ const batchPayResponse = await fetch('https://api.request.network/v2/payouts/bat
     payer: "0x2e2E5C79F571ef1658d4C2d3684a1FE97DD30570"
   })
 });
+
+if (!batchPayResponse.ok) {
+  throw new Error(`API error: ${batchPayResponse.status}`);
+}
 
 const { batchPaymentTransaction, ERC20ApprovalTransactions } = await batchPayResponse.json();
 

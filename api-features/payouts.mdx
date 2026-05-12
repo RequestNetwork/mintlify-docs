@@ -96,7 +96,7 @@ The response includes approval transactions and a batch payment transaction to e
 
 ## Recurring Payouts
 
-Create automated payment schedules where the payer authorizes a series of payments with a single ERC-712 signature.
+Create automated payment schedules where the payer authorizes a series of payments with a single EIP-712 signature.
 
 See [Recurring Payments](/api-features/recurring-payments) for the full lifecycle (create, authorize, monitor, manage).
 
@@ -111,9 +111,10 @@ See [Recurring Payments](/api-features/recurring-payments) for the full lifecycl
 | Status | Meaning |
 |--------|---------|
 | `400` | Invalid request body — check required fields and currency IDs |
-| `401` | Authentication failed — verify your `x-api-key` header |
+| `401` | Authentication failed — verify your `x-client-id` header |
 | `404` | Request or recurring payment not found |
 | `429` | Rate limited — back off and retry |
+| `500` | Server error — safe to retry with exponential backoff |
 
 For batch payouts, a `400` may indicate that payments span multiple networks (all must be on the same chain).
 

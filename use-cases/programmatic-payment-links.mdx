@@ -31,9 +31,8 @@ You'll need:
 
 Use `POST /v2/secure-payments` to mint a link the customer pays into.
 
-<Tabs>
-<Tab title="TypeScript / Node.js">
-```typescript
+<CodeGroup>
+```typescript Node.js
 const response = await fetch("https://api.request.network/v2/secure-payments", {
   method: "POST",
   headers: {
@@ -56,9 +55,8 @@ const response = await fetch("https://api.request.network/v2/secure-payments", {
 const { securePaymentUrl, requestIds, token } = await response.json();
 // Send securePaymentUrl to the customer (redirect, email, etc.)
 ```
-</Tab>
-<Tab title="Python">
-```python
+
+```python Python
 import os
 import requests
 
@@ -87,9 +85,8 @@ response = requests.post(
 data = response.json()
 secure_payment_url = data["securePaymentUrl"]
 ```
-</Tab>
-<Tab title="cURL">
-```bash
+
+```curl cURL
 curl -X POST "https://api.request.network/v2/secure-payments" \
   -H "Content-Type: application/json" \
   -H "x-client-id: $RN_CLIENT_ID" \
@@ -104,8 +101,7 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
     "payerIdentifier": "alice@example.com"
   }'
 ```
-</Tab>
-</Tabs>
+</CodeGroup>
 
 The response includes `securePaymentUrl` — share it with the customer. They open it on `pay.request.network`, connect a wallet, and pay.
 
@@ -114,7 +110,7 @@ The response includes `securePaymentUrl` — share it with the customer. They op
 Pass `redirectUrl` (and optionally `redirectLabel`) when creating the payment link. After a successful payment, the success screen renders a button that opens your URL — the payer clicks it to return to your site. There is no auto-redirect; the button is an explicit user action.
 
 ```typescript
-await fetch("https://api.request.network/v2/secure-payments", {
+const response = await fetch("https://api.request.network/v2/secure-payments", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -127,6 +123,9 @@ await fetch("https://api.request.network/v2/secure-payments", {
     redirectLabel: "Back to your order",
   }),
 });
+
+const { securePaymentUrl } = await response.json();
+// Send securePaymentUrl to the customer (redirect, email, etc.)
 ```
 
 **Validation rules:**
@@ -247,9 +246,11 @@ app.use(
       .update(req.body)
       .digest("hex");
 
+    const sigBuf = Buffer.from(signature, "hex");
+    const expBuf = Buffer.from(expected, "hex");
     const ok =
-      signature.length === expected.length &&
-      timingSafeEqual(Buffer.from(signature, "hex"), Buffer.from(expected, "hex"));
+      sigBuf.length === expBuf.length &&
+      timingSafeEqual(sigBuf, expBuf);
 
     if (!ok) return res.status(401).send("invalid signature");
 

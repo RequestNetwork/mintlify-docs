@@ -168,7 +168,7 @@ Sign in to the [Request Dashboard](https://dashboard.request.network) with your 
 
 ```
 // .env
-RN_API_KEY=<insert-your-client-id>
+RN_CLIENT_ID=<insert-your-client-id>
 RN_API_URL=https://api.request.network/v2 
 ```
 
@@ -182,6 +182,7 @@ import 'dotenv/config';
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import { db } from './db';
 import { payments } from './db/schema';
+import { eq } from 'drizzle-orm';
 
 const fastify = Fastify({
   logger: true
@@ -211,7 +212,7 @@ fastify.post('/payments', async (request: FastifyRequest<{ Body: PaymentBody }>,
     const response = await fetch(`${process.env.RN_API_URL}/payouts`, {
       method: 'POST',
       headers: {
-        'X-Api-Key': process.env.RN_API_KEY,
+        'x-client-id': process.env.RN_CLIENT_ID,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -457,7 +458,7 @@ Next up, register the webhook via the Auth API. The URL is the ngrok URL from ab
 ```bash
 curl -X POST "https://auth.request.network/v1/webhook" \
   -H "Content-Type: application/json" \
-  -H "x-client-id: $RN_API_KEY" \
+  -H "x-client-id: $RN_CLIENT_ID" \
   -d '{ "url": "https://34c701d1d7f9.ngrok-free.app/webhooks" }'
 ```
 
@@ -465,7 +466,7 @@ The response includes a one-time `secret` value — copy it and add to your `.en
 
 ```
 // .env
-RN_API_KEY=<YOUR_API_KEY>
+RN_CLIENT_ID=<YOUR_CLIENT_ID>
 RN_API_URL=https://api.request.network/v2
 RN_WEBHOOK_SECRET=<THE_SECRET_WE_JUST_CREATED>
 ```
@@ -475,7 +476,7 @@ If you want to test it out, fire a test delivery and observe your server's logs:
 ```bash
 curl -X POST "https://auth.request.network/v1/webhook/test" \
   -H "Content-Type: application/json" \
-  -H "x-client-id: $RN_API_KEY" \
+  -H "x-client-id: $RN_CLIENT_ID" \
   -d '{ "eventType": "payment.confirmed" }'
 ```
 
@@ -1503,6 +1504,6 @@ We recommend using two different Metamask accounts you own. That way you will be
 <img src="/images/api-setup/integration-tutorial/payment-confirmed.webp" alt="Payment confirmed" />
 </Frame>
 
-This is it, you have succesfully built a basic application integrating our API to move actual test funds between two wallets.
+This is it, you have successfully built a basic application integrating our API to move actual test funds between two wallets.
 
 **Happy building** 🎉
