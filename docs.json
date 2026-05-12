@@ -51,10 +51,7 @@
             "pages": [
               "use-cases/payment-detection",
               "use-cases/invoicing",
-              "use-cases/payouts",
-              "use-cases/payroll",
-              "use-cases/checkout",
-              "use-cases/subscriptions"
+              "use-cases/checkout"
             ]
           }
         ]
@@ -176,19 +173,6 @@
             "group": "🔧 SDK Documentation",
             "pages": [
               "sdk-legacy/overview"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Release Notes",
-        "groups": [
-          {
-            "group": "📋 Release Notes",
-            "pages": [
-              "release-notes/index",
-              "release-notes/request-api",
-              "release-notes/easy-invoice"
             ]
           }
         ]
