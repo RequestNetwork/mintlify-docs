@@ -1,0 +1,54 @@
+---
+title: "Endpoints Overview"
+description: "Quick index of v2 endpoint groups"
+---
+
+## Overview
+
+Use this page as the index for v2 endpoints in the docs-integrated OpenAPI reference.
+
+## v2 Endpoint Groups
+
+<CardGroup cols={2}>
+  <Card title="Requests" href="/api-reference/request/create-a-new-request-1" icon="file-invoice">
+    v2 request endpoints for create, status, pay calldata, and routes.
+  </Card>
+
+  <Card title="Payouts" href="/api-reference/endpoints" icon="paper-plane">
+    v2 payout endpoints for direct, batch, and recurring operations.
+  </Card>
+
+  <Card title="Payments" href="/api-reference/endpoints" icon="magnifying-glass">
+    v2 payment search endpoint for reconciliation and reporting.
+  </Card>
+
+  <Card title="Payer / Compliance" href="/api-reference/endpoints" icon="shield-check">
+    v2 payer endpoints for KYC, agreement, and payment details.
+  </Card>
+</CardGroup>
+
+## Requests (v2)
+
+- [v2 Request endpoints](https://api.request.network/open-api/#tag/v2request)
+- [POST /v2/request](https://api.request.network/open-api/#tag/v2request/POST/v2/request)
+- [GET /v2/request/{requestId}](https://api.request.network/open-api/#tag/v2request/GET/v2/request/%7BrequestId%7D)
+- [GET /v2/request/{requestId}/pay](https://api.request.network/open-api/#tag/v2request/GET/v2/request/%7BrequestId%7D/pay)
+- [GET /v2/request/{requestId}/routes](https://api.request.network/open-api/#tag/v2request/GET/v2/request/%7BrequestId%7D/routes)
+
+## Payouts (v2)
+
+- [v2 Payout endpoints](https://api.request.network/open-api/#tag/v2payouts)
+- [POST /v2/payouts](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts)
+- [POST /v2/payouts/batch](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts/batch)
+- [POST /v2/payouts/recurring/{id}](https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts/recurring/%7Bid%7D)
+
+## Payments (v2)
+
+- [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments)
+
+## Payer / Compliance (v2)
+
+- [v2 Payer endpoints](https://api.request.network/open-api/#tag/v2payer)
+- [POST /v2/payer](https://api.request.network/open-api/#tag/v2payer/POST/v2/payer)
+- [GET /v2/payer/{clientUserId}](https://api.request.network/open-api/#tag/v2payer/GET/v2/payer/%7BclientUserId%7D)
+- [PATCH /v2/payer/{clientUserId}](https://api.request.network/open-api/#tag/v2payer/PATCH/v2/payer/%7BclientUserId%7D)
