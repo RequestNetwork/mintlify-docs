@@ -3,88 +3,114 @@ title: "Query Payments"
 description: "Advanced payment search and filtering with the GET /payments endpoint"
 ---
 
-<Warning>
-**AI-Generated Content** – This page was generated with AI assistance and may contain inaccuracies. While likely close to accurate, please verify critical details with the [stable documentation](https://docs.request.network) or [contact support](https://github.com/orgs/RequestNetwork/discussions).
-</Warning>
-
 ## Overview
 
-The GET /payments endpoint provides comprehensive payment search and filtering capabilities, enabling detailed payment history analysis and transaction monitoring.
+Use [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments) to search payments with filters such as transaction hash, wallet, request identifiers, currency, type, and date range.
 
-## Endpoint Features
+This endpoint is designed for wallet-level reconciliation, payment history search, and operational reporting.
 
-<CardGroup cols={2}>
-  <Card title="Advanced Filtering" icon="filter">
-    Multiple search criteria
-  </Card>
-  
-  <Card title="Pagination" icon="list">
-    Large dataset management
-  </Card>
-</CardGroup>
+## Core Endpoint
+
+- [GET /v2/payments](https://api.request.network/open-api/#tag/v2payments/GET/v2/payments)
 
 ## How It Works
 
-```mermaid
-graph LR
-    A[Query Parameters] --> B[Filter Payments]
-    B --> C[Sort Results]
-    C --> D[Paginate Response]
-    D --> E[Return Data]
-```
+<Steps>
+<Step title="Provide at least one search parameter">
+`GET /v2/payments` requires at least one of these filters:
 
-**Search Process:**
-1. **Filter:** Apply search criteria
-2. **Sort:** Order by date, amount, or status
-3. **Paginate:** Handle large result sets
-4. **Return:** Structured payment data
+- `txHash`
+- `walletAddress`
+- `paymentReference`
+- `requestId`
+- `reference`
+- `type`
+- `invoiceCurrency`
+- `paymentCurrency`
+
+If none are provided, validation fails.
+</Step>
+
+<Step title="Add optional filters for precision">
+Optional filters include:
+
+- `fromDate`, `toDate` (ISO 8601 UTC)
+- `limit`, `offset`
+
+Date ranges are validated (`toDate` must be after or equal to `fromDate`).
+</Step>
+
+<Step title="Read payments and pagination">
+The response returns:
+
+- `payments` array with payment and request-linked metadata
+- `pagination.total`
+- `pagination.limit`
+- `pagination.offset`
+- `pagination.hasMore`
+</Step>
+</Steps>
 
 ## Filter Options
 
-### Basic Filters
-- **Date Range:** Start and end dates
-- **Amount Range:** Minimum and maximum amounts
-- **Currency:** Specific token or fiat currency
-- **Status:** Payment completion state
+### Identity and Transaction Filters
+- `txHash`: find payments by blockchain transaction hash
+- `walletAddress`: find payments where wallet is payer or payee
+- `paymentReference`: search by payment reference
+- `requestId`: search by specific request ID
+- `reference`: search by merchant reference
 
-### Advanced Filters
-- **Payer Address:** Filter by payment sender
-- **Payee Address:** Filter by payment recipient
-- **Transaction Hash:** Specific transaction lookup
-- **Request ID:** Payments for specific requests
+### Type and Currency Filters
+- `type`: `direct`, `conversion`, `crosschain`, `recurring`
+- `invoiceCurrency`
+- `paymentCurrency`
 
-## Network Filtering
+### Time and Pagination
+- `fromDate`, `toDate`
+- `limit`, `offset`
 
 <CardGroup cols={2}>
-  <Card title="Single Network" icon="link">
-    Payments on specific blockchain
+  <Card title="High-precision Search" icon="filter">
+    Combine request, wallet, currency, and date filters for targeted reconciliation queries.
   </Card>
   
-  <Card title="Multi-Network" icon="network-wired">
-    Crosschain payment search
+  <Card title="Pagination at Scale" icon="list">
+    Use `limit`/`offset` and `hasMore` to process large result sets safely.
   </Card>
 </CardGroup>
 
-### Supported Networks
-Filter payments across Ethereum, Polygon, Arbitrum, BSC, and other supported networks.
-
 ## Response Data
 
-### Payment Information
-- **Basic Details:** Amount, currency, timestamp
-- **Network Data:** Blockchain, transaction hash, block number
-- **Participants:** Payer and payee addresses
-- **Status:** Confirmation state and payment completion
+Common fields include payment-level data and linked request metadata:
 
-### Enhanced Data
-- **Fee Breakdowns:** Detailed fee structure with USD amounts
-- **Exchange Rates:** Historical conversion rates
-- **Gas Costs:** Transaction fee information
+- payment identifiers and transaction hashes
+- source/destination network and amounts
+- payment type and currency fields
+- fee objects
+- linked request information (`requestId`, `paymentReference`, `hasBeenPaid`, optional `customerInfo`, `reference`)
 
-## Pagination
+## Practical Notes
 
-Handle large datasets with cursor-based pagination for optimal performance.
+- Search parameters are combined with AND semantics.
+- Searching by `txHash` or `walletAddress` can return multiple rows from batch transactions.
+- Keep your reconciliation workers idempotent in case the same payment appears across repeated queries.
 
-## Implementation Details
+## Related Pages
 
-See [API Reference - GET /payments](/api-reference/endpoints/get-payments) for complete technical documentation.
+<CardGroup cols={3}>
+  <Card title="Query Requests" href="/api-features/query-requests">
+    Read request-level status and metadata.
+  </Card>
+
+  <Card title="Payment Detection" href="/api-features/payment-detection">
+    Understand automatic detection and payment matching.
+  </Card>
+
+  <Card title="Webhooks & Events" href="/api-features/webhooks-events">
+    Build real-time event-driven reconciliation.
+  </Card>
+</CardGroup>
+
+## API Reference
+
+For full schemas and examples, see [Request Network API Reference](https://api.request.network/open-api).
