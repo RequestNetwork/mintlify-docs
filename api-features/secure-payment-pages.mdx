@@ -58,6 +58,30 @@ See [Authentication](/api-reference/authentication) for implementation options.
   Create a secure payment entry and return a hosted secure payment URL. View the complete endpoint documentation with request/response schemas and examples.
 </Card>
 
+## Crosschain Support
+
+Secure payment pages support crosschain payments. When a payer connects their wallet, the page fetches balance information across supported chains via the `paymentOptions` field. The payer can select which chain and token to pay from, and the page fetches executable calldata for the selected route.
+
+**Supported crosschain currencies:** USDC, USDT
+
+**Supported crosschain chains:** Ethereum, Arbitrum, Base, OP Mainnet
+
+See [Crosschain Payments](/api-features/crosschain-payments) for details on crosschain routing via LiFi.
+
+## Smart Account Payments
+
+The secure payment page supports gas-sponsored payments via [Alchemy Account Kit](https://accountkit.alchemy.com/) smart accounts (ERC-4337). When available, payers can use a smart account to execute payments without paying gas fees.
+
+**How it works:**
+
+1. The payer approves a spending cap from their EOA wallet to the smart account
+2. The smart account batches the `transferFrom` (EOA to smart account) and the payment transaction into a single UserOperation
+3. Gas is sponsored via an Alchemy gas policy — the payer pays zero gas
+
+<Info>
+Smart account payments are a client-side feature of the hosted secure payment page. There is no separate API for smart accounts — the same `GET /v2/secure-payments/:token/pay` endpoint provides the transaction calldata.
+</Info>
+
 ## Status outcomes
 
 - `200`: token is valid and payable

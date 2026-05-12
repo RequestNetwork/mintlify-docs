@@ -55,7 +55,7 @@ For setup details, see:
       "requestIds": [
         "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"
       ],
-      "securePaymentUrl": "https://secure.request.network/?token=01ABC123DEF456GHI789JKL",
+      "securePaymentUrl": "https://pay.request.network/?token=01ABC123DEF456GHI789JKL",
       "token": "01ABC123DEF456GHI789JKL"
     }
     ```
@@ -210,6 +210,35 @@ app.post("/webhooks/request", async (req, res) => {
   return res.status(200).json({ received: true });
 });
 ```
+
+## Using destination IDs
+
+Instead of specifying `payee`, `invoiceCurrency`, and `paymentCurrency` separately, you can use a `destinationId` that encodes all three in a single ERC-7828 composite ID:
+
+```json
+{
+  "requests": [
+    {
+      "destinationId": "0x6923...C7D7@eip155:8453#ABCD1234:0x8335...2913",
+      "amount": "10"
+    }
+  ]
+}
+```
+
+When using a Client ID bound to a [payee destination](/api-features/payee-destinations), the `destinationId` can be omitted entirely — the API resolves it from the Client ID configuration.
+
+## Crosschain payments on secure pages
+
+Secure payment pages support crosschain payments automatically. When the payer connects a wallet, the page checks balances across supported chains and shows payment options. The payer selects a route, and the page handles the rest.
+
+The two-endpoint flow is:
+1. `GET /v2/secure-payments/:token` — returns metadata and `paymentOptions` with balance info per chain
+2. `GET /v2/secure-payments/:token/pay?wallet=&chain=&token=` — returns executable calldata for the selected route
+
+For crosschain tracking, after the payer broadcasts the source-chain transaction, the page calls `POST /v2/secure-payments/:token/intent` with the transaction hash.
+
+See the [Secure Payments API Reference](/api-reference/secure-payments) for full endpoint details.
 
 ## Expiry handling
 

@@ -61,6 +61,7 @@
               "api-setup/getting-started",
               "api-setup/integration-tutorial",
               "request-network-api/api-portal-manage-api-keys-and-webhooks",
+              "api-features/client-id-management",
               "api-setup/migrate-to-v2"
             ]
           },
@@ -96,11 +97,23 @@
                 ]
               },
               {
+                "group": "Payee Destinations",
+                "pages": [
+                  "api-features/payee-destinations"
+                ]
+              },
+              {
                 "group": "Secure Payment Pages",
                 "pages": [
                   "api-features/secure-payment-pages",
                   "api-features/secure-payment-integration-guide",
                   "api-features/secure-payment-supported-networks-and-currencies"
+                ]
+              },
+              {
+                "group": "Payouts",
+                "pages": [
+                  "api-features/payouts"
                 ]
               },
               {
@@ -110,6 +123,12 @@
                   "api-features/protocol-fees",
                   "api-features/fee-breakdowns"
                 ]
+              },
+              {
+                "group": "Advanced",
+                "pages": [
+                  "api-features/commerce-payments"
+                ]
               }
             ]
           },
@@ -117,6 +136,7 @@
             "group": "📚 API Reference",
             "pages": [
               "api-reference/authentication",
+              "api-reference/wallet-authentication",
               "api-reference/secure-payments",
               "api-reference/webhooks",
               {
