@@ -79,7 +79,7 @@ sequenceDiagram
     App->>Blockchain: Submit payment transaction
 
     Request Network API->>Request Network API: Payment detected, stop listening {paymentReference}
-    Request Network API->>App: POST <webhook url> {"payment.confirmed", requestId, paymentReference, request scan link, timestamp}
+    Request Network API->>App: POST <webhook url> {"payment.confirmed", requestId, paymentReference, explorer link, timestamp}
     App-->>User: Payment Complete
 ```
 
@@ -143,12 +143,12 @@ For a complete working example, see the [Integration Tutorial](/api-setup/integr
 ## Used In
 
 <CardGroup cols={2}>
-  <Card title="Invoicing" href="/use-cases/invoicing">
-    Business invoice generation
+  <Card title="No-code payment links" href="/use-cases/no-code-payment-links">
+    Business invoice generation via the Dashboard
   </Card>
   
-  <Card title="Checkout" href="/use-cases/checkout">
-    Payment collection at checkout
+  <Card title="Programmatic payment links" href="/use-cases/programmatic-payment-links">
+    Payment collection at checkout via the API
   </Card>
 
   <Card title="Integration Tutorial" href="/api-setup/integration-tutorial">
