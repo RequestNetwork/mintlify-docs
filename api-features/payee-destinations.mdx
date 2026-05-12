@@ -93,6 +93,16 @@ ERC20 token contract address (EVM `0x...` or Tron `T...` format).
 Chain ID for the receiving network (e.g., `8453` for Base, `1` for Ethereum).
 </ParamField>
 
+<ParamField body="accessPolicy" type="object">
+Optional KYT (Know Your Transaction) compliance policy applied to payments into this destination. When set, every payer wallet that connects to a payment link backed by this destination is screened before the payment can proceed. See [Compliance-gated payments](/use-cases/compliance-gated-payments) for the full guide.
+
+| Sub-field | Type | Description |
+| --- | --- | --- |
+| `mode` | `"off"` \| `"kyt_all_wallets"` | `off` (default): no screening. `kyt_all_wallets`: every payer wallet is screened. |
+| `hideUntilApproved` | `boolean` | When `true`, payment metadata is hidden in the payer UI until the wallet passes screening. |
+| `hidePayeeAddress` | `boolean` | When `true`, the payee address is masked in the payer UI (no copy / no explorer link). |
+</ParamField>
+
 ```json Response (201)
 {
   "id": "01HXEXAMPLE123",
@@ -100,6 +110,11 @@ Chain ID for the receiving network (e.g., `8453` for Base, `1` for Ethereum).
   "walletAddress": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
   "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   "chainId": 8453,
+  "accessPolicy": {
+    "mode": "kyt_all_wallets",
+    "hideUntilApproved": true,
+    "hidePayeeAddress": true
+  },
   "binaryInteropAddress": "0x...",
   "humanReadableInteropAddress": "0x6923...C7D7@eip155:8453#ABCD1234",
   "claimed": true,

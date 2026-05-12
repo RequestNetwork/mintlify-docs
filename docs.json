@@ -49,7 +49,8 @@
               "use-cases/programmatic-payment-links",
               "use-cases/multi-chain-checkout",
               "use-cases/batch-payouts",
-              "use-cases/webhook-reconciliation"
+              "use-cases/webhook-reconciliation",
+              "use-cases/compliance-gated-payments"
             ]
           }
         ]
