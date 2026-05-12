@@ -1,0 +1,227 @@
+---
+title: "Webhook reconciliation"
+description: "Real-time payment notifications wired into your accounting, fulfillment, and order systems. The reliable way to detect payments without polling."
+---
+
+## What you'll build
+
+A webhook handler that receives signed payment events from Request Network, verifies the signature, and triggers your downstream systems — order fulfillment, invoice closeout, accounting entries, customer email. Polling-free, idempotent, retry-safe.
+
+**Audience:** any backend integrating Request Network where payment events drive state changes downstream.
+
+## The 12 events
+
+| Category | Event | When it fires |
+| --- | --- | --- |
+| Payment (core) | `payment.confirmed` | Payment fully settled on-chain |
+| | `payment.partial` | Partial payment received, more expected |
+| | `payment.failed` | Payment execution failed (recurring, cross-chain) |
+| | `payment.refunded` | Payment refunded to payer |
+| Payment (Client ID) | `payment.confirmed.client_id` | Same as `payment.confirmed`, request was created via Client ID — payload includes `clientId` and `origin` |
+| | `payment.partial.client_id` | Client ID-scoped partial |
+| Payment (Checkout) | `payment.confirmed.checkout` | Same as `payment.confirmed`, request originated from a Secure Payment link |
+| | `payment.partial.checkout` | Secure Payment-scoped partial |
+| Processing | `payment.processing` | Crypto-to-fiat offramp in progress (with detailed `subStatus`) |
+| Request | `request.recurring` | A new recurring billing cycle fired |
+| Compliance | `compliance.updated` | KYC or agreement status changed |
+| Bank details | `payment_detail.updated` | Bank account verification status changed |
+
+For the full payload schemas, see the [Webhooks reference](/api-reference/webhooks).
+
+## Setup
+
+<Steps>
+  <Step title="Get a Client ID">
+    Complete steps 1–3 of the [Quickstart](/use-cases/quickstart). Note your `clientId`.
+  </Step>
+
+  <Step title="Register your webhook URL">
+    `POST https://auth.request.network/v1/webhook` with header `x-client-id: <yours>` and body `{ "url": "https://yourapp.com/webhooks/request-network" }`.
+
+    Save the returned `secret` immediately — it's only shown once.
+  </Step>
+
+  <Step title="Test delivery">
+    Fire a test event from the [auth API docs](https://auth.request.network/open-api/#tag/webhook/POST/v1/webhook/test) with body `{ "eventType": "payment.confirmed" }`. The request will arrive with header `x-request-network-test: true`.
+  </Step>
+</Steps>
+
+## Handler — reference implementation
+
+A signature-verifying Express handler with idempotency. Hardened for production: verifies against the **raw** body, uses constant-time comparison, deduplicates on `x-request-network-delivery`.
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+import express from "express";
+import { Redis } from "ioredis";
+
+const app = express();
+const redis = new Redis(process.env.REDIS_URL!);
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET!;
+
+app.post(
+  "/webhooks/request-network",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const signature = req.headers["x-request-network-signature"] as string;
+    const deliveryId = req.headers["x-request-network-delivery"] as string;
+    const isTest = req.headers["x-request-network-test"] === "true";
+
+    if (!signature || !deliveryId) {
+      return res.status(400).send("missing headers");
+    }
+
+    // 1. Verify signature against the RAW body — never re-stringify
+    const expected = createHmac("sha256", WEBHOOK_SECRET)
+      .update(req.body)
+      .digest("hex");
+
+    const sigBuf = Buffer.from(signature, "hex");
+    const expBuf = Buffer.from(expected, "hex");
+
+    if (
+      sigBuf.length !== expBuf.length ||
+      !timingSafeEqual(sigBuf, expBuf)
+    ) {
+      return res.status(401).send("invalid signature");
+    }
+
+    // 2. Idempotency: dedupe on delivery ID
+    const claim = await redis.set(
+      `webhook:${deliveryId}`,
+      "1",
+      "EX",
+      86400, // 24h
+      "NX",
+    );
+    if (!claim && !isTest) {
+      return res.status(200).send("duplicate, ignored");
+    }
+
+    // 3. Parse and route
+    const event = JSON.parse(req.body.toString("utf8"));
+
+    try {
+      await handleEvent(event);
+    } catch (err) {
+      // Return non-2xx to trigger retry (1s, 5s, 15s — up to 3 retries)
+      console.error("handler failed", err);
+      return res.status(500).send("handler error");
+    }
+
+    res.status(200).send("ok");
+  },
+);
+
+async function handleEvent(event: any) {
+  switch (event.event) {
+    case "payment.confirmed":
+    case "payment.confirmed.client_id":
+    case "payment.confirmed.checkout":
+      await markOrderPaid(event.requestId, event.txHash);
+      break;
+
+    case "payment.partial":
+    case "payment.partial.client_id":
+    case "payment.partial.checkout":
+      await recordPartialPayment(
+        event.requestId,
+        event.amount,
+        event.totalAmountPaid,
+      );
+      break;
+
+    case "payment.failed":
+      await flagFailedPayment(event.requestId);
+      break;
+
+    case "request.recurring":
+      await onRecurringInvoice(event.originalRequestId, event.requestId);
+      break;
+
+    case "compliance.updated":
+      await syncKycStatus(event.clientUserId, event.kycStatus);
+      break;
+
+    // ... others
+  }
+}
+```
+
+## Headers reference
+
+| Header | Description |
+| --- | --- |
+| `x-request-network-signature` | HMAC-SHA256 of the raw JSON body, hex-encoded |
+| `x-request-network-delivery` | ULID — use as idempotency key |
+| `x-request-network-retry-count` | `0`–`3`, current retry attempt |
+| `x-request-network-test` | `true` only for `/v1/webhook/test` deliveries |
+
+## Retry policy
+
+| Attempt | Delay | Cumulative time |
+| --- | --- | --- |
+| 0 (initial) | — | t=0 |
+| 1 | 1s | t+1s |
+| 2 | 5s | t+6s |
+| 3 | 15s | t+21s |
+
+After 4 total attempts (initial + 3 retries) the delivery is dropped. Triggers: any non-2xx response, timeout, connection error. Default request timeout is 5s.
+
+## Common patterns
+
+### Idempotency
+
+The same `payment.confirmed` event might arrive twice (network blip, retry overlap). Dedupe on `x-request-network-delivery`.
+
+### Routing by Client ID
+
+If your platform has many merchants, give each their own Client ID. The webhook payload includes `clientId` so you can route events to the right tenant.
+
+```typescript
+async function markOrderPaid(requestId: string, txHash: string) {
+  const order = await db.orders.findOne({ where: { requestId } });
+  if (!order) return; // not ours
+  await db.orders.update({ where: { id: order.id }, data: { paidAt: new Date(), txHash } });
+}
+```
+
+### Slack alerts on failure
+
+```typescript
+case "payment.failed":
+  await fetch(SLACK_WEBHOOK, {
+    method: "POST",
+    body: JSON.stringify({
+      text: `:warning: Payment failed for request ${event.requestId}`,
+    }),
+  });
+  break;
+```
+
+### Crypto-to-fiat status tracking
+
+The `payment.processing` event includes a `subStatus` field that progresses through `initiated → pending_internal_assessment → ongoing_checks → sending_fiat → fiat_sent`. Surface this in your UI so the payee sees real-time offramp progress.
+
+## Local development
+
+Use [ngrok](https://ngrok.com) to expose localhost during development:
+
+```bash
+ngrok http 3000
+# Copy the https://xxxxx.ngrok-free.app URL into the Dashboard webhook field
+```
+
+Local URLs (`localhost`, `127.0.0.1`) are accepted by the auth API for testing. HTTPS is required in production.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Webhooks reference" href="/api-reference/webhooks" icon="webhook">
+    Full payload schemas for every event type.
+  </Card>
+
+  <Card title="Webhooks & Events" href="/api-features/webhooks-events" icon="bell">
+    High-level concepts and event categories.
+  </Card>
+</CardGroup>

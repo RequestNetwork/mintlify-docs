@@ -38,7 +38,18 @@
           {
             "group": "🚀 Get Started",
             "pages": [
-              "use-cases/welcome"
+              "use-cases/welcome",
+              "use-cases/quickstart"
+            ]
+          },
+          {
+            "group": "🎯 Use Cases",
+            "pages": [
+              "use-cases/no-code-payment-links",
+              "use-cases/programmatic-payment-links",
+              "use-cases/multi-chain-checkout",
+              "use-cases/batch-payouts",
+              "use-cases/webhook-reconciliation"
             ]
           }
         ]
@@ -51,6 +62,7 @@
             "pages": [
               "api-setup/getting-started",
               "api-setup/integration-tutorial",
+              "tools/dashboard",
               "api-features/client-id-management"
             ]
           },
@@ -147,6 +159,13 @@
             "pages": [
               "resources/supported-chains-and-currencies",
               "resources/token-list"
+            ]
+          },
+          {
+            "group": "🛠️ Tools",
+            "pages": [
+              "tools/dashboard",
+              "tools/secure-payments"
             ]
           },
           {

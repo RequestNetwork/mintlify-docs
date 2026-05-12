@@ -1,0 +1,259 @@
+---
+title: "Programmatic payment links"
+description: "Generate Secure Payment links on demand from your backend. Best for e-commerce, marketplaces, SaaS, and any app that bills programmatically."
+---
+
+## What you'll build
+
+A backend that creates a Secure Payment link in response to your app's events — a customer hitting checkout, an invoice being approved, a subscription renewing. The customer opens the link, pays from any chain/token in any supported wallet, and your webhook fires when the payment confirms.
+
+**Audience:** developers integrating Request Network into an e-commerce app, marketplace, SaaS, or accounting product.
+
+**Apps used:**
+- [Auth API](https://auth.request.network/open-api) — Client IDs, webhooks
+- [Request API](https://api.request.network/open-api) — `POST /v2/secure-payments` and `POST /v2/secure-payments/payouts`
+- [Secure Payment](https://pay.request.network) — what your customer sees when they open the link
+
+## Prerequisites
+
+Complete steps 1–4 of the [Quickstart](/use-cases/quickstart):
+1. Sign in to the Dashboard with your wallet
+2. Create a payment destination
+3. Create a Client ID (with allowed domains for browser apps, empty for backend-only)
+4. Register a webhook URL pointing at your handler
+
+You'll need:
+- `clientId` — passed as `x-client-id` on every API call
+- `destinationId` — composite ID combining `humanReadableInteropAddress` + `tokenAddress`
+- Webhook signing secret — for verifying webhook payloads
+
+## Create an incoming payment link
+
+Use `POST /v2/secure-payments` to mint a link the customer pays into.
+
+<Tabs>
+<Tab title="TypeScript / Node.js">
+```typescript
+const response = await fetch("https://api.request.network/v2/secure-payments", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-client-id": process.env.RN_CLIENT_ID!,
+  },
+  body: JSON.stringify({
+    requests: [
+      {
+        destinationId:
+          "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:8453#ABCD1234:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        amount: "100",
+      },
+    ],
+    reference: order.id,
+    payerIdentifier: customer.email,
+  }),
+});
+
+const { securePaymentUrl, requestIds, token } = await response.json();
+// Send securePaymentUrl to the customer (redirect, email, etc.)
+```
+</Tab>
+<Tab title="Python">
+```python
+import os
+import requests
+
+response = requests.post(
+    "https://api.request.network/v2/secure-payments",
+    headers={
+        "Content-Type": "application/json",
+        "x-client-id": os.environ["RN_CLIENT_ID"],
+    },
+    json={
+        "requests": [
+            {
+                "destinationId": (
+                    "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7"
+                    "@eip155:8453#ABCD1234:"
+                    "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+                ),
+                "amount": "100",
+            }
+        ],
+        "reference": order.id,
+        "payerIdentifier": customer.email,
+    },
+)
+
+data = response.json()
+secure_payment_url = data["securePaymentUrl"]
+```
+</Tab>
+<Tab title="cURL">
+```bash
+curl -X POST "https://api.request.network/v2/secure-payments" \
+  -H "Content-Type: application/json" \
+  -H "x-client-id: $RN_CLIENT_ID" \
+  -d '{
+    "requests": [
+      {
+        "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:8453#ABCD1234:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "amount": "100"
+      }
+    ],
+    "reference": "ORDER-2026-042",
+    "payerIdentifier": "alice@example.com"
+  }'
+```
+</Tab>
+</Tabs>
+
+The response includes `securePaymentUrl` — share it with the customer. They open it on `pay.request.network`, connect a wallet, and pay.
+
+## EVM and Tron destinations side-by-side
+
+Tron is a drop-in replacement for any EVM destination as long as you submit a single recipient per call. The shape is identical; only the `destinationId` and addresses change format.
+
+<Tabs>
+<Tab title="EVM (USDC on Base)">
+```json
+{
+  "requests": [
+    {
+      "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:8453#ABCD1234:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "amount": "100"
+    }
+  ]
+}
+```
+</Tab>
+<Tab title="Tron (USDT on Tron)">
+```json
+{
+  "requests": [
+    {
+      "destinationId": "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8@eip155:728126428#5F89A3B2:TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+      "amount": "100"
+    }
+  ]
+}
+```
+</Tab>
+</Tabs>
+
+<Warning>
+Submitting multiple `requests[]` items where any destination is on Tron returns a 400 with `Batch payments are not supported for TRON networks. Please submit individual payment requests.` See [Batch payouts](/use-cases/batch-payouts) for the EVM-only batch flow.
+</Warning>
+
+## Send a payout link (outgoing)
+
+To *pay* someone (a contractor, vendor, refund recipient) via a hosted link they open and sign, use `POST /v2/secure-payments/payouts`. Same shape, single recipient, EVM or Tron.
+
+<Tabs>
+<Tab title="EVM payout">
+```typescript
+const response = await fetch(
+  "https://api.request.network/v2/secure-payments/payouts",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-client-id": process.env.RN_CLIENT_ID!,
+    },
+    body: JSON.stringify({
+      recipient: "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+      creatorWalletAddress: process.env.PAYOUT_WALLET!,
+      network: "base",
+      currency: "USDC-base",
+      amount: "250",
+      reference: "INVOICE-2026-042",
+    }),
+  },
+);
+
+const { securePaymentUrl } = await response.json();
+```
+</Tab>
+<Tab title="Tron payout">
+```typescript
+const response = await fetch(
+  "https://api.request.network/v2/secure-payments/payouts",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-client-id": process.env.RN_CLIENT_ID!,
+    },
+    body: JSON.stringify({
+      recipient: "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
+      creatorWalletAddress: process.env.PAYOUT_WALLET_TRON!,
+      network: "tron",
+      currency: "USDT-tron",
+      amount: "250",
+      reference: "INVOICE-2026-042",
+    }),
+  },
+);
+```
+</Tab>
+</Tabs>
+
+The hosted URL the response returns is opened by *you* (or whoever signs payouts). The signer's wallet must match `creatorWalletAddress`.
+
+## Receive payment notifications
+
+Your webhook endpoint receives signed POSTs as the payment lifecycle progresses. Verify the HMAC-SHA256 signature against your webhook secret before parsing the body.
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+import express from "express";
+
+const app = express();
+
+// Capture raw body for signature verification
+app.use(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    const signature = req.headers["x-request-network-signature"] as string;
+    const expected = createHmac("sha256", process.env.WEBHOOK_SECRET!)
+      .update(req.body)
+      .digest("hex");
+
+    const ok =
+      signature.length === expected.length &&
+      timingSafeEqual(Buffer.from(signature, "hex"), Buffer.from(expected, "hex"));
+
+    if (!ok) return res.status(401).send("invalid signature");
+
+    const event = JSON.parse(req.body.toString("utf8"));
+
+    if (event.event === "payment.confirmed") {
+      // Mark the order paid in your DB, fire fulfillment, etc.
+    }
+
+    res.status(200).send("ok");
+  },
+);
+```
+
+For the full webhook spec — all 12 events, retry policy, headers — see [Webhook reconciliation](/use-cases/webhook-reconciliation) and the [Webhooks reference](/api-reference/webhooks).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Multi-chain checkout" href="/use-cases/multi-chain-checkout" icon="shuffle">
+    What the customer sees when they pay across chains.
+  </Card>
+
+  <Card title="Batch payouts" href="/use-cases/batch-payouts" icon="layer-group">
+    Pay many EVM recipients in one signed transaction.
+  </Card>
+
+  <Card title="Webhook reconciliation" href="/use-cases/webhook-reconciliation" icon="webhook">
+    The reliable, signature-verified way to detect payments.
+  </Card>
+
+  <Card title="Secure Payments reference" href="/api-reference/secure-payments" icon="lock">
+    Full request/response schemas for every endpoint.
+  </Card>
+</CardGroup>

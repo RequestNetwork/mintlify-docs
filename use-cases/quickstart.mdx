@@ -1,0 +1,477 @@
+---
+title: "Quickstart"
+description: "End-to-end walkthrough — sign in to the Dashboard, create a payment destination, register a webhook, and create a hosted payment link."
+---
+
+This guide walks through the canonical flow for receiving payments via Request Network: creating a payment destination and Client ID in the Dashboard, registering a webhook for payment notifications, and creating a payment link. Every other use-case page links back to specific steps here.
+
+## Overview
+
+The flow involves three services:
+
+1. **Dashboard** ([dashboard.request.network](https://dashboard.request.network)) — Sign in with your wallet, create payment destinations, and generate Client IDs
+2. **Auth API** ([auth.request.network](https://auth.request.network/open-api)) — Programmatic alternative for Client IDs, and the home of webhooks
+3. **Request API** ([api.request.network](https://api.request.network/open-api)) — Create payment links (secure payments)
+
+```
+┌──────────────────────┐
+│  1. Sign in with     │  dashboard.request.network
+│     wallet           │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  2. Create Payee     │  dashboard.request.network
+│     Destination      │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  3. Create Client ID │  dashboard.request.network
+│                      │  (or auth.request.network/open-api)
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  4. Register Webhook │  auth.request.network/open-api
+│                      │  (POST /v1/webhook with x-client-id)
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  5. Create Secure    │  api.request.network/open-api
+│     Payment (link)   │
+└──────────────────────┘
+```
+
+Your wallet session cookie (`session_token`) is shared across `dashboard.request.network`, `auth.request.network`, and `api.request.network` — so signing in once on the Dashboard gives you access to the API docs as well.
+
+## Prerequisites
+
+- An EVM wallet (e.g. MetaMask) **or** a Tron wallet (e.g. TronLink) that will receive payments
+- The ability to sign messages with that wallet
+
+## Step 1: Sign in with Your Wallet
+
+<Steps>
+  <Step title="Open the Dashboard">
+    Go to [dashboard.request.network](https://dashboard.request.network).
+  </Step>
+  <Step title="Connect and sign">
+    Connect your EVM or Tron wallet and sign the authentication message when prompted.
+  </Step>
+  <Step title="Active session">
+    Once signed in, you have an active wallet session. This sets a `session_token` cookie in your browser that is shared across Request Network services.
+  </Step>
+</Steps>
+
+<Note>
+Wallet sessions expire after 15 minutes of idle time. If your session expires during the following steps, return to the Dashboard and sign in again.
+</Note>
+
+## Step 2: Create a Payment Destination
+
+A payment destination registers where you want to receive payments — it links your wallet address to a specific token on a specific chain.
+
+<Steps>
+  <Step title="Navigate to setup">
+    In the Dashboard, navigate to the payment destination setup.
+  </Step>
+  <Step title="Pick chain and token">
+    Select the **chain** and **token** you want to receive payments in.
+  </Step>
+  <Step title="Confirm">
+    Confirm the creation.
+  </Step>
+</Steps>
+
+The Dashboard returns a **`destinationId`** (also shown as `humanReadableInteropAddress`). Save this value — you'll need it in Step 5.
+
+The `destinationId` follows the ERC-7828 format:
+
+```
+{walletAddress}@eip155:{chainId}#{checksum}
+```
+
+### Supported Chains and Tokens
+
+| Network | Chain ID | USDC | USDT |
+| --- | --- | --- | --- |
+| Ethereum | `1` | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | `0xdAC17F958D2ee523a2206206994597C13D831ec7` |
+| Arbitrum One | `42161` | `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` | `0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9` |
+| Optimism | `10` | `0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85` | `0x94b008aA00579c1307B0EF2c499aD98a8ce58e58` |
+| Base | `8453` | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | `0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2` |
+| Polygon | `137` | `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359` | `0xc2132D05D31c914a87C6611C10748AEb04B58e8F` |
+| BSC | `56` | `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` | `0x55d398326f99059ff775485246999027b3197955` |
+| **Tron** | `728126428` | `TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8` | `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` |
+
+**Testnet:**
+
+| Network | Chain ID | Tokens |
+| --- | --- | --- |
+| Sepolia | `11155111` | FAU: `0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C`, USDC: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`, USDT: `0xF046b3CA5ae2879c6bAcC4D42fAF363eE8379F78` |
+
+## Step 3: Create a Client ID
+
+A Client ID identifies your application and is required to create payment links and register webhooks.
+
+### Option A — Dashboard (recommended)
+
+<Steps>
+  <Step title="Open Dashboard">
+    Go to [dashboard.request.network](https://dashboard.request.network).
+  </Step>
+  <Step title="Open destination settings">
+    Open your payment destination settings.
+  </Step>
+  <Step title="Open Client IDs">
+    Open the **Client IDs** section.
+  </Step>
+  <Step title="Generate">
+    Click **Generate New Client ID**.
+  </Step>
+  <Step title="Name and configure">
+    Enter a human-readable name. Add **Allowed Domains** if the Client ID will be used from a frontend application. Leave empty for backend/server-side usage only.
+  </Step>
+  <Step title="Save">
+    Confirm to generate the Client ID. Copy and save the generated `clientId` — you'll use it in Steps 4 and 5.
+  </Step>
+</Steps>
+
+<Note>
+Allowed domains must use `https://` (except for `localhost`, `127.0.0.1`, or `::1` which allow `http://`). No path, query, or fragment allowed.
+</Note>
+
+### Option B — Auth API (for automation)
+
+Open the Scalar docs at [auth.request.network/open-api](https://auth.request.network/open-api/#tag/client-ids/POST/v1/client-ids) and call:
+
+```http
+POST https://auth.request.network/v1/client-ids
+Content-Type: application/json
+
+{
+  "label": "My Client ID",
+  "allowedDomains": ["https://mydomain.com"],
+  "feePercentage": null,
+  "feeAddress": null,
+  "operatorWalletAddress": null,
+  "payeeDestinationId": "<destinationId-from-step-2>"
+}
+```
+
+Your wallet session from Step 1 is sent automatically via cookie.
+
+**Example response (201 Created):**
+
+```json
+{
+  "id": "01KJBN4KR5PFG4NAQG60EHR2Y0",
+  "clientId": "cli_nz1bj41szV2fvjm9pbxdIhro3ld4x4",
+  "label": "My Client ID",
+  "allowedDomains": ["https://mydomain.com"],
+  "feePercentage": null,
+  "feeAddress": null,
+  "operatorWalletAddress": null,
+  "defaultPreApprovalExpiry": null,
+  "defaultAuthorizationExpiry": null,
+  "status": "active",
+  "createdAt": "2026-03-02T19:42:37 GMT+0000"
+}
+```
+
+Save the `clientId` value (e.g. `cli_nz1bj41szV2fvjm9pbxdIhro3ld4x4`) — you'll use it in Steps 4 and 5.
+
+## Step 4: Register a Webhook
+
+Webhooks let you receive real-time notifications when a payment is completed (or partially paid) for your payment links — no polling required.
+
+Webhooks are scoped to the Client ID that creates them. Any payment link created with that Client ID will trigger the webhook. The webhook payload includes the `clientId` field so you can identify which Client ID the payment was associated with.
+
+### Creating a webhook
+
+Open [auth.request.network/open-api](https://auth.request.network/open-api/#tag/webhook/POST/v1/webhook) and call:
+
+```http
+POST https://auth.request.network/v1/webhook
+x-client-id: <clientId-from-step-3>
+Content-Type: application/json
+
+{
+  "url": "https://mydomain.com/webhook"
+}
+```
+
+**Example response (201 Created):**
+
+```json
+{
+  "id": "01KJC2WX8EH4MP3DHZB2YQ7N9G",
+  "secret": "f3c189a4b5e6d7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2"
+}
+```
+
+<Warning>
+The `secret` is only returned once at creation. Store it securely — you cannot retrieve it again. Use HTTPS in production. `localhost` URLs are accepted for local testing.
+</Warning>
+
+### Managing webhooks
+
+Use the same Scalar docs page to list, toggle, or delete webhooks (all accept `x-client-id`):
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/webhook` | List webhooks for this Client ID |
+| `PUT` | `/v1/webhook/:webhookId` | Toggle active / inactive |
+| `DELETE` | `/v1/webhook/:webhookId` | Permanently delete |
+| `POST` | `/v1/webhook/test` | Body `{ "eventType": "payment.confirmed" }` — fire a test delivery |
+
+### Verifying webhook signatures
+
+Every webhook request includes a signature header so you can verify it came from Request Network:
+
+| Header | Description |
+| --- | --- |
+| `x-request-network-signature` | HMAC-SHA256 of the raw JSON body, signed with your webhook secret |
+| `x-request-network-delivery` | Unique delivery ID — use as an idempotency key |
+| `x-request-network-retry-count` | Retry attempt number (`0`–`3`) |
+| `x-request-network-test` | `true` only for test deliveries via `/v1/webhook/test` |
+
+To verify, compute `HMAC-SHA256(rawBody, webhookSecret)` and compare it to `x-request-network-signature` using a constant-time comparison.
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verify(rawBody: string, signature: string, secret: string) {
+  const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+  const a = Buffer.from(expected, "hex");
+  const b = Buffer.from(signature, "hex");
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+```
+
+Always verify against the **raw** request body before parsing.
+
+**Retries:** up to 3 retries (4 attempts total), default delays 1s / 5s / 15s, triggered on any non-2xx response, timeout, or connection error.
+
+### Webhook events for payment links
+
+When a payer completes a payment on a payment link you created, your webhook receives a `payment.confirmed` event (or `payment.partial` for partial payments). For Client ID-scoped variants you'll also receive `payment.confirmed.client_id` / `payment.partial.client_id` with extra `clientId` and `origin` fields.
+
+**Example `payment.confirmed` payload:**
+
+```json
+{
+  "event": "payment.confirmed",
+  "requestId": "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb",
+  "paymentReference": "0xabc123...",
+  "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "amount": "10.0",
+  "totalAmountPaid": "10.0",
+  "expectedAmount": "10.0",
+  "timestamp": "2026-03-02T20:15:00.000Z",
+  "txHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "network": "sepolia",
+  "currency": "FAU",
+  "paymentCurrency": "FAU",
+  "clientId": "cli_nz1bj41szV2fvjm9pbxdIhro3ld4x4",
+  "origin": "https://mydomain.com"
+}
+```
+
+Key fields to look for:
+
+| Field | Description |
+| --- | --- |
+| `event` | `payment.confirmed` (fully paid) or `payment.partial` (partial payment) |
+| `requestId` | The request ID from when you created the payment link |
+| `clientId` | The Client ID used to create the payment link — use this to route events if you have multiple Client IDs |
+| `amount` | The amount paid in this transaction |
+| `totalAmountPaid` | Cumulative amount paid so far |
+| `expectedAmount` | The total amount expected |
+| `txHash` | On-chain transaction hash |
+| `network` | The blockchain network |
+| `currency` | The token used for payment |
+
+### All supported webhook events
+
+| Event | Description |
+| --- | --- |
+| `payment.confirmed` | Payment fully confirmed |
+| `payment.partial` | Partial payment received |
+| `payment.confirmed.client_id` | Client ID-scoped variant of `payment.confirmed` |
+| `payment.partial.client_id` | Client ID-scoped variant of `payment.partial` |
+| `payment.confirmed.checkout` | Secure-payment-scoped variant of `payment.confirmed` |
+| `payment.partial.checkout` | Secure-payment-scoped variant of `payment.partial` |
+| `payment.failed` | Payment failed |
+| `payment.refunded` | Payment refunded |
+| `payment.processing` | Offramp processing started |
+| `request.recurring` | A recurring request fired |
+| `payment_detail.updated` | Payment detail metadata changed |
+| `compliance.updated` | Compliance status changed |
+
+## Step 5: Create a Secure Payment (Payment Link)
+
+With the `destinationId` from Step 2 and the `clientId` from Step 3, you can now create a payment link. When the payment is completed, the webhook from Step 4 will be notified automatically.
+
+<Steps>
+  <Step title="Open the API docs">
+    Open the Request API docs: [api.request.network/open-api](https://api.request.network/open-api/#tag/v2secure-payment/POST/v2/secure-payments).
+  </Step>
+  <Step title="Set the Client ID header">
+    Set the `x-client-id` header to the `clientId` value from Step 3.
+  </Step>
+  <Step title="Fill in the request body">
+    ```json
+    {
+      "requests": [
+        {
+          "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#1f969856:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+          "amount": "1"
+        }
+      ]
+    }
+    ```
+  </Step>
+  <Step title="Send">
+    Click **Send**.
+  </Step>
+</Steps>
+
+### Constructing the `destinationId`
+
+The `destinationId` in the request body is a composite value that combines the payee destination's `humanReadableInteropAddress` (from Step 2) with the `tokenAddress`, separated by `:`:
+
+```
+{humanReadableInteropAddress}:{tokenAddress}
+```
+
+For example:
+
+```
+0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#1f969856:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C
+└──────────── humanReadableInteropAddress ─────────────────┘ └──────────── tokenAddress ──────────────────────┘
+```
+
+### Request body fields
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `requests` | `array` | Yes | Array of payment request items (at least 1; multiple items create a batch on EVM only) |
+| `requests[].destinationId` | `string` | Yes | Composite ID: `humanReadableInteropAddress:tokenAddress` |
+| `requests[].amount` | `string` | Yes | Amount in human-readable format (e.g. `"10"` for 10 USDC) |
+| `feePercentage` | `string` | No | Fee percentage (0–100). If set, `feeAddress` is required. |
+| `feeAddress` | `string` | No | Address to receive fees. Required if `feePercentage` is set. |
+| `reference` | `string` | No | Merchant reference (≤ 255 chars) |
+| `payerIdentifier` | `string` | No | Payer identifier (≤ 255 chars) |
+
+<Warning>
+Submitting multiple `requests[]` items where any destination is on **Tron** returns a 400 with `Batch payments are not supported for TRON networks. Please submit individual payment requests.` Tron secure payments are single-recipient. EVM batches up to 200 payees per link work as expected.
+</Warning>
+
+**Example response (201 Created):**
+
+```json
+{
+  "requestIds": [
+    "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb"
+  ],
+  "securePaymentUrl": "https://pay.request.network/?token=01KJRA0M9QG8MA4X887908T8A4",
+  "token": "01KJRA0M9QG8MA4X887908T8A4"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `requestIds` | `string[]` | IDs of the created payment requests |
+| `securePaymentUrl` | `string` | Shareable URL for the payer to complete payment |
+| `token` | `string` | Unique token for this payment session |
+
+Share the `securePaymentUrl` with the payer. They can open it in their browser to complete the payment.
+
+<Note>
+The payment link expires after 7 days or once it has been paid, whichever comes first.
+</Note>
+
+## Step 6: Check Payment Status (Optional)
+
+In addition to receiving webhook notifications (Step 4), you can also poll for payment status using the `requestId` from Step 5.
+
+**Endpoint:** `GET https://api.request.network/v2/request/{requestId}`
+
+You can call this from the [Request API docs](https://api.request.network/open-api) using the same wallet session, or programmatically with the `x-client-id` header.
+
+**Example response (200 OK — paid):**
+
+```json
+{
+  "hasBeenPaid": true,
+  "requestId": "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb",
+  "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "isListening": false,
+  "txHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+}
+```
+
+**Example response (200 OK — not yet paid):**
+
+```json
+{
+  "hasBeenPaid": false,
+  "requestId": "01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb",
+  "payee": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7",
+  "isListening": true,
+  "txHash": null
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `hasBeenPaid` | `boolean` | Whether the request has been fully paid |
+| `requestId` | `string` | The request ID |
+| `payee` | `string` | The payee's wallet address |
+| `isListening` | `boolean` | Whether the system is still listening for payment |
+| `txHash` | `string` | Transaction hash of the payment (`null` if unpaid) |
+
+## Quick Reference
+
+| Step | Action | Where |
+| --- | --- | --- |
+| 1 | Sign in with wallet | [dashboard.request.network](https://dashboard.request.network) |
+| 2 | Create payment destination | [dashboard.request.network](https://dashboard.request.network) |
+| 3 | Create Client ID | [dashboard.request.network](https://dashboard.request.network) (or [auth.request.network/open-api](https://auth.request.network/open-api/#tag/client-ids/POST/v1/client-ids)) |
+| 4 | Register webhook | [auth.request.network/open-api](https://auth.request.network/open-api/#tag/webhook/POST/v1/webhook) |
+| 5 | Create payment link | [api.request.network/open-api](https://api.request.network/open-api/#tag/v2secure-payment/POST/v2/secure-payments) |
+| 6 | Check payment status | [api.request.network/open-api](https://api.request.network/open-api) (or via webhook) |
+
+## Troubleshooting
+
+| Issue | Solution |
+| --- | --- |
+| `401 Unauthorized` on Dashboard / Auth API calls | Your wallet session has likely expired (15 min TTL). Go back to [dashboard.request.network](https://dashboard.request.network) and sign in again. |
+| `Origin header is required` | When using `x-client-id` from a browser, include an `Origin` header matching one of the Client ID's allowed domains. |
+| `Invalid destination ID format` | The `destinationId` must be `humanReadableInteropAddress:tokenAddress`. Make sure both values are joined with `:` as the separator. |
+| `Batch payments are not supported for TRON networks` | Tron requests must be single-recipient. Submit one `requests[]` item per Tron destination. |
+| Webhook signature doesn't match | Verify against the **raw** request body (no re-serialization), use HMAC-SHA256, and compare with a constant-time check. |
+| Webhook secret lost | Secrets are only shown at creation. Delete the webhook (`DELETE /v1/webhook/:id`) and create a new one. |
+| Payment link expired | Payment links expire after 7 days or once paid. Create a new one if needed. |
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="No-code payment links" href="/use-cases/no-code-payment-links" icon="hand-pointer">
+    Skip the code — generate payment links from the Dashboard UI.
+  </Card>
+
+  <Card title="Programmatic payment links" href="/use-cases/programmatic-payment-links" icon="code">
+    Server-side payment link creation with TS / Python / cURL examples.
+  </Card>
+
+  <Card title="Multi-chain checkout" href="/use-cases/multi-chain-checkout" icon="shuffle">
+    Let payers pay from any chain/token; receive on your preferred one.
+  </Card>
+
+  <Card title="Webhook reconciliation" href="/use-cases/webhook-reconciliation" icon="webhook">
+    Automated payment notifications wired into your accounting/order systems.
+  </Card>
+</CardGroup>
