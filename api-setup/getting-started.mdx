@@ -207,9 +207,16 @@ Since webhooks can't reach your local server directly, use [ngrok](https://ngrok
 ngrok http 3000
 ```
 
-Copy the HTTPS URL (e.g., `https://abc123.ngrok.io/webhooks`) and add it in the [Dashboard](https://dashboard.request.network) under the Webhooks section.
+Copy the HTTPS URL (e.g., `https://abc123.ngrok.io/webhooks`) and register it via the Auth API:
 
-Copy the webhook signing secret to your `.env`:
+```bash
+curl -X POST "https://auth.request.network/v1/webhook" \
+  -H "Content-Type: application/json" \
+  -H "x-client-id: $RN_API_KEY" \
+  -d '{ "url": "https://abc123.ngrok.io/webhooks" }'
+```
+
+The response includes a one-time `secret` — copy it to your `.env`:
 
 ```bash
 RN_WEBHOOK_SECRET=your_webhook_secret_here
@@ -290,7 +297,7 @@ Now that you've made your first API call, explore more features:
   <Accordion title="Webhook not receiving events">
     - Verify webhook URL is publicly accessible
     - Check webhook signature verification
-    - Ensure webhook is enabled in the Dashboard
+    - Ensure the webhook is `active` (toggle via `PUT /v1/webhook/:id` on the Auth API)
   </Accordion>
 </AccordionGroup>
 

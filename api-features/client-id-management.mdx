@@ -92,11 +92,15 @@ Default authorization duration in seconds. Overrides per-request value when set.
 ```json Response (201)
 {
   "id": "01HXEXAMPLE123",
-  "clientId": "ci_abc123def456",
+  "clientId": "cli_abc123def456",
   "label": "My Checkout Widget",
   "allowedDomains": ["https://mystore.com", "https://staging.mystore.com"],
   "feePercentage": null,
   "feeAddress": null,
+  "operatorWalletAddress": null,
+  "defaultPreApprovalExpiry": null,
+  "defaultAuthorizationExpiry": null,
+  "payeeDestinationId": "0x6923...C7D7@eip155:8453#ABCD1234:0x8335...2913",
   "status": "active",
   "createdAt": "2026-03-15T10:00:00.000Z"
 }

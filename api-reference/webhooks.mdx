@@ -9,18 +9,47 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 
 ## Webhook Configuration
 
-### Setup in Dashboard
-1. Navigate to **Platform Settings → Webhooks** in [Request Dashboard](https://dashboard.request.network)
-2. Click **Add webhook**
-3. In the dialog that opens, enter URL and click **Create webhook**
-4. Click copy button to copy **Signing Secret** to clipboard (see [Authentication](/api-reference/authentication) for API key setup)
-5. Enable/disable or delete webhooks as needed
+Webhooks are managed **programmatically** via the Auth API at `auth.request.network` — there is no Dashboard UI for webhook CRUD. Each webhook is scoped to the Client ID that creates it; events for any payment link or request created with that Client ID are delivered to that webhook.
+
+### Create a webhook
+
+```bash
+curl -X POST "https://auth.request.network/v1/webhook" \
+  -H "Content-Type: application/json" \
+  -H "x-client-id: YOUR_CLIENT_ID" \
+  -d '{ "url": "https://yourapp.com/webhooks/request-network" }'
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "01KJC2WX8EH4MP3DHZB2YQ7N9G",
+  "secret": "f3c189a4b5e6d7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2"
+}
+```
+
+<Warning>
+The `secret` is only returned once at creation. Store it securely — you cannot retrieve it again. Use HTTPS in production. `localhost` URLs are accepted for local testing.
+</Warning>
+
+### Manage webhooks
+
+All endpoints accept `x-client-id` and operate on the webhooks owned by that Client ID.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/webhook` | List webhooks for this Client ID |
+| `PUT` | `/v1/webhook/:webhookId` | Toggle active / inactive |
+| `DELETE` | `/v1/webhook/:webhookId` | Permanently delete |
+| `POST` | `/v1/webhook/test` | Body `{ "eventType": "payment.confirmed" }` — fire a test delivery |
+
+Open the [Auth API Scalar docs](https://auth.request.network/open-api/#tag/webhook) to call these interactively with your wallet session — signing in to the [Dashboard](https://dashboard.request.network) sets the session cookie that's shared across all `*.request.network` services.
 
 ### Local Development
-Use [ngrok](https://ngrok.com/docs/traffic-policy/getting-started/agent-endpoints/cli) to receive webhooks locally:
+Use [ngrok](https://ngrok.com/docs/traffic-policy/getting-started/agent-endpoints/cli) to receive webhooks locally, then pass the public URL to `POST /v1/webhook`:
 ```bash
 ngrok http 3000
-# Use the HTTPS URL (e.g., https://abc123.ngrok.io/webhook) in the Dashboard
+# Use the HTTPS URL (e.g., https://abc123.ngrok.io/webhook) as the webhook URL
 ```
 
 ## Event Types
@@ -386,11 +415,20 @@ export async function POST(request: Request) {
 
 ## Testing
 
-### Portal Testing
-1. Go to **Platform Settings → Webhooks** in Request Dashboard
-2. Create a webhook if you haven't already
-3. Select the webhook event type and click **Send test event**
-4. Monitor your endpoint logs for test requests
+### Test deliveries
+
+Fire a test webhook from the Auth API:
+
+```bash
+curl -X POST "https://auth.request.network/v1/webhook/test" \
+  -H "Content-Type: application/json" \
+  -H "x-client-id: YOUR_CLIENT_ID" \
+  -d '{ "eventType": "payment.confirmed" }'
+```
+
+Or call it interactively from the [Auth API Scalar docs](https://auth.request.network/open-api/#tag/webhook/POST/v1/webhook/test).
+
+Test deliveries arrive at all active webhooks for that Client ID and include the `x-request-network-test: true` header so handlers can branch on test vs real.
 
 ### Test Webhook Identification
 Test webhooks include the `x-request-network-test: true` header:
@@ -422,18 +460,19 @@ app.post("/webhook", (req, res) => {
 ### Common Issues
 
 **Signature verification fails:**
-- Check your signing secret matches Portal configuration
+- Check your signing secret matches the value returned by `POST /v1/webhook` at creation
 - Ensure you're using the raw request body for signature calculation
 - Verify HMAC SHA-256 implementation
 
 **Webhooks not received:**
 - Confirm endpoint URL is accessible via HTTPS
 - Verify endpoint returns 2xx status codes
+- Confirm the webhook is `active` via `GET /v1/webhook` (toggle with `PUT /v1/webhook/:id`)
 
 ### Debugging Tips
 - Use ngrok request inspector to see raw webhook data
 - Monitor retry counts in headers to identify issues
-- Test with Portal's "Send test webhooks" feature
+- Fire test deliveries via `POST /v1/webhook/test`
 
 ## Related Documentation
 
@@ -451,6 +490,6 @@ app.post("/webhook", (req, res) => {
   </Card>
 
   <Card title="Request Dashboard" href="https://dashboard.request.network" icon="browser">
-    Configure webhooks and manage Client IDs
+    Manage Client IDs and payment destinations (webhooks are managed via the Auth API above)
   </Card>
 </CardGroup>

@@ -209,17 +209,17 @@ Example of accordion groups:
 
 Example of cards and card groups:
 
-<Card title="Getting started guide" icon="rocket" href="/quickstart">
+<Card title="Getting started guide" icon="rocket" href="/use-cases/quickstart">
 Complete walkthrough from installation to your first API call in under 10 minutes.
 </Card>
 
 <CardGroup cols={2}>
-<Card title="Authentication" icon="key" href="/auth">
+<Card title="Authentication" icon="key" href="/api-reference/authentication">
   Learn how to authenticate requests using API keys or JWT tokens.
 </Card>
 
-<Card title="Rate limiting" icon="clock" href="/rate-limits">
-  Understand rate limits and best practices for high-volume usage.
+<Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+  Real-time notifications for payment lifecycle events.
 </Card>
 </CardGroup>
 
@@ -292,11 +292,11 @@ Complete user object with all associated data.
 Wrap all images in frames:
 
 <Frame>
-<img src="/images/dashboard.png" alt="Main dashboard showing analytics overview" />
+<img src="/images/dashboard/home-with-destination.webp" alt="Dashboard home with active payment destination" />
 </Frame>
 
-<Frame caption="The analytics dashboard provides real-time insights">
-<img src="/images/analytics.png" alt="Analytics dashboard with charts" />
+<Frame caption="Generate a Client ID from the Manage Destination screen">
+<img src="/images/dashboard/generate-client-id.webp" alt="Generate Client ID dialog" />
 </Frame>
 
 #### Videos

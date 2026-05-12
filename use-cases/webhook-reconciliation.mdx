@@ -209,7 +209,7 @@ Use [ngrok](https://ngrok.com) to expose localhost during development:
 
 ```bash
 ngrok http 3000
-# Copy the https://xxxxx.ngrok-free.app URL into the Dashboard webhook field
+# Pass the https://xxxxx.ngrok-free.app URL to POST /v1/webhook (above)
 ```
 
 Local URLs (`localhost`, `127.0.0.1`) are accepted by the auth API for testing. HTTPS is required in production.

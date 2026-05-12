@@ -33,17 +33,11 @@ The Secure Payment page is intentionally separated from the merchant frontend so
       <img src="/images/secure-payments/connect-wallet.webp" alt="Connect wallet modal — EVM" />
     </Frame>
 
-    <Frame>
-      <img src="/images/secure-payments/connect-wallet-tron.webp" alt="Connect wallet modal — Tron" />
-    </Frame>
+    When the destination is on Tron, the same modal shows Tron wallets (TronLink, Guarda, Trust, WalletConnect-Tron) instead of the EVM list — try a [Tron-destination payment link](https://pay.request.network) to see it.
   </Step>
 
   <Step title="Choose a chain and token">
-    The page reads the connected wallet's balances across supported chains and surfaces every chain × token combo with a sufficient balance. Same-chain payments show no swap; cross-chain shows a Li.Fi banner.
-
-    <Frame>
-      <img src="/images/secure-payments/payment-options-crosschain.webp" alt="Cross-chain payment options" />
-    </Frame>
+    The page reads the connected wallet's balances across supported chains and surfaces every chain × token combo with a sufficient balance. The same-chain options view is shown at the top of this page; for cross-chain payments the layout is identical except the banner reads "You'll be paying across chain via Li.Fi" (in pink) instead of "You'll be paying on the same chain as your recipient" (in slate).
   </Step>
 
   <Step title="Approve and sign">
@@ -65,14 +59,18 @@ The Secure Payment page is intentionally separated from the merchant frontend so
 
 ## Wallet support
 
+The connect modal offers a curated wallet list — only the wallets explicitly registered in the app are surfaced; unrecognised injected providers are filtered out (this is what filters TronLink's EVM injection out of the EVM list).
+
 | EVM wallets | Tron wallets |
 | --- | --- |
 | MetaMask | TronLink |
 | Coinbase Wallet | Guarda |
-| WalletConnect (any wallet that supports it) | Trust Wallet |
-| Any injected EIP-1193 provider (Rabby, Phantom-EVM, Bitget, OKX, Ledger, …) | WalletConnect-Tron |
+| WalletConnect | Trust Wallet |
+| Ledger | WalletConnect-Tron |
+| Phantom | |
+| Rabby | |
 
-EVM and Tron are presented as co-equal columns — neither is hidden behind a more-options click.
+EVM and Tron are presented as co-equal columns. The first 5 wallets render up-front; the rest appear behind a "show more" toggle.
 
 <Note>
 TronLink also injects an EVM provider that converts Tron addresses to EVM-style. Secure Payment **filters this out** of the EVM wallet list because it would mis-route Tron payments — Tron is handled exclusively via the TronWeb integration.
@@ -101,6 +99,12 @@ Tron is fully supported as both a **source** and a **destination** for single-re
 <Warning>
 **Multi-recipient Tron Secure Payments are not supported.** A Secure Payment link with multiple `requests[]` entries pointing at Tron destinations is rejected at creation time with a 400. EVM batches up to 200 payees per link work as expected.
 </Warning>
+
+## Smart accounts (gasless on EVM)
+
+For supported EVM destinations, Secure Payment can route payments through an [Account Abstraction](https://www.alchemy.com/overviews/what-is-account-abstraction) smart account so the payer doesn't need to hold gas-token balance. The flow is invisible to the payer beyond a slightly different transaction signature step. The integration uses Pimlico for bundling and Alchemy gas policies for sponsorship — see [Secure payment pages](/api-features/secure-payment-pages#smart-account-payments) for the full spec.
+
+Smart-account routing is EVM-only. Tron payments use the standard TronWeb path.
 
 ## Error states
 
