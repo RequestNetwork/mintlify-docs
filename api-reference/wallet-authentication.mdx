@@ -12,9 +12,23 @@ This is the authentication method used by the [Request Dashboard](https://dashbo
 ## Supported Wallets
 
 - **EVM wallets** — MetaMask, WalletConnect, Coinbase Wallet, and any wallet supporting `personal_sign`
-- **Tron wallets** — TronLink, Guarda, Trust, WalletConnect-Tron (addresses starting with `T...`)
+- **Tron wallets** — addresses starting with `T...` (see [Recommended Tron wallets](#recommended-tron-wallets))
 
 The API auto-detects the wallet type from the address format. Both EVM and Tron wallets are first-class authentication methods for the Dashboard and the auth API.
+
+### Recommended Tron wallets
+
+We rank these in order of recommendation, based on team testing:
+
+1. **Trust** browser extension
+2. **Trust** mobile app via WalletConnect (scan the QR)
+3. **TronLink** browser extension
+4. **Guarda** browser extension
+5. **OKX** browser extension
+
+<Warning>
+MetaMask is not recommended for Tron — its Tron support is partial.
+</Warning>
 
 ## Challenge/Verify Flow
 
