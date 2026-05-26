@@ -1,0 +1,64 @@
+---
+title: "Hypernative KYT Policy"
+description: "Understand the default Hypernative wallet-screening policy used for Request Network KYT checks."
+---
+
+## Hypernative Standard Screening Policy
+
+Request Network integrates with [Hypernative](https://www.hypernative.io) to provide optional blockchain wallet screening for incoming payments and outgoing payouts.
+
+When the “Hypernative Standard” policy is enabled, payer wallets and recipient wallets are screened against Hypernative’s risk intelligence database across supported blockchains before a transaction is authorized. The purpose of this screening is to help reduce exposure to wallets associated with sanctions, illicit finance activity, scams, ransomware, mixers, darknet activity, terrorism financing, and other high-risk categories.
+
+Under this policy:
+- Incoming payer wallets identified as high risk may be prevented from transacting with you.
+- Outgoing payouts to wallets identified as high risk may also be blocked when payout screening is enabled.
+- Screening can be enabled at the destination level and, where supported, overridden at transaction creation level.
+
+Users may choose to opt out of screening checks. By disabling or bypassing screening, the user acknowledges and accepts the risks associated with transacting with unscreened wallets.
+
+The Hypernative Standard policy uses market-standard rules and exposure thresholds maintained and periodically updated by Hypernative. These rules are intended to provide a baseline level of automated wallet risk protection only.
+
+### Direct High-Risk Categories
+
+Wallets directly associated with the following categories are classified as high risk:
+
+- Sanctions
+- Phishing
+- Scam
+- Attacker Wallets
+- Mixing Services
+- Sanctioned Jurisdiction Exchanges
+- Terrorism Financing
+- CSAM
+- Darknet Marketplaces
+- Drugs Trade
+- Weapon Trade
+- Illicit Goods and Services
+- Special Measures
+- Ransomware
+
+### Related Exposure Thresholds
+
+Indirect exposure may also trigger a high-risk classification when the following thresholds are exceeded:
+
+| Category | Threshold |
+| --- | --- |
+| Sanctions | > $10 exposure |
+| Sanctioned Jurisdiction Exchanges | > $10 exposure |
+| Terrorism Financing | > $10 exposure |
+| CSAM | > $10 exposure |
+| Darknet Marketplaces | > $10 exposure |
+| Drugs Trade | > $10 exposure |
+| Weapon Trade | > $10 exposure |
+| Illicit Goods and Services | > $10 exposure |
+| Special Measures | > $10 exposure |
+| Ransomware | > $10 exposure |
+| Scam | > 5% incoming exposure |
+| Attacker Wallets | > 10% exposure |
+| Mixing Services | > 30% exposure or > $10,000 exposure |
+
+Neither Request Network nor Hypernative provides compliance, legal, regulatory, or risk management services through this feature, and screening results do not constitute legal advice, a guarantee of wallet safety, or a determination that funds are free from illicit exposure or regulatory risk. Users remain solely responsible for assessing the suitability of transactions and complying with applicable laws, sanctions programs, AML obligations, and internal compliance policies.
+
+Request Network acts solely as a technology provider facilitating access to third-party screening infrastructure. Hypernative acts solely as a screening technology and data provider.
+
+Users requiring tailored compliance rules should [contact the Request Network team](https://request.network) to discuss customized screening configurations.

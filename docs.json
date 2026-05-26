@@ -50,7 +50,13 @@
               "use-cases/multi-chain-checkout",
               "use-cases/batch-payouts",
               "use-cases/webhook-reconciliation",
-              "use-cases/compliance-gated-payments"
+              {
+                "group": "Compliance-gated payments",
+                "pages": [
+                  "use-cases/compliance-gated-payments",
+                  "use-cases/hypernative-standard-screening-policy"
+                ]
+              }
             ]
           }
         ]
