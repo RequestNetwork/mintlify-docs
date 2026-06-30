@@ -103,7 +103,7 @@ Create a multicall link from previously created secure-payout tokens:
 
 ```bash
 curl -X POST "https://api.request.network/v2/secure-payments/multicall-payouts" \
-  -H "x-client-id: YOUR_CLIENT_ID" \
+  -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "childTokens": ["01JZ4PC7EXAMPLECHILD000001", "01JZ4PC7EXAMPLECHILD000002"]

@@ -111,7 +111,7 @@ Treat KYT as a first-line filter that blocks the most obvious cases, layered wit
 
 ## Hypernative Standard policy
 
-Request Network's recommended KYT screening provider is **Hypernative**. The **Hypernative Standard** policy defines the high-risk categories and related exposure thresholds used for wallet screening. You can select an alternative multi-chain provider, **Merkle Science**, by setting `screeningProvider: "merklescience"` on the access policy (see [the table above](#configure-a-kyt-gated-destination)).
+Request Network offers two KYT screening providers: **Hypernative** and **Merkle Science** (a multi-chain option). When `mode` is `kyt_all_wallets`, you must set `screeningProvider` to one of them — there is no default. The **Hypernative Standard** policy defines the high-risk categories and related exposure thresholds applied when you screen with Hypernative.
 
 See [Hypernative Standard Screening Policy](/use-cases/hypernative-standard-screening-policy) for the full category list, exposure thresholds, and limitations.
 
