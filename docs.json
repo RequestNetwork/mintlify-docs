@@ -30,6 +30,20 @@
   "thumbnails": {
     "appearance": "dark"
   },
+  "redirects": [
+    {
+      "source": "/api-features/no-code-payment-links",
+      "destination": "/use-cases/no-code-payment-links"
+    },
+    {
+      "source": "/api-features/programmatic-payment-links",
+      "destination": "/use-cases/programmatic-payment-links"
+    },
+    {
+      "source": "/api-features/authentication",
+      "destination": "/api-reference/authentication"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
