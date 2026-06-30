@@ -5,7 +5,7 @@ description: "Pay many recipients in one signed transaction. Marketplaces paying
 
 ## What you'll build
 
-A workflow for paying many recipients at once with a single payer signature — gas-sponsored, atomic, on EVM. Either hand the payer a hosted batch URL on `pay.request.network` (recommended), or pay programmatically by getting calldata and broadcasting it yourself.
+A workflow for paying many recipients at once with a single payer signature — atomic, on EVM. Either hand the payer a hosted batch URL on `pay.request.network` (recommended), or pay programmatically by getting calldata and broadcasting it yourself.
 
 **Audience:** marketplaces paying out sellers, agencies paying contractors, refund campaigns, payroll-adjacent flows, any scenario where you'd otherwise sign N transactions back-to-back.
 
@@ -21,6 +21,10 @@ A workflow for paying many recipients at once with a single payer signature — 
 | **Direct Execution** (advanced) | [`POST /v2/payouts/batch`](/api-features/payouts#batch-payout) | Approval calldata + a single batch payment transaction you broadcast from your wallet |
 
 Pick **hosted batch link** for most scenarios — the payer reviews recipients and the transaction on the Secure Payment Page before signing. Pick **direct execution** only when your backend already signs payouts in fully automated environments with appropriate security controls.
+
+<Tip>
+**Bundling payouts across chains or on Tron?** [Multicall payouts](/api-features/payouts#multicall-payouts) combine multiple existing payout links into one link with cross-chain (Li.Fi) routing or Tron batch execution — a separate mechanism from the same-network batch endpoints below. See the [Secure Payments reference](/api-reference/secure-payments#post-v2secure-paymentsmulticall-payouts).
+</Tip>
 
 ## Prerequisites
 
@@ -124,9 +128,9 @@ await batchTx.wait();
 ## Wallet infrastructure compatibility
 
 <Note>
-At the moment, the Secure Payment Page and Dashboard are not compatible with Safe multisigs.
+The hosted Secure Payment Page and Dashboard execute through the payer's connected wallet (including an automatic [smart account](/api-features/secure-payment-pages#smart-account-payments) on supported EVM chains), so you cannot connect an existing Gnosis Safe multisig directly in the UI.
 
-For corporate treasury management and operational wallet infrastructure, we recommend using vault providers such as Utila, DFNS, or Fireblocks. Request Network is fully compatible with WalletConnect-based wallet infrastructure.
+To pay from a Safe multisig, use the API: request Safe-ready calldata and track settlement with the [Safe multisig payments](/api-features/safe-multisig-payments) flow, executing the transaction on your own Safe. For broader corporate treasury and operational wallet infrastructure, Request Network is also compatible with WalletConnect-based vault providers such as Utila, DFNS, or Fireblocks.
 </Note>
 
 ## Real-world examples

@@ -71,8 +71,8 @@ This four-step approach is required due to current API limitations - more stream
 
 Many `/payer` endpoints in the Request Network API require a `clientUserId` as a path parameter. This value is an **arbitrary identifier** chosen by your platform to represent a user (the payer) in your own system.
 
-* **You control the format:** The `clientUserId` can be any unique string that makes sense for your application. It can be a UUID, email address, database ID, or anything unique per user on your platform.
-* **Common pattern:** Many integrations set `clientUserId` to the user's email address or an internal user ID.
+* **You control the format:** The `clientUserId` can be any unique string that makes sense for your application. It can be a UUID, a database ID, or anything unique per user on your platform.
+* **Common pattern:** Many integrations set `clientUserId` to an internal user ID from their own system.
 * **Why is this useful?** This approach allows you to integrate the Request Network API without having to change your existing user management logic. You simply pass your own identifier to the API, and all payer-related compliance, agreement, and payment detail records will be associated with that value.
 
 **Example usage:**

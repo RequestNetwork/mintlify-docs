@@ -1,5 +1,6 @@
 ---
 title: "Glossary"
+description: "Definitions of Request Network terms — parties, protocol, payments, and cryptography concepts."
 ---
 
 ## Parties of a Request
@@ -147,6 +148,18 @@ The Request Protocol uses IPFS to ensure data accessibility.
 ### Multi-signature
 
 Multi-signature (multisig) wallets allow multiple parties to require more than one key to authorize a transaction. The needed number of signatures is agreed upon at the creation of the wallet. Multi-signature addresses have a much greater resistance to theft.
+
+### Account Abstraction (ERC-4337)
+
+Account Abstraction lets a smart contract act as a wallet (a "smart account"), enabling features such as transaction batching and gas sponsorship that externally-owned accounts (EOAs) cannot do natively. The Secure Payment page can execute supported EVM payments through an ERC-4337 smart account so approval, funding, and settlement run as a single operation. See [Smart account payments](/api-features/secure-payment-pages#smart-account-payments).
+
+### EIP-2612 Permit
+
+[EIP-2612](https://eips.ethereum.org/EIPS/eip-2612) lets a token holder approve a spender with an off-chain signature instead of an on-chain `approve()` transaction, removing the gas cost of the approval step. Tokens such as USDC support it; tokens such as USDT do not. See [Gasless token approvals](/api-features/secure-payment-pages#gasless-token-approvals-eip-2612).
+
+### Gnosis Safe
+
+A [Safe](https://safe.global/) is a widely used smart-contract multisig wallet that requires multiple owner signatures to execute a transaction. Request Network supports paying a secure payment from a Safe via the [Safe multisig payments](/api-features/safe-multisig-payments) flow.
 
 ### Private Key
 

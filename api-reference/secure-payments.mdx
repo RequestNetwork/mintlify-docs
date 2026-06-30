@@ -11,20 +11,24 @@ description: "Generate secure payment URLs, retrieve payment metadata, and get e
 - `GET /v2/secure-payments/:token` — Get payment metadata
 - `GET /v2/secure-payments/:token/pay` — Get payment calldata
 - `POST /v2/secure-payments/:token/intent` — Record crosschain payment intent
+- `POST /v2/secure-payments/multicall-payouts` — Combine multiple existing payout links into one multicall link
+- `GET /v2/secure-payments/multicall-payouts/:token` — Get multicall payout details (operator/session auth)
 
 <Warning>
-Batch incoming and batch payouts are EVM-only. Tron requests with multiple `requests[]` items return a 400 with `Batch payments are not supported for TRON networks. Please submit individual payment requests.`
+Batch incoming and batch payouts are EVM-only. Tron requests with multiple `requests[]` items return a 400 with `Batch payments are not supported for TRON networks`.
 </Warning>
 
 ## Authentication
 
 | Endpoint | Supported auth |
 |----------|---------------|
-| `POST /v2/secure-payments` | `x-api-key`, `x-client-id` + Origin, or session |
+| `POST /v2/secure-payments` | `x-api-key`, `x-client-id` + Origin, session, or orchestrator pair |
 | `GET /v2/secure-payments` | Session only |
-| `GET /v2/secure-payments/:token` | `x-api-key` or `x-client-id` |
-| `GET /v2/secure-payments/:token/pay` | `x-api-key` or `x-client-id` |
-| `POST /v2/secure-payments/:token/intent` | `x-api-key` or `x-client-id` |
+| `GET /v2/secure-payments/:token` | `x-client-id` (+ Origin) |
+| `GET /v2/secure-payments/:token/pay` | `x-client-id` (+ Origin) |
+| `POST /v2/secure-payments/:token/intent` | `x-client-id` (+ Origin) |
+| `POST /v2/secure-payments/multicall-payouts` | `x-api-key`, `x-client-id` + Origin, session, or orchestrator pair |
+| `GET /v2/secure-payments/multicall-payouts/:token` | Session only |
 
 ---
 
@@ -334,6 +338,7 @@ curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789
 - `403`: token expired or not payable
 - `404`: token not found
 - `409`: secure payment already completed
+- `423`: a Safe multisig payment is in progress — keep polling (see [Safe multisig payments](/api-features/safe-multisig-payments))
 - `429`: rate limited
 
 ---
@@ -366,6 +371,14 @@ Source chain for crosschain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `E
 
 <ParamField query="token" type="string">
 Source currency for crosschain payments. Values: `USDC`, `USDT`. Must be provided together with `chain`.
+</ParamField>
+
+<ParamField query="isSafe" type="boolean">
+Set to `true` when the payer wallet is a Gnosis Safe multisig. Returns Safe-ready calldata; `wallet` must be the Safe address and `eoaWallet` must not be set. See [Safe multisig payments](/api-features/safe-multisig-payments).
+</ParamField>
+
+<ParamField query="eoaWallet" type="string">
+Externally-owned account address used to fund a smart-account payment. Mutually exclusive with `isSafe`.
 </ParamField>
 
 <RequestExample>
@@ -469,16 +482,28 @@ Secure payment token.
 
 ### Request fields
 
-<ParamField body="txHash" type="string" required>
-The source-chain transaction hash (66 characters: `0x` + 64 hex chars).
+<ParamField body="txHash" type="string">
+The source-chain transaction hash (66 characters: `0x` + 64 hex chars). Provide **either** `txHash` **or** `safeTxHash` — exactly one.
+</ParamField>
+
+<ParamField body="safeTxHash" type="string">
+A Gnosis Safe transaction hash to track instead of an already-broadcast `txHash`. Used for [Safe multisig payments](/api-features/safe-multisig-payments). Provide exactly one of `txHash` or `safeTxHash`.
+</ParamField>
+
+<ParamField body="safePaymentDeadline" type="number">
+Unix timestamp (seconds) — the hard on-chain execution deadline for the Safe route. Only valid alongside `safeTxHash`.
 </ParamField>
 
 <ParamField body="chain" type="string" required>
-The source chain. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`.
+The source chain. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`, `POLYGON`, `BNB`.
 </ParamField>
 
 <ParamField body="token" type="string" required>
 The source token. Values: `USDC`, `USDT`.
+</ParamField>
+
+<ParamField body="payerAddress" type="string">
+Optional address of the wallet making the payment. Echoed back on the response.
 </ParamField>
 
 <RequestExample>
@@ -511,4 +536,149 @@ curl -X POST "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI78
 - `403`: token expired or not payable
 - `404`: token not found
 - `409`: secure payment already completed
+- `429`: rate limited
+
+---
+
+## POST /v2/secure-payments/multicall-payouts
+
+Combine multiple existing **outgoing payout** secure-payment links into a single multicall link the payer settles as one bundle. You pass the child secure-payment tokens; the API returns a parent token and hosted URL.
+
+This is a distinct mechanism from a [batch payment](#post-v2secure-payments) (multiple `requests[]` in one create call). Multicall composes already-created payout links and supports cross-chain and Tron execution.
+
+### Request fields
+
+<ParamField body="childTokens" type="string[]" required>
+Ordered list of existing secure-payment tokens to combine. Minimum 2, maximum 1000 (the deployed default cap is 150 children). Duplicates are rejected.
+</ParamField>
+
+<ParamField body="requestedExecutionKind" type="string">
+How the bundle executes: `evm_same_chain`, `evm_cross_chain`, or `tron_batch`. When omitted, the execution kind is derived at payment time from the payer's source selection (Tron-only children → `tron_batch`; a chosen source chain/token → `evm_cross_chain`; otherwise `evm_same_chain`).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST "https://api.request.network/v2/secure-payments/multicall-payouts" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "childTokens": [
+      "01JZ4PC7EXAMPLECHILD000001",
+      "01JZ4PC7EXAMPLECHILD000002"
+    ]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "type": "multicall",
+  "token": "01JZ4PCMULTICALLPARENT0001",
+  "securePaymentUrl": "https://pay.request.network/?token=01JZ4PCMULTICALLPARENT0001",
+  "status": "pending",
+  "expiresAt": "2026-06-22T10:00:00.000Z",
+  "createdAt": "2026-06-15T10:00:00.000Z",
+  "items": [
+    { "securePaymentToken": "01JZ4PC7EXAMPLECHILD000001", "requestId": "01e273...", "position": 0 },
+    { "securePaymentToken": "01JZ4PC7EXAMPLECHILD000002", "requestId": "02f384...", "position": 1 }
+  ]
+}
+```
+</ResponseExample>
+
+The parent's `expiresAt` is the earliest expiry among its children.
+
+### Execution kinds
+
+| Kind | When | Behavior |
+| --- | --- | --- |
+| `evm_same_chain` | All children on one network and one currency | Settled as a single bundled batch transaction (plus any ERC-20 approvals) |
+| `evm_cross_chain` | Children span chains/currencies, or the payer pays from a different source | One cross-chain (Li.Fi) route is fetched per child and aggregated into one bundle (default cap 20 children) |
+| `tron_batch` | All children on Tron (same token) | Settled via the Tron batch payment contract |
+
+Supported payer source chains for cross-chain selection: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`, `POLYGON`, `BNB`. Supported source tokens: `USDC`, `USDT`.
+
+### Validation errors
+
+Eligibility failures return a structured envelope:
+
+```json 400 Bad Request
+{
+  "message": "Multicall validation failed",
+  "code": "multicall_validation_failed",
+  "failures": [
+    { "securePaymentToken": "01JZ4PC7EXAMPLECHILD000099", "reason": "already_paid" }
+  ]
+}
+```
+
+`failures[].reason` includes values such as `already_paid`, `secure_payment_expired`, `not_outgoing`, `compliance_failed`, and `not_payable_child`. Each `failures[]` entry also carries `messageKey`, `context`, and `recoveryAction` to help you present and resolve the failure. When a count limit is exceeded, the envelope instead carries a `cap` object together with a `failures` entry whose reason is `too_many_children` (child-count cap) or `cap_exceeded`:
+
+```json 400 Bad Request (cap exceeded)
+{
+  "message": "Multicall validation failed",
+  "code": "multicall_validation_failed",
+  "failures": [
+    { "securePaymentToken": "*", "reason": "too_many_children" }
+  ],
+  "cap": { "type": "child_count", "maximum": 150, "actual": 180, "reduceBy": 30 }
+}
+```
+
+### Paying a multicall link
+
+The payer settles the parent token through the standard payer routes:
+
+- `GET /v2/secure-payments/:token` returns the multicall details (children, totals, per-child eligibility).
+- `GET /v2/secure-payments/:token/pay` returns multicall calldata, including `executionKind`, the `children[]` (each with its own `paymentReference`), the top-level `references[]` array (one per child, in order), and — for cross-chain — a per-child `destinationCall`.
+
+---
+
+## GET /v2/secure-payments/multicall-payouts/:token
+
+Retrieve passive details for a multicall payout parent — children, totals, and per-child eligibility. This endpoint does **not** return quotes, calldata, or execution data; use `GET /v2/secure-payments/:token/pay` for calldata. Requires a SIWE wallet session (operator/Dashboard-facing).
+
+### Path parameters
+
+<ParamField path="token" type="string" required>
+Multicall parent token returned from `POST /v2/secure-payments/multicall-payouts`.
+</ParamField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "paymentType": "multicall",
+  "token": "01JZ4PCMULTICALLPARENT0001",
+  "status": "pending",
+  "canExecute": true,
+  "expiresAt": "2026-06-22T10:00:00.000Z",
+  "createdAt": "2026-06-15T10:00:00.000Z",
+  "children": [
+    {
+      "securePaymentToken": "01JZ4PC7EXAMPLECHILD000001",
+      "requestId": "01e273...",
+      "position": 0,
+      "executable": true,
+      "blockReason": null,
+      "amount": "50",
+      "payee": "0xb07d2398d2004378cad234da0ef14f1c94a530e4"
+    }
+  ],
+  "totals": {
+    "childCount": 2,
+    "blockedChildCount": 0
+  }
+}
+```
+</ResponseExample>
+
+<Note>
+The example is abbreviated. Each child also carries `messageKey`, `context`, `recoveryAction`, and `feePlan`, and `totals` also includes `byDestinationCurrency` and `amountSummary`.
+</Note>
+
+### Error responses
+
+- `403`: not authorized for this multicall parent
+- `404`: token not found
 - `429`: rate limited

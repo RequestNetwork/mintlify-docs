@@ -1,0 +1,80 @@
+---
+title: "Orchestrators overview"
+description: "Orchestrators are fee and branding partners in Request Network. Link client IDs, configure fees, and apply whitelabel branding across the platforms you serve."
+---
+
+## What is an orchestrator?
+
+An **orchestrator** is a fee and branding partner in Request Network. It is a first-class account that can:
+
+- **Link client IDs** — associate the developer [Client IDs](/api-features/client-id-management) (`cli_*` tokens) of the platforms you serve with your orchestrator.
+- **Configure fees** — set [orchestrator fees](/orchestrators/fees) (and per-client-ID overrides) that apply to payments made under those client IDs.
+- **Apply branding** — give the hosted [Secure Payment](/tools/secure-payments) experience your own [whitelabel branding](/orchestrators/whitelabel-branding).
+
+This is aimed at platforms, PSPs, and partners who orchestrate payments on behalf of multiple downstream merchants and want consistent fees and branding across them.
+
+<Note>
+"Orchestrator" here is the formal fee/branding partner account described on this page. It builds on — but is broader than — the lightweight "orchestrator pattern" of binding a single Client ID to a payee destination described in [Client ID Management](/api-features/client-id-management#orchestrator-pattern).
+</Note>
+
+## Getting provisioned
+
+Orchestrator accounts and their API keys are provisioned by Request Network — they are not self-service. [Get in touch](https://request.network) to have an orchestrator created for you.
+
+Once provisioned, you authenticate to the orchestrator endpoints with a secret key sent in the `x-orchestrator-key` header:
+
+```bash
+curl -X GET "https://api.request.network/v2/orchestrators/client-ids" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+<Warning>
+Your orchestrator key (prefixed `orc_`) is a server-side secret. The full key value is shown only once, at creation time. Store it in a secret manager, never expose it in client-side code, and contact Request Network to rotate it if it is compromised.
+</Warning>
+
+## The orchestrator API surface
+
+All partner-facing orchestrator endpoints live under `/v2/orchestrators` and are authenticated with the `x-orchestrator-key` header:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /v2/orchestrators/client-ids` | List the client IDs linked to your orchestrator |
+| `POST /v2/orchestrators/client-ids` | Link an existing `cli_*` client ID |
+| `DELETE /v2/orchestrators/client-ids/:clientId` | Unlink a client ID |
+| `POST /v2/orchestrators/client-id-link-intents` | Create an onboarding link intent |
+| `POST /v2/orchestrators/fee-configs` | Create an orchestrator fee or per-client-ID override |
+| `GET /v2/orchestrators/fee-configs` | List your fee configs (optionally `?clientId`) |
+| `PATCH /v2/orchestrators/fee-configs/:id` | Update a fee config |
+| `DELETE /v2/orchestrators/fee-configs/:id` | Disable a fee config |
+
+See [Client ID linking](/orchestrators/client-id-linking) and [Orchestrator fees](/orchestrators/fees) for details.
+
+## How orchestrators apply at payment time
+
+**Fees** are applied only when the secure payment is created with **paired authentication** — both your `x-orchestrator-key` and the platform's `x-client-id` headers. A client-ID-only call cannot carry an orchestrator key (it is rejected), so it receives no orchestrator fee. The orchestrator's active fee configuration is resolved and baked into the payment at creation time:
+
+```bash
+curl -X POST "https://api.request.network/v2/secure-payments" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "x-client-id: cli_PLATFORM_CLIENT_ID" \
+  -H "Content-Type: application/json" \
+  -d '{ "requests": [ { "destinationId": "...", "amount": "100" } ] }'
+```
+
+**Branding** is resolved from the active client-ID → orchestrator link when the hosted Secure Payment page loads, so your branding applies to a linked client ID's payments even without paired authentication.
+
+## Related
+
+<CardGroup cols={3}>
+  <Card title="Orchestrator fees" href="/orchestrators/fees" icon="percent">
+    Configure orchestrator fees and per-client-ID overrides.
+  </Card>
+
+  <Card title="Client ID linking" href="/orchestrators/client-id-linking" icon="link">
+    Link client IDs directly or via onboarding link intents.
+  </Card>
+
+  <Card title="Whitelabel branding" href="/orchestrators/whitelabel-branding" icon="palette">
+    Theme the Secure Payment page with your branding.
+  </Card>
+</CardGroup>

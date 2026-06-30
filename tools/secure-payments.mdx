@@ -100,17 +100,23 @@ Tron is fully supported as both a **source** and a **destination** for single-re
 **Multi-recipient Tron Secure Payments are not supported.** A Secure Payment link with multiple `requests[]` entries pointing at Tron destinations is rejected at creation time with a 400. EVM batches up to 200 payees per link work as expected.
 </Warning>
 
+## Multicall payouts
+
+When several outgoing payout links are combined into a [multicall payout](/api-features/payouts#multicall-payouts), the payer opens one Secure Payment link that lists every recipient and settles the whole bundle in a single flow. The page shows a per-recipient breakdown (including each payout's reference), totals, and — for cross-chain bundles — the Li.Fi routing, then a single confirm step. Bundles settle same-chain, across chains, or as a Tron batch depending on the recipients and the payer's chosen source.
+
 ## Compliance-gated payments (KYT)
 
 When the merchant has enabled a Know Your Transaction policy on the receiving destination, the secure payment app screens the connected wallet before showing payment options. Wallets that fail the screen see a policy-failure view and cannot reach the sign step. Optional privacy flags can also keep the payment amount and the payee address masked until the screening passes.
 
 See [Compliance-gated payments](/use-cases/compliance-gated-payments) for the merchant-side configuration and [Hypernative Standard Screening Policy](/use-cases/hypernative-standard-screening-policy) for the default KYT categories and thresholds.
 
-## Smart accounts (gasless on EVM)
+## Smart accounts & gasless approvals (EVM)
 
-For supported EVM destinations, Secure Payment can route payments through an [Account Abstraction](https://www.alchemy.com/overviews/what-is-account-abstraction) smart account so the payer doesn't need to hold gas-token balance. The flow is invisible to the payer beyond a slightly different transaction signature step. The integration uses Pimlico for bundling and Alchemy gas policies for sponsorship — see [Secure payment pages](/api-features/secure-payment-pages#smart-account-payments) for the full spec.
+For supported EVM payments, Secure Payment can route through an [ERC-4337](https://www.alchemy.com/overviews/what-is-account-abstraction) smart account derived from the payer's connected wallet and bundled via Pimlico, so the approval, funding, and payment execute as a single operation. The flow is invisible to the payer beyond the signature step.
 
-Smart-account routing is EVM-only. Tron payments use the standard TronWeb path.
+On this path, ERC-20 approvals are **gasless** for tokens that support [EIP-2612 `permit`](/api-features/secure-payment-pages#gasless-token-approvals-eip-2612) (such as USDC) — the payer signs instead of broadcasting a separate approval transaction. Tokens without permit (such as USDT) use a one-time on-chain approval. See [Secure payment pages](/api-features/secure-payment-pages#smart-account-payments) for the full spec.
+
+Smart-account routing is EVM-only; Tron payments use the standard TronWeb path. To pay from an existing **Gnosis Safe multisig**, use the [Safe multisig payments](/api-features/safe-multisig-payments) API flow.
 
 ## Error states
 
