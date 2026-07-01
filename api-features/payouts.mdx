@@ -7,10 +7,11 @@ description: "Initiate single, batch, and recurring payments directly via the AP
 
 Payouts let you initiate payments without a separate request creation step. The API creates the request and returns executable transaction calldata in a single call.
 
-**Three payout modes:**
+**Payout modes:**
 - **Single** — Pay one recipient
-- **Batch** — Pay multiple recipients in one transaction (same network)
+- **Batch** — Pay multiple recipients in one transaction (same network, EVM)
 - **Recurring** — Automated payment schedules with ERC20 permit signatures
+- **Multicall** — Combine multiple existing payout links into one bundle, including across chains and on Tron
 
 ## Single Payout
 
@@ -56,7 +57,7 @@ curl -X POST "https://api.request.network/v2/payouts" \
 **Optional fields:**
 - `reference` — Merchant reference for reconciliation
 - `feePercentage` and `feeAddress` — Platform fee configuration
-- `customerInfo` — Payer information (name, email, address)
+- `customerInfo` — optional structured metadata to attach to the request
 - `payer` — Payer wallet address (required for recurring)
 
 The response includes `requestId` and a `transactions` array with executable calldata.
@@ -66,7 +67,7 @@ The response includes `requestId` and a `transactions` array with executable cal
 Pay multiple recipients in a single blockchain transaction. All payments must be on the same network.
 
 <Warning>
-**EVM-only.** Batch payouts work on EVM chains. Tron batch payouts are not supported — the API rejects them with `Batch payments are not supported for TRON networks.` For Tron, submit individual `POST /v2/payouts` calls per recipient.
+**EVM-only.** Batch payouts work on EVM chains. Tron batch payouts are not supported — the API rejects them with `Batch payments are not supported for TRON networks. Please submit individual payment requests.` For Tron, submit individual `POST /v2/payouts` calls per recipient.
 </Warning>
 
 ```bash
@@ -93,6 +94,32 @@ curl -X POST "https://api.request.network/v2/payouts/batch" \
 ```
 
 The response includes approval transactions and a batch payment transaction to execute.
+
+## Multicall payouts
+
+Multicall payouts combine multiple **existing** outgoing payout links into a single hosted link the payer settles as one bundle. Unlike [batch payouts](#batch-payout) — which are same-network and EVM-only — multicall supports cross-chain routing and Tron.
+
+Create a multicall link from previously created secure-payout tokens:
+
+```bash
+curl -X POST "https://api.request.network/v2/secure-payments/multicall-payouts" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "childTokens": ["01JZ4PC7EXAMPLECHILD000001", "01JZ4PC7EXAMPLECHILD000002"]
+  }'
+```
+
+The response returns a parent `token` and `securePaymentUrl`. Share the URL with whoever signs payouts; they review every recipient and settle the whole bundle in one flow.
+
+**Execution kinds:**
+- `evm_same_chain` — all recipients on one network and currency, settled as a single batch transaction.
+- `evm_cross_chain` — recipients span chains/currencies (or the payer pays from a different source); each leg is routed via Li.Fi.
+- `tron_batch` — all recipients on Tron, settled via the Tron batch contract.
+
+When you omit `requestedExecutionKind`, it is derived from the payer's source selection at payment time. The default cap is 150 children (20 for cross-chain).
+
+See [Multicall payouts in the Secure Payments reference](/api-reference/secure-payments#post-v2secure-paymentsmulticall-payouts) for the full request/response schema, eligibility rules, and validation errors.
 
 ## Recurring Payouts
 

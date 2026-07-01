@@ -7,6 +7,49 @@ This page tracks notable changes to the Request Network v2 API.
 
 ## Recent updates
 
+<Update label="2026-Q2 • Orchestrators" description="Fee & branding partner platform">
+
+### New Features
+
+- **Orchestrators** — a fee and branding partner layer. Provisioned by Request Network and authenticated with an `x-orchestrator-key`, orchestrators link platform Client IDs (`POST /v2/orchestrators/client-ids` and onboarding link intents), configure orchestrator fees and per-client-ID overrides (`/v2/orchestrators/fee-configs`), and apply whitelabel branding. See [Orchestrators](/orchestrators/overview).
+- **Configurable orchestrator fee model** — basis-point rates, optional USD caps, `feeBearer` (payer/recipient), and `flow` (incoming/outgoing), resolving as per-client-ID override → orchestrator default → protocol fee. See [Orchestrator fees](/orchestrators/fees).
+
+</Update>
+
+<Update label="2026-Q2 • Multicall payouts" description="Bundle payouts across chains and on Tron">
+
+### New Features
+
+- **Multicall payouts** — `POST /v2/secure-payments/multicall-payouts` combines multiple existing payout links into one hosted link settled as a single bundle. Three execution kinds: `evm_same_chain`, `evm_cross_chain` (per-child Li.Fi routing), and `tron_batch`. See [Multicall payouts](/api-features/payouts#multicall-payouts).
+
+</Update>
+
+<Update label="2026-Q2 • Safe & gasless" description="Safe multisig payers and gasless approvals">
+
+### New Features
+
+- **Safe multisig payments** — pay a secure payment from an existing Gnosis Safe: request Safe-ready calldata with `isSafe=true`, execute on your Safe, and track settlement by recording `safeTxHash` on the intent endpoint (`423 Locked` while in progress). See [Safe multisig payments](/api-features/safe-multisig-payments).
+- **Gasless token approvals (EIP-2612)** — on the smart-account path, permit-enabled tokens (e.g. USDC) authorize via an off-chain signature with no separate approval transaction. See [Gasless token approvals](/api-features/secure-payment-pages#gasless-token-approvals-eip-2612).
+
+</Update>
+
+<Update label="2026-Q2 • Tokens & compliance" description="USDT0 and Merkle Science KYT">
+
+### New Features
+
+- **USDT0** is supported as a payment currency (alias of USDT) on Arbitrum One, Optimism, and Polygon, and is part of the cross-chain currency set. See [Supported Chains and Currencies](/resources/supported-chains-and-currencies).
+- **Merkle Science** is available as a multi-chain KYT screening provider alongside the default Hypernative — select it with `screeningProvider` on a destination's access policy. See [Compliance-gated payments](/use-cases/compliance-gated-payments).
+
+</Update>
+
+<Update label="2026-Q2 • Whitelabel branding" description="Theme the Secure Payment page">
+
+### New Features
+
+- **Whitelabel branding** for the Secure Payment page — five color tokens plus logo and legal links, set at the orchestrator level or per client ID and delivered with the secure-payment metadata. See [Whitelabel branding](/orchestrators/whitelabel-branding).
+
+</Update>
+
 <Update label="2026-Q2" description="Tron gas fee transparency">
 
 ### Improvements
@@ -62,7 +105,8 @@ The v2 API exposes endpoints across these resource groups (see [Endpoints (V2)](
 - **Requests** (`/v2/request`) — create, query, update, get calldata
 - **Payments** (`/v2/payments`) — search and reconcile
 - **Payouts** (`/v2/payouts`, `/v2/payouts/batch`, `/v2/payouts/recurring`) — single, batch (EVM-only), recurring
-- **Secure Payments** (`/v2/secure-payments`, `/v2/secure-payments/payouts`) — incoming and outgoing hosted links
+- **Secure Payments** (`/v2/secure-payments`, `/v2/secure-payments/payouts`, `/v2/secure-payments/multicall-payouts`) — incoming, outgoing, and multicall hosted links
+- **Orchestrators** (`/v2/orchestrators`) — link client IDs and configure orchestrator fees (orchestrator-key auth)
 - **Currencies** (`/v2/currencies`) — supported tokens and conversion routes
 - **Commerce Payments** (`/v2/commerce-payments`) — authorize/capture/void/refund (preview)
 - **Payer** (`/v2/payer`) — crypto-to-fiat KYC and bank account flows

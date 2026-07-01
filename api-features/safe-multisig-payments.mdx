@@ -1,0 +1,145 @@
+---
+title: "Safe Multisig Payments"
+description: "Pay a secure payment from an existing Gnosis Safe multisig: request Safe-ready calldata, execute on your Safe, and track settlement via the intent endpoint."
+---
+
+## Overview
+
+When the wallet paying a secure payment is an existing [Gnosis Safe](https://safe.global/) multisig, the payment cannot be broadcast in a single signature — it has to be proposed on the Safe, signed by the required owners, and then executed. Request Network supports this flow directly: you ask the calldata endpoint for **Safe-ready** transactions, execute them on your Safe off-platform, and then hand the resulting Safe transaction hash back to the API so it can track settlement.
+
+This is distinct from the [smart-account path](/api-features/secure-payment-pages#smart-account-payments) on the hosted secure payment page, which derives its own ERC-4337 account automatically. Use the flow on this page when **your own payer wallet is a Safe** and you execute the transaction yourself.
+
+<Info>
+Safe multisig payments are **EVM-only**. They are not supported on Tron — requesting Safe calldata for a Tron network returns a 400.
+</Info>
+
+## How it works
+
+<Steps>
+  <Step title="Request Safe-ready calldata">
+    Call `GET /v2/secure-payments/:token/pay` with `isSafe=true` and `wallet` set to the **Safe address**. The API returns calldata sized and priced for a Safe (it includes the required approval transactions and skips the EOA native-gas balance check).
+
+    ```bash
+    curl -X GET "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789JKL/pay?wallet=0xSAFE_ADDRESS&isSafe=true" \
+      -H "x-client-id: YOUR_CLIENT_ID"
+    ```
+
+    <Warning>
+    `isSafe=true` is mutually exclusive with `eoaWallet`, and `wallet` is required. The `wallet` value must be the Safe address that will execute the payment.
+    </Warning>
+  </Step>
+
+  <Step title="Propose and execute on your Safe">
+    Propose the returned transactions to your Safe, collect the required owner signatures, and execute. This happens entirely on your side using your Safe tooling — Request Network does not custody keys or co-sign.
+  </Step>
+
+  <Step title="Record the Safe transaction">
+    Once the Safe transaction is created, tell the API to start tracking it by calling `POST /v2/secure-payments/:token/intent` with `safeTxHash` (instead of `txHash`).
+
+    ```bash
+    curl -X POST "https://api.request.network/v2/secure-payments/01ABC123DEF456GHI789JKL/intent" \
+      -H "x-client-id: YOUR_CLIENT_ID" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "safeTxHash": "0xSAFE_TX_HASH",
+        "chain": "POLYGON",
+        "token": "USDC",
+        "safePaymentDeadline": 1749760800
+      }'
+    ```
+
+    Exactly one of `txHash` or `safeTxHash` must be provided. `safePaymentDeadline` is optional (Unix seconds) and can only be sent alongside `safeTxHash`.
+  </Step>
+
+  <Step title="Poll for settlement">
+    While the Safe transaction is pending execution, `GET /v2/secure-payments/:token` returns **HTTP 423 (Locked)** with the message `Secure payment is in progress` and a `requestStatuses[]` array carrying `safeTxHash`, `chainId`, and `safePaymentDeadline`. Request Network resolves the Safe transaction in the background: once executed it records the real on-chain transaction hash and confirms the payment; if it fails or the deadline passes, the payment is marked failed.
+  </Step>
+</Steps>
+
+## Request fields
+
+### `GET /v2/secure-payments/:token/pay`
+
+<ParamField query="wallet" type="string" required>
+The Safe address that will execute the payment. Used for balance and approval calculation.
+</ParamField>
+
+<ParamField query="isSafe" type="boolean">
+Set to `true` to prepare calldata for a Gnosis Safe multisig payer. Mutually exclusive with `eoaWallet`; `wallet` must be set to the Safe address.
+</ParamField>
+
+<ParamField query="chain" type="string">
+Source chain for cross-chain payments. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`, `POLYGON`, `BNB`. Provide together with `token`.
+</ParamField>
+
+<ParamField query="token" type="string">
+Source currency for cross-chain payments. Values: `USDC`, `USDT`. Provide together with `chain`.
+</ParamField>
+
+### `POST /v2/secure-payments/:token/intent`
+
+<ParamField body="safeTxHash" type="string">
+The Safe transaction hash to track. Provide **either** `safeTxHash` (Safe multisig flow) **or** `txHash` (already-broadcast on-chain hash) — exactly one.
+</ParamField>
+
+<ParamField body="safePaymentDeadline" type="number">
+Unix timestamp (seconds) — the hard on-chain execution deadline for the Safe + cross-chain route. Only valid alongside `safeTxHash`; the API stops tracking once this passes.
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+Source chain. Values: `BASE`, `OPTIMISM`, `ARBITRUM`, `ETHEREUM`, `POLYGON`, `BNB`.
+</ParamField>
+
+<ParamField body="token" type="string" required>
+Source token. Values: `USDC`, `USDT`.
+</ParamField>
+
+<ParamField body="payerAddress" type="string">
+Optional address of the wallet making the payment. Echoed back on the response.
+</ParamField>
+
+<ResponseExample>
+```json 200 OK (intent recorded)
+{
+  "intentId": "01HXEXAMPLE123",
+  "paymentReference": "0xb3581f0b0f74cc61",
+  "safeTxHash": "0xSAFE_TX_HASH",
+  "safePaymentDeadline": 1749760800,
+  "isListening": true
+}
+```
+</ResponseExample>
+
+## Status while a Safe payment is in progress
+
+<ResponseExample>
+```json 423 Locked
+{
+  "message": "Secure payment is in progress",
+  "status": "pending",
+  "requestStatuses": [
+    {
+      "requestId": "01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb",
+      "hasBeenPaid": false,
+      "safeTxHash": "0xSAFE_TX_HASH",
+      "chainId": 137,
+      "safePaymentDeadline": 1749760800
+    }
+  ]
+}
+```
+</ResponseExample>
+
+Treat `423` as "keep polling" — the Safe transaction has been recorded but not yet executed on-chain. Once Request Network detects execution, the request flips to paid (and `GET /v2/secure-payments/:token` returns the completed state); a `payment.confirmed` webhook fires as usual.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Secure Payments API Reference" href="/api-reference/secure-payments" icon="book">
+    Full request/response schemas for the secure payment endpoints.
+  </Card>
+
+  <Card title="Smart account payments" href="/api-features/secure-payment-pages#smart-account-payments" icon="wand-magic-sparkles">
+    The automatic ERC-4337 path on the hosted page (for EOA payers).
+  </Card>
+</CardGroup>

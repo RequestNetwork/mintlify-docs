@@ -68,25 +68,38 @@ Secure payment pages support crosschain payments. When a payer connects their wa
 
 **Supported crosschain currencies:** USDC, USDT
 
-**Supported crosschain chains:** Ethereum, Arbitrum, Base, OP Mainnet, Polygon
+**Supported crosschain chains:** Ethereum, Arbitrum, Base, OP Mainnet, Polygon, BNB Chain
 
 See [Crosschain Payments](/api-features/crosschain-payments) for details on crosschain routing via LiFi.
 
 ## Smart Account Payments
 
-The secure payment page supports gas-sponsored payments via [Safe](https://safe.global/) smart accounts (ERC-4337), bundled and sponsored through [Pimlico](https://pimlico.io/). When available, payers can use a smart account to execute payments without paying gas fees.
+For supported EVM payments, the secure payment page can execute through an ERC-4337 [Safe](https://safe.global/) smart account derived automatically from the payer's connected wallet, bundled through [Pimlico](https://pimlico.io/). The whole payment — approval, funding, and settlement — runs as a single UserOperation.
 
 **How it works:**
 
-1. The payer approves a spending cap from their EOA wallet to the smart account
-2. The smart account batches the `transferFrom` (EOA to smart account) and the payment transaction into a single UserOperation
-3. Gas is sponsored via Pimlico's paymaster — the payer pays zero gas
+1. The payer authorizes the token spend. For tokens that support [EIP-2612 `permit`](#gasless-token-approvals-eip-2612) (such as USDC), this is an off-chain signature with no separate approval transaction; for other tokens (such as USDT) it is a one-time on-chain approval.
+2. The smart account batches the `permit`/approval, the funding transfer from the payer's wallet, and the payment transaction into a single UserOperation.
+3. The bundler submits the UserOperation and the page surfaces the resulting on-chain transaction hash on the success screen.
 
-**Supported chains for smart account payments:** Ethereum, Base, Arbitrum, Optimism, Polygon, BSC, and Sepolia (testnet).
+**Supported chains for smart account payments:** Ethereum, Base, Arbitrum, Optimism, Polygon, and BNB Chain (plus Sepolia testnet). Native-currency payments and Tron payments do not use the smart-account path.
 
 <Info>
-Smart account payments are a client-side feature of the hosted secure payment page. There is no separate API for smart accounts — the same `GET /v2/secure-payments/:token/pay` endpoint provides the transaction calldata.
+Smart account payments are an automatic client-side behavior of the hosted secure payment page. There is no API field to enable them — the same `GET /v2/secure-payments/:token/pay` endpoint provides the transaction calldata, and the page decides whether to route through a smart account. To pay from an existing **Gnosis Safe multisig** programmatically, see [Safe multisig payments](/api-features/safe-multisig-payments).
 </Info>
+
+### Gasless token approvals (EIP-2612)
+
+ERC-20 payments normally need a separate `approve()` transaction before the transfer, which costs the payer extra gas. On the smart-account path, the secure payment page checks each token at runtime for [EIP-2612](https://eips.ethereum.org/EIPS/eip-2612) `permit` support:
+
+- **Permit-enabled tokens (e.g. USDC, EURC)** — the payer signs an off-chain `permit` instead of sending an approval transaction. No approval gas is required, and the approval gas line item is hidden in the payer's cost breakdown.
+- **Non-permit tokens (e.g. USDT, DAI)** — the page falls back to a standard one-time on-chain `approve()`, which costs native gas as usual.
+
+The approval is a one-time authorization that stays in effect until revoked (the page exposes a revoke control), and it applies to both single payments and [multicall payouts](/api-features/payouts#multicall-payouts). Gasless approvals are available on the same chains as smart-account payments listed above.
+
+<Note>
+Whether a token is gasless is determined per token at payment time by probing the token contract, not from a fixed list — any EIP-2612-compliant token gets the gasless signature path. USDC/EURC and USDT/DAI are cited here only as common examples.
+</Note>
 
 ## Status outcomes
 

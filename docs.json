@@ -128,6 +128,7 @@
                 "pages": [
                   "api-features/secure-payment-pages",
                   "api-features/secure-payment-integration-guide",
+                  "api-features/safe-multisig-payments",
                   "api-features/secure-payment-supported-networks-and-currencies"
                 ]
               },
@@ -149,6 +150,15 @@
                 "group": "Advanced",
                 "pages": [
                   "api-features/commerce-payments"
+                ]
+              },
+              {
+                "group": "Orchestrators",
+                "pages": [
+                  "orchestrators/overview",
+                  "orchestrators/fees",
+                  "orchestrators/client-id-linking",
+                  "orchestrators/whitelabel-branding"
                 ]
               }
             ]

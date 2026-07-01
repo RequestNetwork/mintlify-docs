@@ -1,0 +1,72 @@
+---
+title: "Client ID linking"
+description: "Link platform Client IDs to your orchestrator — directly or via onboarding link intents — so your fees and branding apply to their payments."
+---
+
+## Overview
+
+To apply your [orchestrator fees](/orchestrators/fees) and [branding](/orchestrators/whitelabel-branding) to a platform's payments, link that platform's [Client ID](/api-features/client-id-management) (`cli_*` token) to your orchestrator. There are two ways to link: directly, when you already have the client ID, or via an onboarding **link intent**, when a recipient creates and links the client ID themselves.
+
+All linking endpoints use the `x-orchestrator-key` header.
+
+<Note>
+Linking is **one-to-one from the client ID side**: a client ID can be actively linked to at most one orchestrator. Re-linking a client ID that is already linked to a *different* orchestrator is rejected; re-linking to the *same* orchestrator is idempotent.
+</Note>
+
+## List linked client IDs
+
+```bash
+curl -X GET "https://api.request.network/v2/orchestrators/client-ids?page=1&limit=20" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+Results are paginated with `page` and `limit`.
+
+## Link an existing client ID
+
+When the platform has already shared its `cli_*` token with you, link it directly:
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/client-ids" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "clientId": "cli_PLATFORM_CLIENT_ID" }'
+```
+
+## Onboard with a link intent
+
+When you want a recipient to create and link a client ID themselves, create a **link intent**. It returns a single-use onboarding URL you hand to the recipient; redeeming it creates a client ID under the name you chose and links it to your orchestrator.
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/client-id-link-intents" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "clientIdName": "Acme Store" }'
+```
+
+The response contains an onboarding `url` carrying a single-use access token. Share it with the recipient to complete onboarding.
+
+<Note>
+A link intent is single-use and expires. Once redeemed, the new client ID is linked to your orchestrator and appears in `GET /v2/orchestrators/client-ids`.
+</Note>
+
+## Unlink a client ID
+
+```bash
+curl -X DELETE "https://api.request.network/v2/orchestrators/client-ids/cli_PLATFORM_CLIENT_ID" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+Unlinking revokes the active link. The client ID itself continues to exist and work; it simply no longer carries your orchestrator's fees and branding.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Orchestrator fees" href="/orchestrators/fees" icon="percent">
+    Apply fees and per-client-ID overrides to linked client IDs.
+  </Card>
+
+  <Card title="Client ID Management" href="/api-features/client-id-management" icon="id-card">
+    How platforms create and manage the `cli_*` client IDs you link.
+  </Card>
+</CardGroup>

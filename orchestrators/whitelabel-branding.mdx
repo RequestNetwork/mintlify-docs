@@ -1,0 +1,70 @@
+---
+title: "Whitelabel branding"
+description: "Theme the hosted Secure Payment page with your own colors, logo, and legal links as an orchestrator or per linked client ID."
+---
+
+## Overview
+
+As an [orchestrator](/orchestrators/overview), you can whitelabel the hosted [Secure Payment](/tools/secure-payments) page with your own colors, logo, and legal links. Branding can be set at the orchestrator level (applies to all your linked client IDs) or overridden per linked client ID.
+
+Branding is resolved server-side and delivered embedded in the `GET /v2/secure-payments/:token` response, so the hosted page renders your theme without any extra call.
+
+## Color tokens
+
+Branding defines five color tokens. Each must be a 3- or 6-digit hex color. The page derives additional shades (hovers, borders, modal colors, and a light/dark scheme) automatically from these five values.
+
+| Token | Default | Used for |
+| --- | --- | --- |
+| `pageBackground` | `#f3f4f6` | Page background |
+| `surfaceBackground` | `#ffffff` | Cards and panels |
+| `primaryAction` | `#00d395` | Primary buttons (Pay, Approve) |
+| `primaryText` | `#475569` | Headings and amounts |
+| `secondaryText` | `#94a3b8` | Labels and helper text |
+
+<Note>
+These are the theme-token names applied by the Secure Payment page. The underlying stored branding fields use `Color`-suffixed names — in particular `surfaceBackground` is stored as `cardBackgroundColor` (and `pageBackground` → `pageBackgroundColor`, `primaryAction` → `primaryActionColor`, and so on).
+</Note>
+
+## Logo and legal links
+
+| Field | Rules |
+| --- | --- |
+| `logoPath` | Footer/icon image. Must be a raster image: `.png`, `.jpg`, `.jpeg`, `.webp`, or `.avif` (SVG is rejected). |
+| `termsPath` | Terms link. Must end in `.html`. |
+| `privacyPath` | Privacy link. Must end in `.html`. |
+
+All three are **relative paths that must start with `/branding/`** — they cannot be absolute URLs or protocol-relative, cannot contain a query (`?`) or hash (`#`), and cannot contain path traversal (`..`).
+
+<Warning>
+Asset files must be **bundled with the deployed Secure Payment app** under `public/branding/{brand}/`. There is no remote-URL fetch — a path that points to a missing file renders as broken branding, not a fallback. Coordinate logo/legal asset bundling with Request Network when onboarding your branding.
+</Warning>
+
+## Request Network attribution
+
+`displayRequestBranding` (boolean) controls whether the footer shows **"Made easy by Request Network"**. It defaults to off for orchestrator-branded payments. Set it to `true` to keep the attribution.
+
+## Resolution priority
+
+Branding is selected **one row at a time**, most specific wins:
+
+1. **Client branding** — if a linked client ID has its own branding row, it is used. Any field left unset in that row falls back to the **Secure Payment defaults** (not to the orchestrator's values).
+2. **Orchestrator branding** — used only when the client ID has no branding row of its own.
+3. **Secure Payment defaults** (and the platform's default legal links) — used when neither is set.
+
+In other words, defining client-level branding replaces the orchestrator branding entirely for that client ID, so set every field you want at the level you use.
+
+## Setting branding
+
+Branding is managed through your orchestrator surface using the `x-orchestrator-key` header. Provide a `clientId` to set a per-client-ID override; omit it to set the orchestrator-level branding that applies to all your linked client IDs. Because logo and legal asset files must be bundled into the deployed app (see warning above), coordinate branding setup with Request Network during onboarding.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Secure Payment" href="/tools/secure-payments" icon="lock">
+    The hosted page your branding themes.
+  </Card>
+
+  <Card title="Orchestrators overview" href="/orchestrators/overview" icon="diagram-project">
+    How orchestrators, client IDs, fees, and branding fit together.
+  </Card>
+</CardGroup>

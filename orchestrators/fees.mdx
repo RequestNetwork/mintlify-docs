@@ -1,0 +1,97 @@
+---
+title: "Orchestrator fees"
+description: "Configure orchestrator fees and per-client-ID overrides: rates, caps, fee bearer, flow direction, and how fee layers resolve."
+---
+
+## Overview
+
+As an [orchestrator](/orchestrators/overview), you can attach fees to the payments made under the client IDs you've linked. Fees are configured with the `x-orchestrator-key` header on the `/v2/orchestrators/fee-configs` endpoints.
+
+Orchestrator fees are separate from — and stack with — the Request Network [protocol fee](/api-features/protocol-fees) and any per-request [platform fee](/api-features/platform-fees). On the orchestrator API you manage **orchestrator fees only**; the protocol fee is administered by Request Network.
+
+## Fee layers and precedence
+
+A payment can be subject to up to three fee layers. They resolve from most to least specific:
+
+1. **Per-client-ID override** — an orchestrator fee scoped to a single linked client ID. Wins its slot over the orchestrator default.
+2. **Orchestrator default** — an orchestrator fee that applies to all of the orchestrator's linked client IDs.
+3. **Protocol fee** — set by Request Network (falls back to the standard protocol default when none is configured).
+
+There is no per-client-ID protocol fee — client IDs can only override orchestrator fees.
+
+## Fee configuration fields
+
+<ParamField body="bps" type="integer" required>
+Fee rate in basis points, `0`–`10000` (`10000` = 100%). For example, `250` is 2.5%.
+</ParamField>
+
+<ParamField body="usdCap" type="string">
+Optional maximum fee in USD (as a string). Caps the fee for large payments.
+</ParamField>
+
+<ParamField body="feeBearer" type="string" required>
+Who absorbs the fee: `payer` (added on top of what the payer pays) or `recipient` (deducted from what the recipient receives).
+</ParamField>
+
+<ParamField body="flow" type="string" required>
+Which payment direction the fee applies to: `incoming` (get-paid flows) or `outgoing` (pay/payout flows). **Immutable** — see below.
+</ParamField>
+
+<ParamField body="evmRecipientAddress" type="string">
+EVM address that receives the fee. At least one of `evmRecipientAddress` or `tronRecipientAddress` is required.
+</ParamField>
+
+<ParamField body="tronRecipientAddress" type="string">
+Tron address that receives the fee. At least one of `evmRecipientAddress` or `tronRecipientAddress` is required.
+</ParamField>
+
+<Note>
+A fee config's identity is its combination of fee type, `flow`, and `feeBearer`. These are **immutable** — to change `flow` or `feeBearer`, disable the existing config and create a new one. You can update `bps`, `usdCap`, recipient addresses, and `status`.
+</Note>
+
+## Fee bearer and flow semantics
+
+- **`flow: incoming`** applies to payments you receive ("get paid"); its default bearer is the recipient.
+- **`flow: outgoing`** applies to payouts you send ("pay"); its default bearer is the payer.
+- **`feeBearer: payer`** adds the fee on top of the amount the payer pays.
+- **`feeBearer: recipient`** deducts the fee from the amount the recipient receives. A recipient-borne fee cannot exceed the gross amount.
+
+## Managing fee configs
+
+```bash
+# Create an orchestrator default fee (2.5%, payer-borne, on incoming payments)
+curl -X POST "https://api.request.network/v2/orchestrators/fee-configs" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bps": 250,
+    "feeBearer": "payer",
+    "flow": "incoming",
+    "evmRecipientAddress": "0x742d35CC6634c0532925a3B844BC9e7595f8fA40"
+  }'
+```
+
+| Operation | Endpoint |
+| --- | --- |
+| Create a fee or per-client-ID override | `POST /v2/orchestrators/fee-configs` |
+| List fee configs (filter with `?clientId`) | `GET /v2/orchestrators/fee-configs` |
+| Update a fee config | `PATCH /v2/orchestrators/fee-configs/:id` |
+| Disable a fee config | `DELETE /v2/orchestrators/fee-configs/:id` |
+
+To scope a fee to a single linked client ID (an **override** rather than the orchestrator-wide default), provide that `clientId` when creating, listing, or disabling the config.
+
+## Related
+
+<CardGroup cols={3}>
+  <Card title="Protocol fees" href="/api-features/protocol-fees" icon="building-columns">
+    Request Network's protocol-level fee, rate, and cap.
+  </Card>
+
+  <Card title="Platform fees" href="/api-features/platform-fees" icon="percent">
+    Per-request integrator fees via feePercentage/feeAddress.
+  </Card>
+
+  <Card title="Fee breakdowns" href="/api-features/fee-breakdowns" icon="receipt">
+    Where fee line items appear in API responses.
+  </Card>
+</CardGroup>

@@ -14,10 +14,10 @@ Request Network supports payment destinations on **8 networks** — 7 EVM chains
 | Network | Chain ID | Network ID | USDC | USDT | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Ethereum | `1` | `mainnet` | ✓ | ✓ | |
-| Arbitrum One | `42161` | `arbitrum-one` | ✓ | ✓ | Also supports USDT0 |
-| Optimism | `10` | `optimism` | ✓ | ✓ | |
+| Arbitrum One | `42161` | `arbitrum-one` | ✓ | ✓ | USDT0 payment currency also available |
+| Optimism | `10` | `optimism` | ✓ | ✓ | USDT0 payment currency also available |
 | Base | `8453` | `base` | ✓ | ✓ | |
-| Polygon | `137` | `matic` | ✓ | ✓ | |
+| Polygon | `137` | `matic` | ✓ | ✓ | USDT0 payment currency also available |
 | BNB Smart Chain | `56` | `bsc` | ✓ | ✓ | |
 | **Tron** | `728126428` | `tron` | ✓ | ✓ | TRC-20 tokens, `T...` addresses |
 
@@ -28,6 +28,10 @@ Request Network supports payment destinations on **8 networks** — 7 EVM chains
 | Sepolia | `11155111` | `sepolia` | FAU, USDC, USDT |
 
 All token addresses above are mainnet contracts. Use them as the `tokenAddress` when creating a payment destination via the [Auth API](https://auth.request.network/open-api/#tag/payee-destination).
+
+<Note>
+**USDT0** is supported as a payment currency (an alias of USDT) on **Arbitrum One**, **Optimism**, and **Polygon** — for example `USDT0-arbitrum-one`, `USDT0-optimism`, `USDT0-matic`. It is also part of the cross-chain currency set (USDC, USDT, USDT0). USDT0 is a payment/cross-chain currency, not a separate payee-destination token — receiving destinations are registered in USDC or USDT.
+</Note>
 
 ## Feature support per chain
 
@@ -141,6 +145,8 @@ Typical fields include:
 "USDC-base"
 "USDT-arbitrum-one"
 "USDT0-arbitrum-one"
+"USDT0-optimism"
+"USDT0-matic"
 ```
 
 ```javascript Tron examples
