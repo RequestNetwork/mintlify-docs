@@ -75,6 +75,17 @@ Advanced fields — `feePercentage`, `feeAddress`, `operatorWalletAddress`, `pay
 
 For the full field reference, see [Client ID Management](/api-features/client-id-management).
 
+## Webhooks
+
+The Dashboard manages webhooks from the **Webhooks** section on the **Manage Destination** page. Each webhook endpoint is tied to a specific Client ID.
+
+From this section you can:
+- **Add a webhook** — enter the endpoint URL and choose the Client ID it belongs to. The Dashboard shows the signing secret once, immediately after creation — save it, since it isn't displayed in full again afterward.
+- **Enable or disable** an existing webhook with a toggle, without deleting it.
+- **Delete** a webhook endpoint.
+
+See [Webhooks](/api-features/webhooks-events) for the payload format and how to verify signatures. Webhooks can also be managed programmatically via the [Auth API](https://auth.request.network/open-api/#tag/webhook).
+
 ## Get Paid
 
 The **Get Paid** tab is your incoming-payments view. Create a request — amount, currency, optional reference and payer identifier — and the Dashboard generates a `pay.request.network` link to share.
@@ -102,7 +113,6 @@ The Dashboard supports single-recipient payouts on both EVM and Tron, and lets y
 ## What the Dashboard does *not* do
 
 - It is not an admin / merchant control panel for downstream platforms — it's a user dashboard for your own wallet.
-- It does not manage webhooks today — webhooks are managed via the [Auth API](https://auth.request.network/open-api).
 - It does not host the payer-side checkout — that's [Secure Payment](/tools/secure-payments) at `pay.request.network`.
 
 ## Open the Dashboard

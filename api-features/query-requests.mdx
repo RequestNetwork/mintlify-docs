@@ -29,6 +29,8 @@ Typical fields include:
 - `requestAmount` — the original requested amount in invoice currency
 - `detectionSource` — how the payment was confirmed (`"request-network"` or `"lifi"`)
 - `note` — additional context for non-standard settlements (e.g., LiFi fallback)
+- `payerAddress` — the resolved payer wallet address for the payment (`null` when it can't be determined, e.g. for some contract-mediated flows)
+- `paidAmount`, `receivedAmount`, `excessAmount` — the amount paid by the payer, the raw amount received by the payment route, and any route-delivered amount above what was applied to the request
 - optional metadata such as `customerInfo` and `reference`
 </Step>
 
@@ -66,6 +68,7 @@ For wallet-level reconciliation views, use [GET /v2/payments](https://api.reques
 
 - Use `requestId` for deterministic lookup.
 - Keep idempotent reconciliation logic in case the same request is processed multiple times by your workers.
+- The `GET /v2/request` list endpoint accepts an optional `walletAddress` query parameter to scope results to a single payee wallet. Omit it to list across the authenticated identity's requests.
 
 ## Related Pages
 

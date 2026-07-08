@@ -10,7 +10,7 @@ Request Network API supports two authentication modes:
 - `x-api-key` for server-side integrations
 - `x-client-id` for browser/client integrations (with `Origin` header)
 
-Use this page as the canonical auth reference. Client IDs are managed in the [Request Dashboard](https://dashboard.request.network); webhooks are managed programmatically via the [Auth API](https://auth.request.network/open-api/#tag/webhook) (`POST /v1/webhook` with the `x-client-id` header).
+Use this page as the canonical auth reference. Client IDs are managed in the [Request Dashboard](https://dashboard.request.network). Webhooks can be managed no-code from the [Dashboard](/tools/dashboard#webhooks) or programmatically via the [Auth API](https://auth.request.network/open-api/#tag/webhook) (`POST /v1/webhook` with the `x-client-id` header).
 
 ## Choose the Right Method
 
@@ -52,6 +52,27 @@ For browser-based requests, `Origin` is part of the request context and is requi
 - `x-client-id`: Client identifier used for client-side auth
 - `Origin`: required with Client ID flows in browser contexts
 
+## Rate limits
+
+Request Network enforces rate limits on `x-client-id` requests to keep the API responsive for every integrator. By default, authenticated `x-client-id` integrators get an SLA of **300 requests per minute (5 requests per second)** in production.
+
+Several tiers exist. Most integrators run on **Default**; contact us to move to a higher-throughput tier if you need one:
+
+| Tier | Rate |
+| --- | --- |
+| Basic | 2 req/sec (120 req/min) |
+| Default (standard SLA) | 5 req/sec (300 req/min) |
+| Premium | 10 req/sec (600 req/min) |
+| High-volume | 20 req/sec (1,200 req/min) |
+
+Tiers are listed from lowest to highest throughput; `Default` is the standard SLA applied to authenticated integrators unless you have been assigned another tier.
+
+Rate limits are scoped per client ID and IP address, so usage from one client ID on one IP doesn't affect your limit on another IP. If you sustain a breach of your limit, requests from that client ID and IP are temporarily blocked (5 minutes by default) before being allowed again. Some endpoints, such as client ID management, use a more relaxed limit than the general default shown above.
+
+<Note>
+The production default is 5 req/sec. Non-production environments (development and test) run at a higher limit to support testing. Contact us if your integration needs a higher tier than the production default.
+</Note>
+
 ## Common Authentication Errors
 
 ### 401 Unauthorized
@@ -66,7 +87,7 @@ For browser-based requests, `Origin` is part of the request context and is requi
 
 ### 429 Too Many Requests
 
-- Request rate exceeded for your credentials
+- Request rate exceeded for your credentials. See [Rate limits](#rate-limits).
 
 ## Security Guidance
 

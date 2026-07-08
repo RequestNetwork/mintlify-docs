@@ -67,7 +67,7 @@ The response includes `requestId` and a `transactions` array with executable cal
 Pay multiple recipients in a single blockchain transaction. All payments must be on the same network.
 
 <Warning>
-**EVM-only.** Batch payouts work on EVM chains. Tron batch payouts are not supported — the API rejects them with `Batch payments are not supported for TRON networks. Please submit individual payment requests.` For Tron, submit individual `POST /v2/payouts` calls per recipient.
+**This endpoint is EVM-only.** `POST /v2/payouts/batch` settles a single same-network EVM transaction and rejects Tron with `Batch payments are not supported for TRON networks. Please submit individual payment requests.` To batch Tron payouts, use [multicall payouts](#multicall-payouts) with the `tron_batch` execution kind instead; single Tron payouts via `POST /v2/payouts` also remain available.
 </Warning>
 
 ```bash
