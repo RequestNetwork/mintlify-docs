@@ -156,7 +156,9 @@ Returns the active payee destination for the authenticated wallet, or `null` if 
 
 ### GET /v1/payee-destination/payout-lookup
 
-Retrieve the active destination preference for a payout recipient wallet. Returns only the routing fields needed to prefill payout creation, or `null` if the recipient has no active destination.
+Retrieve the active destination preference for a payout **recipient** wallet. Returns only the routing fields needed to prefill payout creation, or `null` if the recipient has no active destination.
+
+Like the other endpoints on this page, this requires a SIWE wallet session (httpOnly cookie). Unlike the other endpoints, the `walletAddress` query parameter is the *recipient* you are looking up — not the authenticated caller — so a payout initiator can resolve where a recipient wants to be paid.
 
 <ParamField query="walletAddress" type="string" required>
 Recipient wallet address to check for an active destination (Ethereum or Tron format).
