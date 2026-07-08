@@ -11,6 +11,10 @@ description: "Multi-network payment routing with automatic bridging via LiFi"
 
 Crosschain payments allow users to pay a request using a stablecoin from a different blockchain network than the one specified on the request. For example, a payer can pay a request for USDC on Base using USDT from their Optimism wallet. Crosschain routing is powered by [LiFi](https://li.fi/), which aggregates bridges and DEXs to find optimal routes.
 
+<Info>
+Cross-chain routing uses the Across bridge (LiFi routes are restricted to Across for predictable, supported settlement). A circuit breaker automatically degrades gracefully if the LiFi routing service is impaired—routes may temporarily be unavailable during an outage, but payments remain detectable and the API stays responsive.
+</Info>
+
 ## Benefits
 
 - **Flexibility:** Payers can pay with their preferred stablecoin on any supported chain.

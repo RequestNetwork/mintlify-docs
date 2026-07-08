@@ -101,6 +101,10 @@ Optional KYT (Know Your Transaction) compliance policy applied to payments into 
     `off` (default): no screening. `kyt_all_wallets`: every payer wallet is screened.
   </ParamField>
 
+  <ParamField body="screeningProvider" type='"hypernative" | "merklescience"'>
+    KYT provider used for screening. Required when `mode` is `kyt_all_wallets` (must be omitted or `null` when `mode` is `off`). `merklescience` (Merkle Science) is available where enabled for your account.
+  </ParamField>
+
   <ParamField body="hideUntilApproved" type="boolean">
     When `true`, payment metadata is hidden in the payer UI until the wallet passes screening.
   </ParamField>
@@ -120,6 +124,7 @@ Optional KYT (Know Your Transaction) compliance policy applied to payments into 
   "chainId": 8453,
   "accessPolicy": {
     "mode": "kyt_all_wallets",
+    "screeningProvider": "hypernative",
     "hideUntilApproved": true,
     "hidePayeeAddress": true
   },
@@ -148,6 +153,24 @@ Returns the updated destination object (same format as POST response).
 ### GET /v1/payee-destination
 
 Returns the active payee destination for the authenticated wallet, or `null` if none exists.
+
+### GET /v1/payee-destination/payout-lookup
+
+Retrieve the active destination preference for a payout recipient wallet. Returns only the routing fields needed to prefill payout creation, or `null` if the recipient has no active destination.
+
+<ParamField query="walletAddress" type="string" required>
+Recipient wallet address to check for an active destination (Ethereum or Tron format).
+</ParamField>
+
+```json Response (200)
+{
+  "destinationId": "0x742d...8f44e@eip155:1#4CA88C9C:0xa0b8...6eb48",
+  "walletAddress": "0x742d35cc6634c0532925a3b844bc454e4438f44e",
+  "tokenAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "chainId": 1,
+  "claimed": true
+}
+```
 
 ### GET /v1/payee-destination/lookup
 

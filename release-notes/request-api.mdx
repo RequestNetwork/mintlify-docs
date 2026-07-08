@@ -7,6 +7,21 @@ This page tracks notable changes to the Request Network v2 API.
 
 ## Recent updates
 
+<Update label="2026-Q3" description="Wallet reconciliation, rate limits, and hardened routing">
+
+### New Features
+
+- **Payer wallet address in reconciliation** — request status responses and payment webhook payloads now include `payerAddress`, the resolved wallet that paid (or `null` when it cannot be determined). See [Query requests](/api-features/query-requests) and [Webhooks & events](/api-features/webhooks-events).
+- **List requests by wallet (optional)** — the request list endpoint (`GET /v2/request`) now accepts an optional `walletAddress` filter to scope results to a single payee wallet; omit it to list across the authenticated identity scope.
+- **Tron batch payouts** — Tron payouts can now be bundled via multicall payouts using the `tron_batch` execution kind. See [Multicall payouts](/api-features/payouts#multicall-payouts).
+
+### Improvements
+
+- **Rate-limit SLA** — authenticated integrators (via `x-client-id`) are served at a 300 requests/min SLA, with higher tiers available on request. Limits are scoped per client ID and IP. See [Authentication](/api-reference/authentication).
+- **LiFi routing hardened** — cross-chain routing is now restricted to the Across bridge, and a circuit breaker degrades gracefully when LiFi is impaired so payments remain detectable. See [Cross-chain payments](/api-features/crosschain-payments).
+
+</Update>
+
 <Update label="2026-Q2 • Orchestrators" description="Fee & branding partner platform">
 
 ### New Features
