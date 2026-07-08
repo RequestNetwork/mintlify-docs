@@ -37,6 +37,14 @@ For larger payments with stablecoins, the fee is capped:
 
 - Payment of 100,000 USDC -> Fee capped at 25 USDC (not 50 USDC)
 
+## Tron-specific fees
+
+Transaction fees on Tron are paid in TRX and can be high when a wallet burns TRX directly for energy and bandwidth.
+
+To prevent payers from needing TRX before they can broadcast a transaction, Request Network covers the required Tron resources through dedicated providers. We use [CatFee](https://catfee.io/) to sponsor energy and [Tron Energy Rent](https://tronenergyrent.com/) to sponsor bandwidth. This provider-based flow makes Tron transactions cost less than if the payer burned TRX directly.
+
+To cover these sponsored resource costs, Request Network applies a fixed $5 payer-borne fee to every Tron transaction. This fee is lower than the TRX amount the payer would typically spend when paying Tron network resources directly.
+
 ## Shifting the Fee to the Payee
 
 If you want the payee to bear the protocol fee instead of the payer, simply reduce the invoice amount by 5bps (0.05%) before creating the request.
