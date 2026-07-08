@@ -86,6 +86,8 @@ Every API response includes the fee details in the metadata:
 
 Transaction fees on Tron are paid in TRX and can be high when a wallet burns TRX directly for energy and bandwidth.
 
-To prevent payers from needing TRX to broadcast a transaction, Request Network covers the required Tron resources through dedicated providers. We use [CatFee](https://catfee.io/) to sponsor energy and [Tron Energy Rent](https://tronenergyrent.com/) to sponsor bandwidth. This provider-based flow makes Tron transactions cost less than if the payer burned TRX directly.
+To prevent payers from needing TRX to broadcast a transaction, Request Network covers the required Tron resources through dedicated providers such as [CatFee](https://catfee.io/) and [Tron Energy Rent](https://tronenergyrent.com/). This provider-based flow makes Tron transactions cost less than if you burned TRX directly.
 
-To cover these sponsored resource costs, Request Network applies a fixed $5 payer-borne fee to every Tron payment. This fee is lower than the TRX amount the payer would typically spend when paying Tron network resources directly.
+<Note>
+To cover these sponsored resource costs, Request Network applies a fixed $5 fee to every Tron payment. This Tron-specific fee is charged in addition to the standard protocol fee and is lower than the TRX amount you would typically spend when paying Tron network resources directly.
+</Note>
