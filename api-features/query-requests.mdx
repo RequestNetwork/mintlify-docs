@@ -30,6 +30,7 @@ Typical fields include:
 - `detectionSource` — how the payment was confirmed (`"request-network"` or `"lifi"`)
 - `note` — additional context for non-standard settlements (e.g., LiFi fallback)
 - `payerAddress` — the resolved payer wallet address for the payment (`null` when it can't be determined, e.g. for some contract-mediated flows)
+- `payerEoaAddress` — the payer's connected wallet address (`null` when unavailable). It can differ from `payerAddress` when a smart account is used.
 - `paidAmount`, `receivedAmount`, `excessAmount` — the amount paid by the payer, the raw amount received by the payment route, and any route-delivered amount above what was applied to the request
 - optional metadata such as `customerInfo` and `reference`
 </Step>
