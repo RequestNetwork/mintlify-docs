@@ -1,0 +1,79 @@
+---
+title: "Request Network vs Stripe, PayPal & crypto payment tools"
+description: "How Request Network compares to Stripe, PayPal, and other crypto payment tools on fees, settlement time, custody, chargebacks, and stablecoin support."
+---
+
+Businesses accepting stablecoin or crypto payments often start by asking how Request Network compares to the processors they already know. This page lays out the concrete differences in fees, fund custody, dispute handling, and currency support, using the same numbers referenced elsewhere in these docs.
+
+## How much cheaper is Request Network?
+
+Request Network charges **0.05% (5 basis points)** per transaction. Stripe and PayPal charge **2.9% + $0.30** per transaction.
+
+On a $10,000 payment, that's **$5** with Request Network versus **$290** with Stripe or PayPal — Request Network is **58x cheaper**.
+
+| | Request Network | Stripe / PayPal |
+|---|---|---|
+| Fee | 0.05% (5 bps) | 2.9% + $0.30 |
+| Fee on $10,000 payment | $5 | $290 |
+
+## What does non-custodial mean for me?
+
+With Request Network, funds move **directly from payer to recipient** on-chain. There is no intermediary holding period.
+
+Traditional processors hold funds for **2-7 days** before releasing them to the merchant. That hold introduces:
+
+- Counterparty risk — the processor could freeze the account or go bankrupt while holding your funds
+- Delayed access to money you've already been paid
+- Exposure to fund freezing or seizure
+
+Because Request Network never takes custody of funds, none of these risks apply. The recipient has full control and immediate access as soon as the transaction settles on-chain.
+
+## What about chargebacks?
+
+Crypto payments made through Request Network are **final by default** — there are no chargebacks.
+
+This means:
+
+- No reversals appearing 60-90 days after a payment was made
+- No chargeback fees, which typically run **$15-25 per dispute** with card processors
+- Fewer losses from chargeback fraud, which is a common problem for international card payments and digital goods
+
+Card processors carry chargeback risk on every transaction: a merchant can lose the product *and* the payment, then pay a dispute fee on top.
+
+For businesses that still want buyer protection, Request Network supports **escrow-based flows**. Funds are held in a smart contract until agreed conditions are met, which enables refunds when needed without reintroducing custodial risk.
+
+## Which is better for crypto-native businesses?
+
+Request Network is built for crypto from the ground up, rather than adding crypto support to a fiat-first system.
+
+- **553+ currencies** supported across EVM chains (Ethereum, Polygon, BSC, and others) plus Tron
+- **No forced fiat conversion** — funds can stay in crypto end-to-end
+- **Native wallet integration** — connects directly with MetaMask, WalletConnect, and other Web3 wallets
+- **Crosschain payments** — a payer can pay in one token on one chain and the recipient receives a different token on a different chain
+
+Traditional processors typically support a handful of assets (often just BTC, ETH, and USDC), require crypto-to-fiat conversion with variable fees, and treat crypto as an add-on to a fiat-first architecture.
+
+## How does reconciliation compare?
+
+Both Request Network and traditional processors offer reconciliation, but the underlying guarantees differ.
+
+| | Request Network | Stripe / PayPal |
+|---|---|---|
+| Record integrity | Cryptographically guaranteed, on-chain | Stored in a company database |
+| Retention | No retention limit — records are permanent | Typically limited (for example, 7 years) |
+| Status updates | Real-time via webhooks | Real-time via webhooks |
+| Durability | Independent of any single company staying in business | Depends on the processor remaining operational |
+
+Because Request Network payment records live on-chain, they can't be altered or deleted, and they don't depend on a vendor's continued existence to remain accessible.
+
+## Full comparison at a glance
+
+| | Request Network | Stripe / PayPal |
+|---|---|---|
+| Fee | 0.05% (5 bps) | 2.9% + $0.30 |
+| Settlement | Direct payer → recipient, on-chain | 2-7 day hold before payout |
+| Custody | Non-custodial | Processor holds funds during settlement |
+| Chargebacks | None by default; optional escrow for buyer protection | Standard; $15-25 dispute fee |
+| Crypto/stablecoin support | 553+ currencies, native | Limited (typically BTC, ETH, USDC) |
+| Chains | EVM chains + Tron | N/A (fiat-first, crypto bolted on) |
+| Crosschain payments | Pay in one token, receive in another | Not supported |
