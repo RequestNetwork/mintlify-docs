@@ -199,6 +199,7 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
 - `timestamp`: ISO 8601 formatted event timestamp
 - `paymentProcessor`: Either `request-network` (crypto) or `request-tech` (fiat)
 - `payerAddress`: Resolved payer wallet — the on-chain sender for plain direct payments, or the resolved payer for recurring and intent-based flows (Secure Payment Page, LiFi, Safe, ERC-4337, multicall). `null` when it cannot be determined. Included on `payment.confirmed` and `payment.partial` events (and their `.client_id` / `.checkout` variants).
+- `payerEoaAddress`: The payer's connected wallet address. It can differ from `payerAddress` when a smart account is used. `null` when unavailable. Included on `payment.confirmed` and `payment.partial` events (and their `.client_id` / `.checkout` variants).
 
 ### Payment Confirmed
 ```json
@@ -214,6 +215,7 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
   "timestamp": "2025-10-03T14:30:00Z",
   "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
   "payerAddress": "0x92Fc3406Fc6BB7A76aC63b2E8b9d02b1B9C3e4d5",
+  "payerEoaAddress": "0x7A1F20C4D58E9B0A3C6D4E2F1B8A5C7D9E0F1234",
   "network": "ethereum",
   "currency": "USDC",
   "paymentCurrency": "USDC",
@@ -262,6 +264,7 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
   "timestamp": "2025-10-03T14:30:00Z",
   "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
   "payerAddress": "0x92Fc3406Fc6BB7A76aC63b2E8b9d02b1B9C3e4d5",
+  "payerEoaAddress": "0x7A1F20C4D58E9B0A3C6D4E2F1B8A5C7D9E0F1234",
   "network": "ethereum",
   "currency": "USDC",
   "paymentCurrency": "USDC",

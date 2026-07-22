@@ -11,7 +11,7 @@ This page tracks notable changes to the Request Network v2 API.
 
 ### New Features
 
-- **Payer wallet address in reconciliation** — request status responses and payment webhook payloads now include `payerAddress`, the resolved wallet that paid (or `null` when it cannot be determined). See [Query requests](/api-features/query-requests) and [Webhooks & events](/api-features/webhooks-events).
+- **Payer wallet details in reconciliation** — request status responses and payment webhook payloads include `payerAddress`, the address used to make the payment, and `payerEoaAddress`, the payer's connected wallet address. These can differ when a smart account is used. Both are `null` when unavailable. See [Query requests](/api-features/query-requests) and [Webhooks & events](/api-features/webhooks-events).
 - **List requests by wallet (optional)** — the request list endpoint (`GET /v2/request`) now accepts an optional `walletAddress` filter to scope results to a single payee wallet; omit it to list across the authenticated identity scope.
 - **Tron batch payouts** — Tron payouts can now be bundled via multicall payouts using the `tron_batch` execution kind. See [Multicall payouts](/api-features/payouts#multicall-payouts).
 

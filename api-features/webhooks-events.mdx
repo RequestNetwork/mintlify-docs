@@ -23,7 +23,7 @@ The Request Network webhook system emits **12 event types** across four categori
 The `.client_id` and `.checkout` variants are emitted in addition to the base `.confirmed` / `.partial` events when the request was created via a Client ID or as a checkout / secure payment, respectively. They include extra metadata (`clientId`, `origin`).
 
 <Note>
-Payment webhook payloads include `payerAddress` — the resolved payer wallet address (`null` when it can't be determined). See the [Webhooks reference](/api-reference/webhooks) for the full payload schema.
+Payment webhook payloads include `payerAddress`, the address used to make the payment, and `payerEoaAddress`, the payer's connected wallet address. These can differ when a smart account is used. Both are `null` when unavailable. See the [Webhooks reference](/api-reference/webhooks) for the full payload schema.
 </Note>
 
 For full payload schemas and headers, see the [Webhooks reference](/api-reference/webhooks).
