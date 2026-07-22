@@ -53,6 +53,7 @@
             "group": "🚀 Get Started",
             "pages": [
               "use-cases/welcome",
+              "use-cases/why-request-network",
               "use-cases/quickstart"
             ]
           },
@@ -83,6 +84,7 @@
             "pages": [
               "api-setup/getting-started",
               "api-setup/integration-tutorial",
+              "api-setup/llm-integration-guide",
               "api-features/client-id-management"
             ]
           },
@@ -244,6 +246,26 @@
       "cursor",
       "vscode"
     ]
+  },
+  "seo": {
+    "metatags": {
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "og:locale": "en_US",
+      "inLanguage": "en"
+    },
+    "organization": {
+      "name": "Request Network",
+      "url": "https://request.network",
+      "logo": "https://docs.request.network/logo/dark.svg",
+      "sameAs": [
+        "https://x.com/RequestNetwork",
+        "https://request.network/discord",
+        "https://github.com/RequestNetwork",
+        "https://www.linkedin.com/company/request-network",
+        "https://bsky.app/profile/requestnetwork.bsky.social",
+        "https://request.network"
+      ]
+    }
   },
   "integrations": {
     "ga4": {

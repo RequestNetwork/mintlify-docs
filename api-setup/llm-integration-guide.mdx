@@ -1,0 +1,153 @@
+---
+title: "LLM Integration Guide"
+description: "The canonical reference for AI agents integrating Request Network payments: credentials, endpoints, and webhook verification."
+---
+
+This page is the single source an AI coding agent should read to integrate Request Network payments correctly. You'll build a flow that accepts a crypto or stablecoin payment through a hosted payment link and confirms it via webhook. This flow uses the **REST API directly** — no SDK required.
+
+## Which credentials do I actually need?
+
+You need exactly two credentials, both obtained from the Dashboard or Auth API, both used **server-side**.
+
+<ParamField header="x-client-id" type="string" required>
+The Client ID that identifies your application. Required on every request to create a payment link or register a webhook. Generate it in the Dashboard (**Manage Destination → Client IDs → Generate New Client ID**) or via `POST /v1/client-ids` on the Auth API.
+</ParamField>
+
+<ParamField body="webhookSecret" type="string" required>
+The secret returned once when you register a webhook (`POST /v1/webhook`). Used to verify the HMAC-SHA256 signature on incoming webhook requests. It is shown exactly once at creation — store it securely (e.g. as an environment variable); it cannot be retrieved again.
+</ParamField>
+
+| Credential | Where it's used | Where it comes from |
+| --- | --- | --- |
+| `x-client-id` | Request header, server-side (or frontend only if the Client ID has Allowed Domains configured) | Dashboard or `POST /v1/client-ids` on the Auth API |
+| Webhook secret | Server-side only, to verify `x-request-network-signature` | Response of `POST /v1/webhook` on the Auth API (shown once) |
+
+<Warning>
+Do **not** ask the user for an API key, a Destination ID, or a wallet address to get started. Request Network does not use API keys — the credential is the Client ID. A `destinationId` is only needed if you are building the payment destination setup yourself (most integrations just create a payment link against an existing destination configured in the Dashboard). Never ask the user to paste a raw wallet address into your integration code — payment destinations are configured once in the Dashboard and referenced by ID.
+</Warning>
+
+## Should I use the SDK or the API?
+
+Use the **REST API** for server-side integrations. It requires no additional dependency, works from any language, and is the interface documented and versioned at `api.request.network` and `auth.request.network`. Reach for the API directly with `fetch`/`curl`/`requests` rather than pulling in an SDK.
+
+## How do I create a payment link?
+
+<Steps>
+  <Step title="Get a Client ID">
+    Obtain a `clientId` from the Dashboard (**Manage Destination → Client IDs**) or via `POST /v1/client-ids` on the Auth API. Store it as an environment variable, e.g. `RN_CLIENT_ID`.
+  </Step>
+  <Step title="Call the secure-payments endpoint">
+    `POST https://api.request.network/v2/secure-payments` with the `x-client-id` header and a `requests` array containing at least one `{ destinationId, amount }` item.
+  </Step>
+  <Step title="Share the returned URL">
+    The response includes a `securePaymentUrl`. Redirect the payer there, or embed it as a link/button. The link expires after 7 days or once paid, whichever comes first.
+  </Step>
+</Steps>
+
+<CodeGroup>
+```bash cURL
+curl -X POST 'https://api.request.network/v2/secure-payments' \
+  -H "x-client-id: $RN_CLIENT_ID" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "requests": [
+      {
+        "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#1f969856:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+        "amount": "1"
+      }
+    ]
+  }'
+```
+
+```typescript TypeScript
+const response = await fetch("https://api.request.network/v2/secure-payments", {
+  method: "POST",
+  headers: {
+    "x-client-id": process.env.RN_CLIENT_ID!,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    requests: [
+      {
+        destinationId:
+          "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#1f969856:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+        amount: "1",
+      },
+    ],
+  }),
+});
+
+if (!response.ok) {
+  throw new Error(`Failed to create payment link: ${await response.text()}`);
+}
+
+const { requestIds, securePaymentUrl, token } = await response.json();
+console.log({ requestIds, securePaymentUrl, token });
+```
+</CodeGroup>
+
+**Response (201 Created):**
+
+```json
+{
+  "requestIds": ["01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb"],
+  "securePaymentUrl": "https://pay.request.network/?token=01KJRA0M9QG8MA4X887908T8A4",
+  "token": "01KJRA0M9QG8MA4X887908T8A4"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `requestIds` | `string[]` | IDs of the created payment requests — use these to correlate webhook events |
+| `securePaymentUrl` | `string` | Shareable URL for the payer to complete payment |
+| `token` | `string` | Unique token for this payment session |
+
+<Note>
+The `destinationId` in the request body is a composite value: `{humanReadableInteropAddress}:{tokenAddress}`. It comes from a payment destination already configured in the Dashboard — you do not construct it from a raw wallet address.
+</Note>
+
+## How do I confirm a payment?
+
+The webhook is the source of truth for payment confirmation — do not treat a successful `POST /v2/secure-payments` call or a payer's browser redirect as proof of payment.
+
+<Steps>
+  <Step title="Register a webhook">
+    `POST https://auth.request.network/v1/webhook` with `x-client-id` and a `{ "url": "https://yourdomain.com/webhook" }` body. The response includes a one-time `secret` — store it as `RN_WEBHOOK_SECRET`.
+  </Step>
+  <Step title="Verify the signature on every incoming request">
+    Compute `HMAC-SHA256(rawBody, webhookSecret)` and compare it to the `x-request-network-signature` header using a constant-time comparison. You must use the **raw** request body — verifying against a re-serialized (e.g. `JSON.stringify(req.body)`) body will produce a mismatch and silently break verification.
+  </Step>
+  <Step title="Handle payment.confirmed / payment.partial">
+    A fully paid request fires `payment.confirmed`; a partial payment fires `payment.partial`. Match the `requestId` in the payload to the `requestIds` you received when creating the payment link.
+  </Step>
+</Steps>
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verify(rawBody: string, signature: string, secret: string) {
+  const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+  const a = Buffer.from(expected, "hex");
+  const b = Buffer.from(signature, "hex");
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+```
+
+<Warning>
+Always verify against the raw request body, before any JSON parsing. Frameworks like Express parse and re-serialize the body by default (`express.json()`); if you re-stringify `req.body` instead of using the original raw bytes, the computed HMAC will not match and every verification will fail (or worse, be skipped entirely if the check is disabled to "fix" it).
+</Warning>
+
+**Fallback (optional polling):** `GET https://api.request.network/v2/request/{requestId}` with `x-client-id` returns `{ hasBeenPaid: boolean, ... }`. Use this only as a fallback if a webhook delivery is missed — it is not a replacement for webhook handling.
+
+## How do I handle cross-chain payments?
+
+<Warning>
+When a payer pays from a different chain than your payment destination, settlement is not instantaneous. Your thank-you or confirmation page must treat the payment as **pending** until the webhook confirms it — never mark a payment as complete purely because the payer's browser reported a successful transaction submission or redirected back to your site. Drive the final "paid" state exclusively from the `payment.confirmed` webhook (or the `hasBeenPaid` polling fallback), not from front-end submission success.
+</Warning>
+
+## Common mistakes
+
+- Asking the user for an API key, Destination ID, or wallet address instead of just the Client ID and webhook secret.
+- Verifying the webhook signature against a re-serialized body (e.g. `JSON.stringify(req.body)`) instead of the raw request body.
+- Assuming a cross-chain payment is final as soon as the payer's browser confirms submission, instead of waiting for the `payment.confirmed` webhook.
+- Reaching for an SDK when the REST API is the documented, supported interface for server-side integrations.
