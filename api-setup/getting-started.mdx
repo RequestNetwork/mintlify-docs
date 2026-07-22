@@ -1,11 +1,11 @@
 ---
 title: "Getting Started"
-description: "Quick setup guide to get your API keys and start building with Request Network"
+description: "Quick setup guide to get your Client ID and start building with Request Network"
 ---
 
 ## Welcome to Request Network
 
-Get started with Request Network in just a few minutes. This guide will walk you through setting up your account, obtaining API keys, and making your first payment.
+Get started with Request Network in just a few minutes. This guide will walk you through setting up your account, obtaining your Client ID, and making your first payment.
 
 ## Quick Setup
 
@@ -13,7 +13,7 @@ Get started with Request Network in just a few minutes. This guide will walk you
   <Step title="Create Account">
     Sign up for a free Request Network account at [dashboard.request.network](https://dashboard.request.network)
   </Step>
-  <Step title="Get API Keys">
+  <Step title="Get Your Client ID">
     Generate your Client ID from the Dashboard
   </Step>
   <Step title="Create Your First Request">
@@ -46,9 +46,9 @@ Sign up at [dashboard.request.network](https://dashboard.request.network) to get
 <Warning>
 **Security Best Practices**
 
-- Store API keys in environment variables
-- Never commit keys to version control
-- Rotate keys regularly
+- Store your Client ID and webhook secret in environment variables
+- Never commit credentials to version control
+- Rotate credentials regularly
 </Warning>
 
 ## Your First Integration
@@ -72,6 +72,8 @@ Create a `.env` file:
 RN_CLIENT_ID=your_client_id_here
 RN_API_URL=https://api.request.network/v2
 ```
+
+`RN_CLIENT_ID` is used server-side only — it's sent as the `x-client-id` header on API requests and should never be exposed in client-side code.
 
 ### Create a Payment
 
@@ -162,27 +164,38 @@ The response will include:
 
 ### Setting Up Webhooks
 
-To track payment status in real-time, set up a webhook endpoint:
+To track payment status in real-time, set up a webhook endpoint. Always verify against the **raw** request body, before it's parsed as JSON — re-serializing the parsed body will produce a different signature and fail verification.
 
 ```javascript
 const crypto = require('crypto');
 const express = require('express');
 
 const app = express();
-app.use(express.json());
+// Capture the raw body alongside JSON parsing so we can verify against
+// the exact bytes Request Network signed.
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
 // Webhook handler
 app.post('/webhooks', async (req, res) => {
   const signature = req.headers['x-request-network-signature'];
   const webhookSecret = process.env.RN_WEBHOOK_SECRET;
 
-  // Verify signature
+  // Verify signature against the RAW body (not JSON.stringify(req.body))
   const expectedSignature = crypto
     .createHmac('sha256', webhookSecret)
-    .update(JSON.stringify(req.body))
+    .update(req.rawBody)
     .digest('hex');
 
-  if (signature !== expectedSignature) {
+  const expected = Buffer.from(expectedSignature, 'hex');
+  const received = Buffer.from(signature || '', 'hex');
+  const isValid = expected.length === received.length &&
+    crypto.timingSafeEqual(expected, received);
+
+  if (!isValid) {
     return res.status(401).send({ error: 'Invalid signature' });
   }
 
@@ -195,8 +208,11 @@ app.post('/webhooks', async (req, res) => {
       console.log('Payment confirmed!');
       // Update your database, send email, etc.
       break;
-    case 'payment.pending':
-      console.log('Payment pending...');
+    case 'payment.partial':
+      console.log('Partial payment received...');
+      break;
+    case 'payment.processing':
+      console.log('Payment processing...');
       break;
   }
 
@@ -229,7 +245,7 @@ RN_WEBHOOK_SECRET=your_webhook_secret_here
 
 ## Environment Configuration
 
-Set up environment variables for secure API key management:
+Set up environment variables for secure credential management:
 
 <CodeGroup>
 ```bash .env

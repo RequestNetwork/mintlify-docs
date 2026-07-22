@@ -1,0 +1,169 @@
+# Request Network
+
+Request Network is an API, Dashboard, and hosted Secure Payment Page for accepting crypto and stablecoin payments across EVM chains (Ethereum, Arbitrum, Optimism, Base, Polygon, BSC) and Tron. It handles payment link creation, cross-chain routing, payment detection/reconciliation, payouts, and compliance screening so you don't have to build blockchain payment infrastructure yourself. It is built for developers integrating payments into an app or backend, platforms/orchestrators reselling payments to their own customers, and merchants who just need a shareable payment link.
+
+## Canonical user story
+
+A merchant creates a payment link (a "Secure Payment") for an amount owed. They share the link with a payer. The payer opens it and pays from any supported chain and token — Request Network handles routing/bridging if the payer's chain/token differs from the merchant's destination. When the payment completes, Request Network calls the merchant's webhook server-to-server as the source of truth; the merchant does not need to poll or watch the chain themselves.
+
+## Credentials
+
+Only two credentials are needed for the core integration. Do not ask the user for an API key, a Destination ID, or a wallet address — the Client ID is sufficient for creating payment links and registering webhooks.
+
+| Credential | What it's for | How to get it | Where it's used |
+| --- | --- | --- | --- |
+| `RN_CLIENT_ID` | Identifies your application | Dashboard (dashboard.request.network), after a payment destination exists — or programmatically via `POST https://auth.request.network/v1/client-ids` | Sent as the `x-client-id` header on Auth API and Request API calls |
+| `RN_WEBHOOK_SECRET` | Verifies webhook signatures | Returned **once**, in the response body of `POST https://auth.request.network/v1/webhook` | Used server-side to compute an HMAC-SHA256 over the raw webhook body and compare it to the `x-request-network-signature` header |
+
+`RN_CLIENT_ID` is normally server-side, but it may be used directly from a frontend if you configure **Allowed Domains** on it when creating it (and send a matching `Origin` header). `RN_WEBHOOK_SECRET` must never be used or exposed client-side.
+
+## Security warning
+
+Never expose `RN_CLIENT_ID` in client-side code without configuring allowed-domains for it, and never expose `RN_WEBHOOK_SECRET` in client-side code, logs, or version control. The webhook secret is the only thing protecting your webhook signature verification — if it leaks, anyone can forge payment-confirmation calls to your server.
+
+## API vs SDK
+
+Use the **Request Network REST API** (`api.request.network`, `auth.request.network`) directly — not an SDK — for the integration flows in this file: creating payment links, registering webhooks, and querying payment status. Call the endpoints with `fetch`/`axios`/`requests`/`curl`, not a package.
+
+## Happy path
+
+### 1. Create a payment link (Secure Payment)
+
+```http
+POST https://api.request.network/v2/secure-payments
+x-client-id: <RN_CLIENT_ID>
+Content-Type: application/json
+
+{
+  "requests": [
+    {
+      "destinationId": "<humanReadableInteropAddress>:<tokenAddress>",
+      "amount": "10"
+    }
+  ]
+}
+```
+
+`destinationId` is a composite value: the payee destination's `humanReadableInteropAddress` (an ERC-7828 address, e.g. `0x6923...C7D7@eip155:1#1f969856`, obtained from the Dashboard or `POST /v1/payee-destination` on the Auth API) joined with `:` to the token's contract address.
+
+**Response (201 Created):**
+
+```json
+{
+  "requestIds": ["01de2a889ee629c15b71b5d7964e3a7e87638c886be75bf1b9d2c1fbe64cf855fb"],
+  "securePaymentUrl": "https://pay.request.network/?token=01KJRA0M9QG8MA4X887908T8A4",
+  "token": "01KJRA0M9QG8MA4X887908T8A4"
+}
+```
+
+Share `securePaymentUrl` with the payer — they open it in a browser to pay from any supported chain/token.
+
+### 2. Verify the webhook (raw body, before parsing)
+
+Request Network POSTs to your registered webhook URL when a payment completes. Verify the `x-request-network-signature` header as an HMAC-SHA256 of the **raw** request body, computed with `RN_WEBHOOK_SECRET`, compared timing-safe:
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verify(rawBody: string, signature: string, secret: string) {
+  const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+  const a = Buffer.from(expected, "hex");
+  const b = Buffer.from(signature, "hex");
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+```
+
+Verify against the raw body **before** any JSON parsing/re-serialization — re-serialized JSON will not match the signature.
+
+### 3. Confirm the payment
+
+Treat the webhook event as the source of truth: `payment.confirmed` (fully paid) or `payment.partial` (partial payment). As a fallback, poll:
+
+```http
+GET https://api.request.network/v2/request/{requestId}
+```
+
+and read the `hasBeenPaid` boolean in the response.
+
+## Cross-chain caveat
+
+When the payer pays from a different chain/token than the merchant's destination, settlement is routed/bridged and is **not instant**. Your "thank you" / payment-confirmation page must show the payment as **PENDING** immediately after the payer submits — do not assume finality on redirect. Drive the final "paid" state from the webhook (`payment.confirmed` / `payment.partial`), not from the payer reaching your return URL.
+
+## Gotchas / breaking behaviors
+
+- **Tron is single-recipient.** Submitting multiple `requests[]` items in one `POST /v2/secure-payments` call where any destination is on Tron returns `400 Batch payments are not supported for TRON networks. Please submit individual payment requests.` EVM batches (up to 200 payees per link) work fine.
+- **Wallet sessions expire after 15 minutes idle.** Dashboard/Auth API calls that rely on the `session_token` cookie will 401 after 15 min of inactivity; the user must sign in again.
+- **The webhook secret is shown exactly once**, in the `POST /v1/webhook` response. If it's lost, there is no way to retrieve it — delete the webhook and create a new one.
+- **Payment links expire** after 7 days or as soon as they're paid, whichever comes first.
+
+## Complete link index
+
+Full-text docs (every page, concatenated): https://docs.request.network/llms-full.txt
+OpenAPI v2 spec: https://docs.request.network/api-reference/openapi.v2.json
+
+### Use Cases
+
+- [Welcome](https://docs.request.network/use-cases/welcome.md): Request Network is a protocol for creating, sending, and reconciling crypto payments across EVM chains and Tron.
+- [Quickstart](https://docs.request.network/use-cases/quickstart.md): End-to-end walkthrough — sign in to the Dashboard, create a payment destination, register a webhook, and create a hosted payment link.
+- [No-code payment links](https://docs.request.network/use-cases/no-code-payment-links.md): Generate payment links from the Dashboard UI — no API integration required.
+- [Programmatic payment links](https://docs.request.network/use-cases/programmatic-payment-links.md): Generate Secure Payment links on demand from your backend.
+- [Multi-chain checkout](https://docs.request.network/use-cases/multi-chain-checkout.md): Let payers pay from any chain and any token; receive on your preferred chain.
+- [Batch payouts](https://docs.request.network/use-cases/batch-payouts.md): Pay many recipients in one signed transaction.
+- [Webhook reconciliation](https://docs.request.network/use-cases/webhook-reconciliation.md): Real-time payment notifications wired into your accounting/order systems.
+- [Compliance-gated payments](https://docs.request.network/use-cases/compliance-gated-payments.md): Screen every payer wallet for sanctions and risk before accepting a payment.
+- [Hypernative standard screening policy](https://docs.request.network/use-cases/hypernative-standard-screening-policy.md): The default Hypernative wallet-screening policy used for Request Network KYT checks.
+
+### API
+
+- [Getting started](https://docs.request.network/api-setup/getting-started.md): Quick setup guide to get your API keys and start building with Request Network.
+- [Integration tutorial](https://docs.request.network/api-setup/integration-tutorial.md): Complete step-by-step guide to integrate Request Network API with a Node.js backend and React frontend.
+- [Client ID management](https://docs.request.network/api-features/client-id-management.md): Create and manage Client IDs for frontend authentication, domain whitelisting, and orchestrator flows.
+- [Create requests](https://docs.request.network/api-features/create-requests.md): Request creation workflows and configuration for invoices and payment collection.
+- [Payment types overview](https://docs.request.network/api-features/payment-types-overview.md): Choose the right Request Network payment type for your integration.
+- [Standard payments](https://docs.request.network/api-features/standard-payments.md): Simple crypto-to-crypto payments using native currencies and ERC20 tokens.
+- [Conversion payments](https://docs.request.network/api-features/conversion-payments.md): Requests denominated in one currency and settled in another with conversion at payment time.
+- [Crypto-to-fiat payments](https://docs.request.network/api-features/crypto-to-fiat-payments.md): Pay requests in crypto while payees receive fiat in bank accounts.
+- [Batch payments](https://docs.request.network/api-features/batch-payments.md): Process multiple payments in a single transaction for gas optimization.
+- [Cross-chain payments](https://docs.request.network/api-features/crosschain-payments.md): Multi-network payment routing with automatic bridging via LiFi.
+- [Partial payments](https://docs.request.network/api-features/partial-payments.md): Split payments across multiple transactions and funding sources.
+- [Recurring payments](https://docs.request.network/api-features/recurring-payments.md): Automated payment schedules for subscriptions and recurring billing.
+- [Payment detection](https://docs.request.network/api-features/payment-detection.md): Automatic reference-based payment detection system for blockchain transactions.
+- [Query requests](https://docs.request.network/api-features/query-requests.md): Request status monitoring, lifecycle management, and information retrieval.
+- [Query payments](https://docs.request.network/api-features/query-payments.md): Advanced payment search and filtering with the GET /v2/payments endpoint.
+- [Webhooks & events](https://docs.request.network/api-features/webhooks-events.md): Real-time notifications for payment lifecycle events and request status changes.
+- [Payee destinations](https://docs.request.network/api-features/payee-destinations.md): Register and manage receiving routes using ERC-7828 interop addresses.
+- [Secure payment pages](https://docs.request.network/api-features/secure-payment-pages.md): Create hosted secure payment links and let payers complete payments from a dedicated secure flow.
+- [Secure payment integration guide](https://docs.request.network/api-features/secure-payment-integration-guide.md): Integrate a secure payment experience via a secured link (redirect).
+- [Safe multisig payments](https://docs.request.network/api-features/safe-multisig-payments.md): Pay a secure payment from an existing Gnosis Safe multisig.
+- [Secure payment supported networks and currencies](https://docs.request.network/api-features/secure-payment-supported-networks-and-currencies.md): Chain and currency coverage for Secure Payment Pages.
+- [Payouts](https://docs.request.network/api-features/payouts.md): Initiate single, batch, and recurring payments directly via the API.
+- [Platform fees](https://docs.request.network/api-features/platform-fees.md): Configure platform fees with feePercentage and feeAddress.
+- [Protocol fees](https://docs.request.network/api-features/protocol-fees.md): Protocol fee model applied by Request Network API payments.
+- [Fee breakdowns](https://docs.request.network/api-features/fee-breakdowns.md): Where to read fee details in routes, payment search, and status responses.
+- [Commerce payments](https://docs.request.network/api-features/commerce-payments.md): Authorize-capture-void escrow payment flow for e-commerce platforms.
+- [Orchestrators overview](https://docs.request.network/orchestrators/overview.md): Orchestrators are fee and branding partners in Request Network.
+- [Orchestrator fees](https://docs.request.network/orchestrators/fees.md): Configure orchestrator fees and per-client-ID overrides.
+- [Orchestrator Client ID linking](https://docs.request.network/orchestrators/client-id-linking.md): Link platform Client IDs to your orchestrator.
+- [Orchestrator whitelabel branding](https://docs.request.network/orchestrators/whitelabel-branding.md): Theme the hosted Secure Payment page with your own colors, logo, and legal links.
+- [Authentication](https://docs.request.network/api-reference/authentication.md): How to authenticate Request Network API calls with API keys or Client ID.
+- [Wallet authentication](https://docs.request.network/api-reference/wallet-authentication.md): Sign-In with Ethereum and Tron wallet authentication for session-based API access.
+- [Secure payments reference](https://docs.request.network/api-reference/secure-payments.md): Generate secure payment URLs, retrieve payment metadata, and get executable calldata.
+- [Webhooks reference](https://docs.request.network/api-reference/webhooks.md): Complete webhook implementation guide with event types, security, and retry configuration.
+- [Endpoints overview (V2)](https://docs.request.network/api-reference/endpoints-overview.md): Quick index of v2 endpoint groups.
+- [OpenAPI v2](https://docs.request.network/api-reference/openapi.v2.json): Machine-readable OpenAPI v2 spec for api.request.network.
+
+### Resources
+
+- [Supported chains and currencies](https://docs.request.network/resources/supported-chains-and-currencies.md): Supported chains and currency coverage across Request Network API payment types.
+- [Token list](https://docs.request.network/resources/token-list.md): The curated list of tokens supported by Request Network products (address, symbol, name, decimals, chainId).
+- [Dashboard](https://docs.request.network/tools/dashboard.md): dashboard.request.network — sign in with your wallet to manage payment destinations, Client IDs, requests, and payouts.
+- [Secure Payments app](https://docs.request.network/tools/secure-payments.md): pay.request.network — the hosted payment link app payers open to settle a Request Network payment.
+- [Lifecycle of a request](https://docs.request.network/resources/lifecycle-of-a-request.md): The typical lifecycle of a request, from creation to settlement.
+- [FAQ](https://docs.request.network/faq.md): Frequently Asked Questions and Common Misconceptions.
+- [Glossary](https://docs.request.network/glossary.md): Definitions of Request Network terms — parties, protocol, payments, and cryptography concepts.
+
+## Advanced (optional)
+
+- Batch payouts (pay many recipients in one transaction): https://docs.request.network/use-cases/batch-payouts.md and https://docs.request.network/api-features/payouts.md
+- Cross-chain routing (payer pays any chain/token, you receive on your chosen one, bridging via LiFi): https://docs.request.network/use-cases/multi-chain-checkout.md and https://docs.request.network/api-features/crosschain-payments.md
+- Compliance-gated payments (sanctions/risk screening on payer wallets before accepting payment): https://docs.request.network/use-cases/compliance-gated-payments.md and https://docs.request.network/use-cases/hypernative-standard-screening-policy.md
