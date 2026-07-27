@@ -3,7 +3,7 @@ title: "LLM Integration Guide"
 description: "The canonical reference for AI agents integrating Request Network payments: credentials, endpoints, and webhook verification."
 ---
 
-This page is the single source an AI coding agent should read to integrate Request Network payments correctly. You'll build a flow that accepts a crypto or stablecoin payment through a hosted payment link and confirms it via webhook. This flow uses the **REST API directly** — no SDK required.
+This page is the single source an AI coding agent should read to integrate Request Network payments correctly. You'll build a flow that accepts a crypto or stablecoin payment through a hosted payment link and confirms it via webhook. This flow uses the **REST API** directly — plain HTTP requests, with no extra dependency to install.
 
 ## Which credentials do I actually need?
 
@@ -26,9 +26,9 @@ The secret returned once when you register a webhook (`POST /v1/webhook`). Used 
 Do **not** ask the user for an API key, a Destination ID, or a wallet address to get started. Request Network does not use API keys — the credential is the Client ID. A `destinationId` is only needed if you are building the payment destination setup yourself (most integrations just create a payment link against an existing destination configured in the Dashboard). Never ask the user to paste a raw wallet address into your integration code — payment destinations are configured once in the Dashboard and referenced by ID.
 </Warning>
 
-## Should I use the SDK or the API?
+## How should I call Request Network?
 
-Use the **REST API** for server-side integrations. It requires no additional dependency, works from any language, and is the interface documented and versioned at `api.request.network` and `auth.request.network`. Reach for the API directly with `fetch`/`curl`/`requests` rather than pulling in an SDK.
+Call the **REST API** directly for server-side integrations. It needs no extra dependency, works from any language, and is the interface documented and versioned at `api.request.network` and `auth.request.network`. Make requests with `fetch`/`curl`/`requests` — there's nothing to install.
 
 ## How do I create a payment link?
 
@@ -150,4 +150,4 @@ When a payer pays from a different chain than your payment destination, settleme
 - Asking the user for an API key, Destination ID, or wallet address instead of just the Client ID and webhook secret.
 - Verifying the webhook signature against a re-serialized body (e.g. `JSON.stringify(req.body)`) instead of the raw request body.
 - Assuming a cross-chain payment is final as soon as the payer's browser confirms submission, instead of waiting for the `payment.confirmed` webhook.
-- Reaching for an SDK when the REST API is the documented, supported interface for server-side integrations.
+- Adding an unnecessary dependency instead of calling the documented REST API directly.

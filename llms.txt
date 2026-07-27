@@ -21,9 +21,9 @@ Only two credentials are needed for the core integration. Do not ask the user fo
 
 Never expose `RN_CLIENT_ID` in client-side code without configuring allowed-domains for it, and never expose `RN_WEBHOOK_SECRET` in client-side code, logs, or version control. The webhook secret is the only thing protecting your webhook signature verification — if it leaks, anyone can forge payment-confirmation calls to your server.
 
-## API vs SDK
+## Calling the API
 
-Use the **Request Network REST API** (`api.request.network`, `auth.request.network`) directly — not an SDK — for the integration flows in this file: creating payment links, registering webhooks, and querying payment status. Call the endpoints with `fetch`/`axios`/`requests`/`curl`, not a package.
+Use the **Request Network REST API** (`api.request.network`, `auth.request.network`) directly for the integration flows in this file: creating payment links, registering webhooks, and querying payment status. Call the endpoints with `fetch`/`axios`/`requests`/`curl` — there's nothing to install.
 
 ## Happy path
 
