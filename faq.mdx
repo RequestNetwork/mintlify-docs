@@ -53,29 +53,8 @@ If your question is not answered below, please consider posting it to the [Reque
     Crypto-to-fiat (off-ramp) payments are supported via the Request Network API — see [Crypto-to-fiat Payments](/api-features/crypto-to-fiat-payments). Fiat-to-crypto (on-ramp) payments are not currently supported by the API.
   </Accordion>
 
-  <Accordion title="Does Request Network support crypto payments from centralized exchanges (CEX) or custodians?">
-    Yes. See [Single Request Forwarder](https://docs.request.network/advanced/request-network-sdk/sdk-guides/payment/single-request-forwarder).
-  </Accordion>
-
   <Accordion title="Can a Request Node modify a request's contents before persisting it to IPFS and onchain?">
     No. A Request Node cannot change a request's contents before persisting it to IPFS and onchain because doing so would invalidate the signature. This is true for private, encrypted requests as well. The Request Node cannot forge the end-user's signature.
-  </Accordion>
-
-  <Accordion title="Can I create a request via the Request Network SDK without using a Request Node?">
-    No. Today, a Request Node is required to interact with the Request Network IPFS Network. That said, it is possible to make the end-user pay the protocol fee when creating a request instead of the Request Node. To do this, inject an `HttpMetaMaskDataAccess` into the frontend `RequestNetwork` instance.
-
-    ```javascript
-    const requestNetwork = new RequestNetworkBase({
-      dataAccess: new HttpMetaMaskDataAccess({
-        ethereumProviderUrl: 'https://eth-mainnet.g.alchemy.com/v2/demo',
-      }),
-      signatureProvider: new EthereumPrivateKeySignatureProvider({
-        method: Types.SIGNATURE_METHOD.ECDSA,
-        privateKey: process.env.PRIVATE_KEY
-      })
-      // additional config options as needed
-    });
-    ```
   </Accordion>
 
   <Accordion title="Can I access a user's historical invoices created via Request Finance?">
@@ -88,29 +67,14 @@ If your question is not answered below, please consider posting it to the [Reque
   </Accordion>
 
   <Accordion title="Does Request Network support crosschain payments where the payer sends funds on one chain and the payee receives funds on a different chain?">
-    Yes, via the **Request Network API only**. Crosschain payments are not supported by the Request Network SDK or protocol directly. When using the API, payers can fund requests using assets on different chains and tokens, and the payee receives the requested asset on the request's chain. For example, you can pay a USDC-on-Base request using USDT from Optimism. 
+    Yes, via the **Request Network API only**. Crosschain payments are not supported by the protocol directly. When using the API, payers can fund requests using assets on different chains and tokens, and the payee receives the requested asset on the request's chain. For example, you can pay a USDC-on-Base request using USDT from Optimism. 
 
     See [Crosschain Payments](/api-features/crosschain-payments) for implementation details.
-  </Accordion>
-
-  <Accordion title="Does Request Network support private requests?">
-    Yes. See:
-
-    - [Private Requests using Encryption](https://docs.request.network/advanced/protocol-overview/private-requests-using-encryption)
-    - [Handle Encryption with a Web3 Wallet](https://docs.request.network/advanced/request-network-sdk/sdk-guides/encryption-and-decryption/handle-encryption-with-a-web3-wallet)
-  </Accordion>
-
-  <Accordion title="Does Request Network support private payments?">
-    Yes. See [Hinkal Private Payments](https://docs.request.network/advanced/request-network-sdk/sdk-guides/payment/hinkal-private-payments).
   </Accordion>
 
   <Accordion title="Can I create a request via a smart contract call?">
     No. It is not currently possible to create a request via a smart contract call. However, [RequestNetwork/public-issues#15](https://github.com/RequestNetwork/public-issues/issues/15) is in our roadmap to make this possible.
 
     The recommended way to create a request is using the Request Network API.
-  </Accordion>
-
-  <Accordion title="Can I use Request Network requests even if I have my own payment infrastructure?">
-    Yes. See [Single Request Forwarder](https://docs.request.network/advanced/request-network-sdk/sdk-guides/payment/single-request-forwarder).
   </Accordion>
 </AccordionGroup>
