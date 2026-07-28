@@ -105,6 +105,7 @@ OpenAPI v2 spec: https://docs.request.network/api-reference/openapi.v2.json
 
 - [Welcome](https://docs.request.network/use-cases/welcome.md): Request Network is a protocol for creating, sending, and reconciling crypto payments across EVM chains and Tron.
 - [Quickstart](https://docs.request.network/use-cases/quickstart.md): End-to-end walkthrough — sign in to the Dashboard, create a payment destination, register a webhook, and create a hosted payment link.
+- [Why Request Network](https://docs.request.network/use-cases/why-request-network.md): How Request Network compares to Stripe, PayPal, and other crypto payment tools on fees, custody, chargebacks, and stablecoin support.
 - [No-code payment links](https://docs.request.network/use-cases/no-code-payment-links.md): Generate payment links from the Dashboard UI — no API integration required.
 - [Programmatic payment links](https://docs.request.network/use-cases/programmatic-payment-links.md): Generate Secure Payment links on demand from your backend.
 - [Multi-chain checkout](https://docs.request.network/use-cases/multi-chain-checkout.md): Let payers pay from any chain and any token; receive on your preferred chain.
@@ -115,8 +116,9 @@ OpenAPI v2 spec: https://docs.request.network/api-reference/openapi.v2.json
 
 ### API
 
-- [Getting started](https://docs.request.network/api-setup/getting-started.md): Quick setup guide to get your API keys and start building with Request Network.
+- [Getting started](https://docs.request.network/api-setup/getting-started.md): Quick setup guide to get your Client ID and start building with Request Network.
 - [Integration tutorial](https://docs.request.network/api-setup/integration-tutorial.md): Complete step-by-step guide to integrate Request Network API with a Node.js backend and React frontend.
+- [LLM integration guide](https://docs.request.network/api-setup/llm-integration-guide.md): The canonical guide for AI agents integrating Request Network payments — credentials, endpoints, and webhook verification.
 - [Client ID management](https://docs.request.network/api-features/client-id-management.md): Create and manage Client IDs for frontend authentication, domain whitelisting, and orchestrator flows.
 - [Create requests](https://docs.request.network/api-features/create-requests.md): Request creation workflows and configuration for invoices and payment collection.
 - [Payment types overview](https://docs.request.network/api-features/payment-types-overview.md): Choose the right Request Network payment type for your integration.
