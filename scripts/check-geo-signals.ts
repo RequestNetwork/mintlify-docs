@@ -243,11 +243,13 @@ async function checkPlatformGated() {
       record("Cache-Control not no-store", "PLATFORM-GATED", `network error — ${res.error}`);
     } else {
       const cc = res.headers.get("cache-control");
-      const noStore = !!cc && /no-store/i.test(cc);
+      // A missing header is not a pass: without an explicit cacheable
+      // directive we cannot claim the signal is configured.
+      const cacheable = !!cc && !/no-store/i.test(cc);
       record(
         "Cache-Control not no-store",
-        noStore ? "PLATFORM-GATED" : "PASS",
-        `cache-control: ${cc ?? "(missing)"}${noStore ? " — platform-controlled" : ""}`,
+        cacheable ? "PASS" : "PLATFORM-GATED",
+        `cache-control: ${cc ?? "(missing)"}${cacheable ? "" : " — platform-controlled"}`,
       );
     }
   }
