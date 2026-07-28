@@ -20,10 +20,12 @@
  * Exit code is non-zero only if a non-platform-gated check fails.
  */
 
+import { readFileSync } from "node:fs";
+
 const DEFAULT_BASE_URL = "https://docs.request.network";
 const BASE_URL = (process.argv[2] || process.env.BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, "");
 
-type Status = "PASS" | "FAIL" | "PLATFORM-GATED";
+type Status = "PASS" | "FAIL" | "PLATFORM-GATED" | "INFO";
 
 type Result = {
   name: string;
@@ -46,6 +48,89 @@ async function fetchText(url: string, init?: RequestInit): Promise<{ ok: boolean
     return { ok: res.ok, status: res.status, body, headers: res.headers };
   } catch (err) {
     return { ok: false, status: 0, body: "", headers: new Headers(), error: (err as Error).message };
+  }
+}
+
+// --- HTML parsing helpers ---
+//
+// Every HTML signal below is read from a *parsed* tag or a *parsed* JSON-LD
+// block rather than from a regex over the whole response body, so that a check
+// never depends on attribute order and never matches a marker that happens to
+// appear in prose, a code sample, or an embedded framework payload.
+
+type TagAttributes = Record<string, string>;
+
+const ATTRIBUTE_PATTERN =
+  /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+)))?/g;
+
+function parseAttributes(raw: string): TagAttributes {
+  const attributes: TagAttributes = {};
+  for (const match of raw.matchAll(ATTRIBUTE_PATTERN)) {
+    attributes[match[1].toLowerCase()] = match[2] ?? match[3] ?? match[4] ?? "";
+  }
+  return attributes;
+}
+
+function findTags(html: string, tagName: string): TagAttributes[] {
+  const pattern = new RegExp(`<${tagName}\\b([^>]*)>`, "gi");
+  return [...html.matchAll(pattern)].map((match) => parseAttributes(match[1]));
+}
+
+/** The parsed contents of every `<script type="application/ld+json">` block. */
+function parseJsonLdBlocks(html: string): unknown[] {
+  const blocks: unknown[] = [];
+  const scriptPattern = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
+  for (const match of html.matchAll(scriptPattern)) {
+    if (parseAttributes(match[1]).type?.trim().toLowerCase() !== "application/ld+json") continue;
+    try {
+      blocks.push(JSON.parse(match[2]));
+    } catch {
+      // A block that isn't valid JSON carries no structured-data signal.
+    }
+  }
+  return blocks;
+}
+
+/**
+ * The nodes a JSON-LD block actually declares: the block itself, the members of
+ * a top-level array, and the members of any `@graph`.
+ *
+ * Deliberately *not* a recursive walk of every property. Mintlify's stock
+ * `WebSite` block nests `{"@type":"Organization","name":"Mintlify"}` under
+ * `creator`, so counting nested nodes would let the Organization check pass on
+ * any Mintlify site regardless of our own structured data.
+ */
+function declaredNodes(block: unknown): Record<string, unknown>[] {
+  const nodes: Record<string, unknown>[] = [];
+  const visit = (value: unknown) => {
+    if (Array.isArray(value)) {
+      for (const entry of value) visit(entry);
+      return;
+    }
+    if (!value || typeof value !== "object") return;
+    const node = value as Record<string, unknown>;
+    nodes.push(node);
+    if ("@graph" in node) visit(node["@graph"]);
+  };
+  visit(block);
+  return nodes;
+}
+
+function hasType(node: Record<string, unknown>, type: string): boolean {
+  const declared = node["@type"];
+  return Array.isArray(declared) ? declared.includes(type) : declared === type;
+}
+
+/** `seo.organization` from docs.json — the organization identity this repo configures. */
+function configuredOrganization(): { id?: string; name?: string; url?: string } {
+  try {
+    const raw = readFileSync(new URL("../docs.json", import.meta.url), "utf8");
+    const config = JSON.parse(raw) as {
+      seo?: { organization?: { id?: string; name?: string; url?: string } };
+    };
+    return config.seo?.organization ?? {};
+  } catch {
+    return {};
   }
 }
 
@@ -138,6 +223,11 @@ async function checkRedirects() {
 const PAGES_TO_CHECK = ["/", "/use-cases/no-code-payment-links"];
 
 async function checkHtmlSignals() {
+  const configured = configuredOrganization();
+  const expectedIdentity = [configured.id, configured.url, configured.name].filter(
+    (value): value is string => !!value,
+  );
+
   for (const path of PAGES_TO_CHECK) {
     const url = `${BASE_URL}${path}`;
     const res = await fetchText(url);
@@ -150,20 +240,55 @@ async function checkHtmlSignals() {
       continue;
     }
 
-    const hasRobotsMeta =
-      /<meta[^>]+name=["']robots["'][^>]*content=["'][^"']*max-snippet:-1[^"']*["']/i.test(res.body);
+    const robotsContent = findTags(res.body, "meta")
+      .filter((attributes) => attributes.name?.toLowerCase() === "robots")
+      .map((attributes) => attributes.content ?? "");
+    const hasRobotsMeta = robotsContent.some((content) =>
+      content.toLowerCase().includes("max-snippet:-1"),
+    );
     record(
       `${path} robots meta max-snippet:-1`,
       hasRobotsMeta ? "PASS" : "FAIL",
-      hasRobotsMeta ? "found in <head>" : "not found",
+      hasRobotsMeta
+        ? "found in <head>"
+        : robotsContent.length > 0
+          ? `robots meta present without max-snippet:-1 — content: ${robotsContent.join(" | ")}`
+          : "no robots meta tag found",
     );
 
-    const hasOrgJsonLd = /"@type"\s*:\s*"Organization"/.test(res.body);
+    const organizations = parseJsonLdBlocks(res.body)
+      .flatMap(declaredNodes)
+      .filter((node) => hasType(node, "Organization"));
     record(
       `${path} Organization JSON-LD`,
-      hasOrgJsonLd ? "PASS" : "FAIL",
-      hasOrgJsonLd ? 'found "@type":"Organization"' : "not found",
+      organizations.length > 0 ? "PASS" : "FAIL",
+      organizations.length > 0
+        ? `declared in application/ld+json — ${organizations
+            .map((node) => String(node["@id"] ?? node.url ?? node.name ?? "(unidentified)"))
+            .join(", ")}`
+        : "no Organization node declared in any application/ld+json block",
     );
+
+    // Mintlify emits a default Organization derived from docs.json "name", so the
+    // presence check above can be satisfied by platform defaults alone. This line
+    // reports whether the identity configured in docs.json seo.organization is the
+    // one actually being served. It never fails the run: whether Mintlify honours
+    // seo.organization over its own default is platform behaviour we have not
+    // confirmed, so a mismatch is reported rather than asserted.
+    if (expectedIdentity.length > 0) {
+      const matched = organizations.find((node) =>
+        expectedIdentity.some(
+          (value) => node["@id"] === value || node.url === value || node.name === value,
+        ),
+      );
+      record(
+        `${path} Organization matches docs.json seo.organization`,
+        matched ? "PASS" : "INFO",
+        matched
+          ? `@id ${String(matched["@id"] ?? "(none)")}, name ${String(matched.name ?? "(none)")}`
+          : `no Organization node carries ${expectedIdentity.join(" / ")} — only Mintlify's default organization data is being served`,
+      );
+    }
   }
 }
 
@@ -174,7 +299,12 @@ async function checkPlatformGated() {
     const res = await fetchText(`${BASE_URL}/`);
     const hasLink =
       !res.error &&
-      /<link[^>]+rel=["']alternate["'][^>]+type=["']text\/plain["'][^>]+href=["']\/llms\.txt["']/i.test(res.body);
+      findTags(res.body, "link").some(
+        (attributes) =>
+          attributes.rel?.toLowerCase() === "alternate" &&
+          attributes.type?.toLowerCase() === "text/plain" &&
+          attributes.href === "/llms.txt",
+      );
     record(
       '<link rel="alternate" type="text/plain" href="/llms.txt">',
       hasLink ? "PASS" : "PLATFORM-GATED",
@@ -279,7 +409,7 @@ async function main() {
   console.log("Summary");
   console.log("=".repeat(78));
 
-  const counts = { PASS: 0, FAIL: 0, "PLATFORM-GATED": 0 } as Record<Status, number>;
+  const counts = { PASS: 0, FAIL: 0, "PLATFORM-GATED": 0, INFO: 0 } as Record<Status, number>;
   for (const r of results) counts[r.status]++;
 
   for (const r of results) {
@@ -287,7 +417,9 @@ async function main() {
   }
 
   console.log();
-  console.log(`PASS: ${counts.PASS}  FAIL: ${counts.FAIL}  PLATFORM-GATED: ${counts["PLATFORM-GATED"]}`);
+  console.log(
+    `PASS: ${counts.PASS}  FAIL: ${counts.FAIL}  PLATFORM-GATED: ${counts["PLATFORM-GATED"]}  INFO: ${counts.INFO}`,
+  );
 
   const failing = results.filter((r) => r.status === "FAIL");
   if (failing.length > 0) {

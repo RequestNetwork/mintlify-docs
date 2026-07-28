@@ -48,6 +48,7 @@ Each check reports one of:
 
 - **PASS** — the signal is present and correct.
 - **FAIL** — the signal is missing or wrong. Non-zero exit code if any check is FAIL.
+- **INFO** — reported, never asserted. Used where the expected value depends on unconfirmed Mintlify behaviour: currently whether the `seo.organization` identity in `docs.json` overrides the default Organization structured data Mintlify generates from `docs.json` `name`. Never affects the exit code.
 - **PLATFORM-GATED** — the signal depends on a Mintlify platform capability that isn't available to this repo yet (the `<link rel="alternate" type="text/plain" href="/llms.txt">` head tag, per-bot `robots.txt` Allow lines, `/.well-known/security.txt`, and certain response headers). These are tracked in REQ-271 and are **expected to stay failing** (reported as PLATFORM-GATED, not FAIL) until that platform request lands — do not treat them as a regression in this repo.
 
 Note: the script's own header reminds you that redirect and rendered-HTML checks assert the **post-merge, deployed** state — running it against production before this PR stack merges will show real (and expected) FAILs for those checks. Re-run after merge + deploy for a meaningful result.
