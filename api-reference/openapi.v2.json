@@ -5533,7 +5533,7 @@
                       ]
                     },
                     "minItems": 1,
-                    "description": "Array of payment requests. Single item = single incoming payment. Multiple items preserve the legacy incoming-payment batch shape and are unrelated to multicall payout parents."
+                    "description": "Array of payment requests. Single item = single incoming payment. Multiple items preserve the legacy incoming-payment batch shape and are unrelated to multicall payout parents. A batch varies only the amounts: every item resolves to the caller's single configured destination, so one create call cannot collect into several different payee destinations."
                   },
                   "feePercentage": {
                     "type": "string",
@@ -5617,6 +5617,16 @@
                     ]
                   }
                 },
+                "singlePaymentResolvedDestination": {
+                  "summary": "Single payment, destination resolved from the Client ID",
+                  "value": {
+                    "requests": [
+                      {
+                        "amount": "10"
+                      }
+                    ]
+                  }
+                },
                 "singlePaymentWithFees": {
                   "summary": "Single payment with fees example",
                   "value": {
@@ -5631,7 +5641,7 @@
                   }
                 },
                 "batchPayment": {
-                  "summary": "Legacy incoming batch payment example",
+                  "summary": "Legacy incoming batch payment example (every item resolves to the same destination)",
                   "value": {
                     "requests": [
                       {
@@ -5639,7 +5649,7 @@
                         "amount": "10"
                       },
                       {
-                        "destinationId": "0xb07d2398d2004378cad234da0ef14f1c94a530e4@eip155:11155111#E5F6A7B8:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
+                        "destinationId": "0x6923831ACf5c327260D7ac7C9DfF5b1c3cB3C7D7@eip155:11155111#A1B2C3D4:0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C",
                         "amount": "5"
                       }
                     ]
