@@ -8,7 +8,9 @@ A merchant creates a payment link (a "Secure Payment") for an amount owed. They 
 
 ## Credentials
 
-Only two credentials are needed for the core integration. Do not ask the user for an API key, a Destination ID, or a wallet address — the Client ID is sufficient for creating payment links and registering webhooks.
+Only two credentials are needed for the core integration: the Client ID and the webhook secret. Do not ask the user for an API key or a wallet address, and never ask for a private key.
+
+You will also need the user's **Destination ID**, which is not a credential — it is a non-secret identifier the user copies from their Dashboard (see step 1 below). Ask for it. It is required in the request body unless the user's Client ID is bound to a payee destination, in which case the API resolves the payee from the Client ID and the field may be omitted. When in doubt, ask for it and send it.
 
 | Credential | What it's for | How to get it | Where it's used |
 | --- | --- | --- | --- |
@@ -86,6 +88,8 @@ x-client-id: <RN_CLIENT_ID>
 ```
 
 and read the `hasBeenPaid` boolean in the response — only `hasBeenPaid: true` (fully paid) confirms completion via polling.
+
+This call runs from your server, so use a **backend** Client ID — one created with no Allowed Domains. A Client ID that has Allowed Domains set is validated against the `Origin` header and will be rejected when called from a server, which sends no `Origin`.
 
 ## Cross-chain caveat
 
