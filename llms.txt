@@ -65,7 +65,8 @@ Request Network POSTs to your registered webhook URL when a payment completes. V
 ```typescript
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-function verify(rawBody: string, signature: string, secret: string) {
+function verify(rawBody: string, signature: string | undefined, secret: string) {
+  if (!signature) return false;
   const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
   const a = Buffer.from(expected, "hex");
   const b = Buffer.from(signature, "hex");
@@ -77,17 +78,18 @@ Verify against the raw body **before** any JSON parsing/re-serialization — re-
 
 ### 3. Confirm the payment
 
-Treat the webhook event as the source of truth: `payment.confirmed` (fully paid) or `payment.partial` (partial payment). As a fallback, poll:
+Treat the webhook event as the source of truth. Fulfill the order **only** after `payment.confirmed` — that is the sole final, fully-paid state. `payment.partial` means only part of the requested amount has been received: record it as an intermediate state and keep waiting for `payment.confirmed`; never fulfill on `payment.partial`. As a fallback, poll:
 
 ```http
 GET https://api.request.network/v2/request/{requestId}
+x-client-id: <RN_CLIENT_ID>
 ```
 
-and read the `hasBeenPaid` boolean in the response.
+and read the `hasBeenPaid` boolean in the response — only `hasBeenPaid: true` (fully paid) confirms completion via polling.
 
 ## Cross-chain caveat
 
-When the payer pays from a different chain/token than the merchant's destination, settlement is routed/bridged and is **not instant**. Your "thank you" / payment-confirmation page must show the payment as **PENDING** immediately after the payer submits — do not assume finality on redirect. Drive the final "paid" state from the webhook (`payment.confirmed` / `payment.partial`), not from the payer reaching your return URL.
+When the payer pays from a different chain/token than the merchant's destination, settlement is routed/bridged and is **not instant**. Your "thank you" / payment-confirmation page must show the payment as **PENDING** immediately after the payer submits — do not assume finality on redirect. Drive the final "paid" state from the webhook's `payment.confirmed` event (`payment.partial` is an intermediate state, not final), not from the payer reaching your return URL.
 
 ## Gotchas / breaking behaviors
 
