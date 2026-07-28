@@ -57,6 +57,12 @@ async function fetchText(url: string, init?: RequestInit): Promise<{ ok: boolean
 // block rather than from a regex over the whole response body, so that a check
 // never depends on attribute order and never matches a marker that happens to
 // appear in prose, a code sample, or an embedded framework payload.
+//
+// Markup only counts when it is *active*. Before any tag is matched, HTML
+// comments and the text content of `<script>`/`<style>`/`<template>` are
+// removed, and the head-only signals are matched against `<head>` alone.
+// Otherwise a commented-out tag, or the same literal markup appearing inside
+// script text, would report PASS after the real signal had been deleted.
 
 type TagAttributes = Record<string, string>;
 
@@ -71,16 +77,37 @@ function parseAttributes(raw: string): TagAttributes {
   return attributes;
 }
 
-function findTags(html: string, tagName: string): TagAttributes[] {
-  const pattern = new RegExp(`<${tagName}\\b([^>]*)>`, "gi");
-  return [...html.matchAll(pattern)].map((match) => parseAttributes(match[1]));
+/** Commented-out markup is inert; a crawler never sees it, so neither should we. */
+function stripComments(html: string): string {
+  return html.replace(/<!--[\s\S]*?-->/g, "");
 }
 
-/** The parsed contents of every `<script type="application/ld+json">` block. */
+/**
+ * Removes the *text content* of elements whose contents are not markup, so that
+ * a tag written out inside script text (an inlined framework payload, a docs
+ * example) is not mistaken for a tag the document actually declares.
+ */
+function stripInertText(html: string): string {
+  return html.replace(/<(script|style|template)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
+}
+
+/** The `<head>` markup, or the whole document if no head can be located. */
+function headOf(html: string): string {
+  return /<head\b[^>]*>([\s\S]*?)<\/head\s*>/i.exec(html)?.[1] ?? html;
+}
+
+/** Active tags declared in `<head>` — comments and script/style text excluded. */
+function findHeadTags(html: string, tagName: string): TagAttributes[] {
+  const head = headOf(stripInertText(stripComments(html)));
+  const pattern = new RegExp(`<${tagName}\\b([^>]*)>`, "gi");
+  return [...head.matchAll(pattern)].map((match) => parseAttributes(match[1]));
+}
+
+/** The parsed contents of every active `<script type="application/ld+json">` block. */
 function parseJsonLdBlocks(html: string): unknown[] {
   const blocks: unknown[] = [];
   const scriptPattern = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
-  for (const match of html.matchAll(scriptPattern)) {
+  for (const match of stripComments(html).matchAll(scriptPattern)) {
     if (parseAttributes(match[1]).type?.trim().toLowerCase() !== "application/ld+json") continue;
     try {
       blocks.push(JSON.parse(match[2]));
@@ -240,7 +267,7 @@ async function checkHtmlSignals() {
       continue;
     }
 
-    const robotsContent = findTags(res.body, "meta")
+    const robotsContent = findHeadTags(res.body, "meta")
       .filter((attributes) => attributes.name?.toLowerCase() === "robots")
       .map((attributes) => attributes.content ?? "");
     const hasRobotsMeta = robotsContent.some((content) =>
@@ -299,7 +326,7 @@ async function checkPlatformGated() {
     const res = await fetchText(`${BASE_URL}/`);
     const hasLink =
       !res.error &&
-      findTags(res.body, "link").some(
+      findHeadTags(res.body, "link").some(
         (attributes) =>
           attributes.rel?.toLowerCase() === "alternate" &&
           attributes.type?.toLowerCase() === "text/plain" &&
