@@ -48,7 +48,7 @@
     },
     {
       "source": "/advanced/introduction-to-the-request-protocol",
-      "destination": "/use-cases/welcome"
+      "destination": "/resources/lifecycle-of-a-request"
     },
     {
       "source": "/advanced/introduction-to-the-request-protocol/advanced-logic",
@@ -72,7 +72,7 @@
     },
     {
       "source": "/advanced/protocol-overview",
-      "destination": "/use-cases/welcome"
+      "destination": "/resources/lifecycle-of-a-request"
     },
     {
       "source": "/advanced/protocol-overview/contracts",
@@ -80,7 +80,7 @@
     },
     {
       "source": "/advanced/protocol-overview/how-payment-networks-work",
-      "destination": "/use-cases/welcome"
+      "destination": "/resources/lifecycle-of-a-request"
     },
     {
       "source": "/advanced/protocol-overview/private-requests-using-encryption",
@@ -88,15 +88,15 @@
     },
     {
       "source": "/advanced/request-network-sdk/get-started",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-setup/getting-started"
     },
     {
       "source": "/advanced/request-network-sdk/get-started/installation",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-setup/getting-started"
     },
     {
       "source": "/advanced/request-network-sdk/get-started/quickstart-browser",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-setup/getting-started"
     },
     {
       "source": "/advanced/request-network-sdk/get-started/request-node-gateways",
@@ -224,7 +224,7 @@
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/payment",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-features/payment-types-overview"
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/payment/batch-payment",
@@ -256,7 +256,7 @@
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/payment/pay-through-a-proxy-contract-with-a-multisig",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-features/safe-multisig-payments"
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/payment/shared",
@@ -272,7 +272,7 @@
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/payment/swap-to-pay-request",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-features/crosschain-payments"
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/payment/transferable-receivable-payment",
@@ -284,7 +284,7 @@
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/request-client/retrieve-a-request",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-features/query-requests"
     },
     {
       "source": "/advanced/request-network-sdk/sdk-guides/request-client/support-a-new-currency",
@@ -296,19 +296,15 @@
     },
     {
       "source": "/api-setup/components/create-payment",
-      "destination": "/use-cases/welcome"
-    },
-    {
-      "source": "/contribute/request-fund/how-to-apply",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-setup/getting-started"
     },
     {
       "source": "/development/guides/online-payments",
-      "destination": "/use-cases/welcome"
+      "destination": "/use-cases/programmatic-payment-links"
     },
     {
       "source": "/development/protocol",
-      "destination": "/use-cases/welcome"
+      "destination": "/resources/lifecycle-of-a-request"
     },
     {
       "source": "/docs/guides/1-first-request",
@@ -316,7 +312,7 @@
     },
     {
       "source": "/docs/guides/7-protocol/5-flows",
-      "destination": "/use-cases/welcome"
+      "destination": "/resources/lifecycle-of-a-request"
     },
     {
       "source": "/general/lifecycle-of-a-request",
@@ -328,7 +324,7 @@
     },
     {
       "source": "/general/request-scan",
-      "destination": "/tools/dashboard"
+      "destination": "https://scan.request.network"
     },
     {
       "source": "/general/supported-chains",
@@ -343,20 +339,12 @@
       "destination": "/use-cases/welcome"
     },
     {
-      "source": "/img/request_docs_thumbnail.png",
-      "destination": "/use-cases/welcome"
-    },
-    {
       "source": "/learn-request-network/introduction-to-the-request-protocol",
-      "destination": "/use-cases/welcome"
+      "destination": "/resources/lifecycle-of-a-request"
     },
     {
       "source": "/payments",
-      "destination": "/use-cases/welcome"
-    },
-    {
-      "source": "/request-fund",
-      "destination": "/use-cases/welcome"
+      "destination": "/api-features/payment-types-overview"
     },
     {
       "source": "/request-network-api/api-portal-manage-api-keys-and-webhooks",
