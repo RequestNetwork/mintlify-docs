@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Tooling for the Request Network Mintlify docs (e.g. Playwright screenshot capture).",
   "scripts": {
-    "capture-screenshots": "tsx scripts/capture-screenshots.ts"
+    "capture-screenshots": "tsx scripts/capture-screenshots.ts",
+    "check-geo-signals": "tsx scripts/check-geo-signals.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
