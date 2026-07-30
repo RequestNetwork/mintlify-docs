@@ -7,13 +7,7 @@ description: "Protocol fee model applied by Request Network API payments"
 
 Request Network charges a protocol fee on all payments processed through the API.
 
-## Fee Structure
-
-| Fee Type     | Rate                   | Cap                                               |
-| ------------ | ---------------------- | ------------------------------------------------- |
-| Protocol Fee | 5 basis points (0.05%) | ~$25/€25 for main USD and EUR backed stablecoins |
-
-The protocol fee applies to all the payment types
+The fee applies to every payment type:
 
 - ERC20 token payments
 - Native currency payments (ETH, POL, etc.)
@@ -22,35 +16,17 @@ The protocol fee applies to all the payment types
 - Crosschain payments
 - Subscription (coming soon)
 
+<Note>
+The protocol fee rate can change over time, so it isn't published here. Read the **current** rate that applies to any payment from the `metadata.protocolFee` field returned in every API response (see [Fee Information In Responses](#fee-information-in-responses) below), or [contact the Request Network team](https://request.network/discord) for current pricing.
+</Note>
+
 ## Who Pays the Fee?
 
-By default, the payer bears the protocol fee. The fee is added on top of the invoice amount.
-
-### Example
-
-- Invoice amount: 1000 USDC
-- Protocol fee: 1000 x 0.05% = 0.50 USDC
-- Total paid by payer: 1000.50 USDC + gas fee
-- Amount received by payee: 1000 USDC
-
-For larger payments with stablecoins, the fee is capped:
-
-- Payment of 100,000 USDC -> Fee capped at 25 USDC (not 50 USDC)
+By default, the payer bears the protocol fee. It is added on top of the invoice amount, so the payee receives the full invoice amount. The exact fee for a given payment is returned in the API response before the payer pays, and a cap applies to large stablecoin payments.
 
 ## Shifting the Fee to the Payee
 
-If you want the payee to bear the protocol fee instead of the payer, simply reduce the invoice amount by 5bps (0.05%) before creating the request.
-
-### Example:
-
-- Original intended payment: 1000 USDC
-- Reduce by 0.05%: 1000 - (1000 x 0.05%) = 999.50 USDC
-- Invoice amount: 999.50 USDC
-- Protocol fee: 999.50 x 0.05% ≈ 0.4975 USDC
-- Total paid by the payer: ≈ 999.9975 USDC (≈ 1000 USDC) + gas fee
-- Amount received by payee: 999.50 USDC
-
-This way, the payer pays approximately the original amount while the payee effectively absorbs the fee.
+If you want the payee to bear the protocol fee instead of the payer, reduce the invoice amount by the protocol fee percentage before creating the request. The payer then pays approximately the original invoice amount, while the payee effectively absorbs the fee. Use `metadata.protocolFee.percentage` from the response to calculate the exact reduction.
 
 ## Platform Fees
 
@@ -65,13 +41,13 @@ When both protocol and platform fees are configured, the API automatically batch
 
 ### Fee Information In Responses
 
-Every API response includes the fee details in the metadata:
+Every API response includes the fee details in the metadata. Read the live protocol fee rate from `protocolFee.percentage` rather than hardcoding it:
 
 ```json
 {
   "metadata": {
     "protocolFee": {
-      "percentage": "0.05",
+      "percentage": "...",
       "address": "0x..."
     },
     "platformFee": {
