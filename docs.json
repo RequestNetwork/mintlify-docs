@@ -18,6 +18,9 @@
     }
   },
   "favicon": "/favicon.svg",
+  "metadata": {
+    "timestamp": true
+  },
   "fonts": {
     "heading": {
       "family": "Montserrat"
@@ -212,6 +215,13 @@
               "faq",
               "glossary"
             ]
+          },
+          {
+            "group": "📰 Release Notes",
+            "pages": [
+              "release-notes/index",
+              "release-notes/request-api"
+            ]
           }
         ]
       }
@@ -251,9 +261,12 @@
     "metatags": {
       "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
       "og:locale": "en_US",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "author": "Request Network",
+      "article:publisher": "https://request.network"
     },
     "organization": {
+      "id": "https://request.network/#organization",
       "name": "Request Network",
       "url": "https://request.network",
       "logo": "https://docs.request.network/logo/dark.svg",
