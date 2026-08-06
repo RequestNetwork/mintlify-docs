@@ -104,6 +104,26 @@ Emitted **in addition to** the core events when the request was created via a Se
 | `compliance.updated` | KYC or agreement status changed | **kycStatus values:** not_started, pending, approved, rejected, retry_required<br/>**agreementStatus values:** not_started, pending, completed, rejected, failed | Update user permissions, notify status |
 | `payment_detail.updated` | Bank account verification status updated | States: approved, failed, pending | Enable fiat payments, update profiles |
 
+### Secure Payment Page Events (payer funnel)
+
+| Event | Description | Context | Primary Use |
+|-------|-------------|---------|-------------|
+| `secure_payment.user_event` | Payer progressed through a step of the Secure Payment Page | **userEvent values:** wallet_connected, payment_sent_to_wallet, payment_approved_in_wallet | Real-time payer-funnel visibility, drop-off analytics |
+
+Sent to the same registered webhook endpoints as every other event — same Client ID scoping, `x-request-network-signature` HMAC verification, delivery headers, timeout, and 1s/5s/15s retry semantics described elsewhere on this page.
+
+The `userEvent` field distinguishes the 3 funnel steps:
+
+| `userEvent` | Meaning |
+|-------------|---------|
+| `wallet_connected` | The payer successfully connected a wallet on the secure payment page |
+| `payment_sent_to_wallet` | The payment transaction was handed to the payer's wallet for signature |
+| `payment_approved_in_wallet` | The payer approved/signed the payment in their wallet. `properties` includes the submission id (e.g. tx hash / user-operation hash) |
+
+<Note>
+`securePaymentToken` is the platform's correlation key, returned when the secure payment was created. `requestId` is present only when exactly one request is linked to the secure payment (see `requestIds` for the full list). `timestamp` is server-stamped on receipt. `occurredAt` and `properties` are **client-reported telemetry from the payer's browser** — useful for analytics, but not authoritative. `properties` keys mirror the Secure Payment Page's analytics vocabulary, and wallet addresses appear only as sha256 hashes (`wallet_address_hashed`), never in raw form.
+</Note>
+
 ## Security Implementation
 
 ### Signature Verification
@@ -299,6 +319,27 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
   "rawPayload": {
     "verificationLevel": "full",
     "documents": "verified"
+  }
+}
+```
+
+### Secure Payment User Event
+```json
+{
+  "event": "secure_payment.user_event",
+  "userEvent": "payment_approved_in_wallet",
+  "securePaymentToken": "spt_3fk29ax7...",
+  "requestId": "01JD3E6JD46KY4KKV7X9V0MZ7W",
+  "requestIds": ["01JD3E6JD46KY4KKV7X9V0MZ7W"],
+  "orchestratorId": "orch_12345",
+  "occurredAt": "2026-08-05T14:03:21.512Z",
+  "timestamp": "2026-08-05T14:03:22.104Z",
+  "properties": {
+    "wallet_provider": "metamask",
+    "payment_submission_id": "0x6a4f...e21b",
+    "payment_submission_id_type": "evm_tx_hash",
+    "selected_source_chain": "base",
+    "payment_type": "single"
   }
 }
 ```

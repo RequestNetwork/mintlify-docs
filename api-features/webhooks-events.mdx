@@ -9,7 +9,7 @@ Webhooks provide real-time notifications when payment and request events occur, 
 
 ## Event Categories
 
-The Request Network webhook system emits **12 event types** across four categories:
+The Request Network webhook system emits **13 event types** across five categories:
 
 | Category | Events |
 | --- | --- |
@@ -19,6 +19,7 @@ The Request Network webhook system emits **12 event types** across four categori
 | **Processing** (crypto-to-fiat) | `payment.processing` (with `subStatus`) |
 | **Request** | `request.recurring` |
 | **Compliance / Bank** | `compliance.updated`, `payment_detail.updated` |
+| **Secure Payment Page** (payer funnel) | `secure_payment.user_event` (with `userEvent`) |
 
 The `.client_id` and `.checkout` variants are emitted in addition to the base `.confirmed` / `.partial` events when the request was created via a Client ID or as a checkout / secure payment, respectively. They include extra metadata (`clientId`, `origin`).
 
@@ -67,6 +68,7 @@ graph LR
 - **Subscription management:** Handle `request.recurring` for automatic billing renewals
 - **Compliance workflows:** Update user permissions when `compliance.updated` shows KYC approval
 - **Real-time dashboards:** Display live payment status using `payment.processing` subStatus values
+- **Payer-funnel visibility:** Track wallet connection and signature progress on the Secure Payment Page via `secure_payment.user_event`
 
 ## Implementation
 
