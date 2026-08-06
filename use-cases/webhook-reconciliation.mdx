@@ -9,7 +9,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 
 **Audience:** any backend integrating Request Network where payment events drive state changes downstream.
 
-## The 12 events
+## The 13 events
 
 | Category | Event | When it fires |
 | --- | --- | --- |
@@ -25,6 +25,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 | Request | `request.recurring` | A new recurring billing cycle fired |
 | Compliance | `compliance.updated` | KYC or agreement status changed |
 | Bank details | `payment_detail.updated` | Bank account verification status changed |
+| Secure Payment Page | `secure_payment.user_event` | Payer progressed through a step of the Secure Payment Page (`userEvent`: `wallet_connected`, `payment_sent_to_wallet`, `payment_approved_in_wallet`) — funnel telemetry, **not** a settlement signal |
 
 For the full payload schemas, see the [Webhooks reference](/api-reference/webhooks).
 
@@ -141,6 +142,13 @@ async function handleEvent(event: any) {
 
     case "compliance.updated":
       await syncKycStatus(event.clientUserId, event.kycStatus);
+      break;
+
+    // Payer-funnel telemetry from the Secure Payment Page. Never reconcile
+    // money off this — a payer can approve in their wallet and still have the
+    // transaction fail on-chain. Wait for payment.confirmed for settlement.
+    case "secure_payment.user_event":
+      await recordFunnelStep(event.securePaymentToken, event.userEvent);
       break;
 
     // ... others
