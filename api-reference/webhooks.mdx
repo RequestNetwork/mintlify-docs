@@ -121,7 +121,11 @@ The `userEvent` field distinguishes the 3 funnel steps:
 | `payment_approved_in_wallet` | The payer approved/signed the payment in their wallet. `properties` includes the submission id (e.g. tx hash / user-operation hash) |
 
 <Note>
-`securePaymentToken` is the platform's correlation key, returned when the secure payment was created. `requestId` is present only when exactly one request is linked to the secure payment (see `requestIds` for the full list). `timestamp` is server-stamped on receipt. `occurredAt` and `properties` are **client-reported telemetry from the payer's browser** — useful for analytics, but not authoritative. `properties` keys mirror the Secure Payment Page's analytics vocabulary, and wallet addresses appear only as sha256 hashes (`wallet_address_hashed`), never in raw form.
+`securePaymentToken` is the platform's correlation key, returned when the secure payment was created. `requestId` is present only when exactly one request is linked to the secure payment (see `requestIds` for the full list). `timestamp` is server-stamped on receipt. `occurredAt` and `properties` are **client-reported telemetry from the payer's browser** — useful for analytics, but not authoritative.
+
+`secure_payment.user_event` is best-effort browser telemetry. Navigation, network errors, or browser extensions can prevent the API from receiving it. Webhook retries begin only after the API accepts the event. Do not treat an absent event as evidence that the payer did not take the step; use `payment.confirmed` for settlement and reconciliation.
+
+When the Secure Payment Page includes wallet information in `properties`, it uses `wallet_address_hashed` rather than a raw wallet address.
 </Note>
 
 ## Security Implementation
