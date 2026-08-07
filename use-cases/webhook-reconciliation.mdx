@@ -49,15 +49,13 @@ For the full payload schemas, see the [Webhooks reference](/api-reference/webhoo
 
 ## Handler — reference implementation
 
-A signature-verifying Express handler with delivery-ID deduplication. It verifies against the **raw** body, uses constant-time comparison, and lets Request Network retry a failed handler.
+A signature-verifying Express handler. It verifies against the **raw** body, uses constant-time comparison, passes the delivery ID to business handlers as their idempotency key, and lets Request Network retry a failed handler.
 
 ```typescript
 import { createHmac, timingSafeEqual } from "node:crypto";
 import express from "express";
-import { Redis } from "ioredis";
 
 const app = express();
-const redis = new Redis(process.env.REDIS_URL!);
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET!;
 
 app.post(
@@ -66,7 +64,6 @@ app.post(
   async (req, res) => {
     const signature = req.headers["x-request-network-signature"] as string;
     const deliveryId = req.headers["x-request-network-delivery"] as string;
-    const isTest = req.headers["x-request-network-test"] === "true";
 
     if (!signature || !deliveryId) {
       return res.status(400).send("missing headers");
@@ -87,20 +84,12 @@ app.post(
       return res.status(401).send("invalid signature");
     }
 
-    // 2. Idempotency: dedupe deliveries that completed successfully.
-    const completedKey = `webhook:${deliveryId}`;
-    if (!isTest && (await redis.exists(completedKey))) {
-      return res.status(200).send("duplicate, ignored");
-    }
-
-    // 3. Parse and route
+    // 2. Parse and route. Each business operation uses deliveryId as an
+    // idempotency key in its own durable store.
     const event = JSON.parse(req.body.toString("utf8"));
 
     try {
-      await handleEvent(event);
-
-      // Record completion only after downstream processing succeeds.
-      await redis.set(completedKey, "1", "EX", 86400); // 24h
+      await handleEvent(event, deliveryId);
       return res.status(200).send("ok");
     } catch (err) {
       console.error("handler failed", err);
@@ -109,12 +98,12 @@ app.post(
   },
 );
 
-async function handleEvent(event: any) {
+async function handleEvent(event: any, deliveryId: string) {
   switch (event.event) {
     case "payment.confirmed":
     case "payment.confirmed.client_id":
     case "payment.confirmed.checkout":
-      await markOrderPaid(event.requestId, event.txHash);
+      await markOrderPaid(event.requestId, event.txHash, deliveryId);
       break;
 
     case "payment.partial":
@@ -124,26 +113,31 @@ async function handleEvent(event: any) {
         event.requestId,
         event.amount,
         event.totalAmountPaid,
+        deliveryId,
       );
       break;
 
     case "payment.failed":
-      await flagFailedPayment(event.requestId);
+      await flagFailedPayment(event.requestId, deliveryId);
       break;
 
     case "request.recurring":
-      await onRecurringInvoice(event.originalRequestId, event.requestId);
+      await onRecurringInvoice(event.originalRequestId, event.requestId, deliveryId);
       break;
 
     case "compliance.updated":
-      await syncKycStatus(event.clientUserId, event.kycStatus);
+      await syncKycStatus(event.clientUserId, event.kycStatus, deliveryId);
       break;
 
     // Payer-funnel telemetry from the Secure Payment Page. Never reconcile
     // money off this — a payer can approve in their wallet and still have the
     // transaction fail on-chain. Wait for payment.confirmed for settlement.
     case "secure_payment.user_event":
-      await recordFunnelStep(event.securePaymentToken, event.userEvent);
+      await recordFunnelStep(
+        event.securePaymentToken,
+        event.userEvent,
+        deliveryId,
+      );
       break;
 
     // ... others
@@ -151,7 +145,7 @@ async function handleEvent(event: any) {
 }
 ```
 
-Webhook delivery is at least once, not exactly once. The delivery ID prevents ordinary duplicate deliveries, but downstream work must also be idempotent: a process can fail after a side effect but before it returns `200`.
+Webhook delivery is at least once, not exactly once. Each business operation must atomically record the delivery ID with the state it changes, then make a repeat delivery a successful no-op. If an operation calls another service, pass the delivery ID as that service's idempotency key too. A process can fail after a side effect but before it returns `200`.
 
 ## Headers reference
 
@@ -177,7 +171,7 @@ After 4 total attempts (initial + 3 retries) the delivery is dropped. Triggers: 
 
 ### Idempotency
 
-The same `payment.confirmed` event might arrive twice (network blip, retry overlap). Dedupe on `x-request-network-delivery`.
+The same `payment.confirmed` event might arrive twice (network blip, retry overlap). Use `x-request-network-delivery` as the idempotency key. Record it atomically with the business update in your durable store; do not use a check-then-act cache lookup, because overlapping deliveries can both pass the check.
 
 ### Routing by Client ID
 
