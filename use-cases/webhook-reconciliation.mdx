@@ -9,7 +9,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 
 **Audience:** any backend integrating Request Network where payment events drive state changes downstream.
 
-## The 12 events
+## The 13 events
 
 | Category | Event | When it fires |
 | --- | --- | --- |
@@ -25,6 +25,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 | Request | `request.recurring` | A new recurring billing cycle fired |
 | Compliance | `compliance.updated` | KYC or agreement status changed |
 | Bank details | `payment_detail.updated` | Bank account verification status changed |
+| Secure Payment Page | `secure_payment.user_event` | Payer progressed through a step of the Secure Payment Page (`userEvent`: `wallet_connected`, `payment_sent_to_wallet`, `payment_approved_in_wallet`) — funnel telemetry, **not** a settlement signal |
 
 For the full payload schemas, see the [Webhooks reference](/api-reference/webhooks).
 
@@ -48,15 +49,13 @@ For the full payload schemas, see the [Webhooks reference](/api-reference/webhoo
 
 ## Handler — reference implementation
 
-A signature-verifying Express handler with idempotency. Hardened for production: verifies against the **raw** body, uses constant-time comparison, deduplicates on `x-request-network-delivery`.
+A signature-verifying Express handler. It verifies against the **raw** body, uses constant-time comparison, passes the delivery ID to business handlers as their idempotency key, and lets Request Network retry a failed handler.
 
 ```typescript
 import { createHmac, timingSafeEqual } from "node:crypto";
 import express from "express";
-import { Redis } from "ioredis";
 
 const app = express();
-const redis = new Redis(process.env.REDIS_URL!);
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET!;
 
 app.post(
@@ -65,7 +64,6 @@ app.post(
   async (req, res) => {
     const signature = req.headers["x-request-network-signature"] as string;
     const deliveryId = req.headers["x-request-network-delivery"] as string;
-    const isTest = req.headers["x-request-network-test"] === "true";
 
     if (!signature || !deliveryId) {
       return res.status(400).send("missing headers");
@@ -86,39 +84,26 @@ app.post(
       return res.status(401).send("invalid signature");
     }
 
-    // 2. Idempotency: dedupe on delivery ID
-    const claim = await redis.set(
-      `webhook:${deliveryId}`,
-      "1",
-      "EX",
-      86400, // 24h
-      "NX",
-    );
-    if (!claim && !isTest) {
-      return res.status(200).send("duplicate, ignored");
-    }
-
-    // 3. Parse and route
+    // 2. Parse and route. Each business operation uses deliveryId as an
+    // idempotency key in its own durable store.
     const event = JSON.parse(req.body.toString("utf8"));
 
     try {
-      await handleEvent(event);
+      await handleEvent(event, deliveryId);
+      return res.status(200).send("ok");
     } catch (err) {
-      // Return non-2xx to trigger retry (1s, 5s, 15s — up to 3 retries)
       console.error("handler failed", err);
       return res.status(500).send("handler error");
     }
-
-    res.status(200).send("ok");
   },
 );
 
-async function handleEvent(event: any) {
+async function handleEvent(event: any, deliveryId: string) {
   switch (event.event) {
     case "payment.confirmed":
     case "payment.confirmed.client_id":
     case "payment.confirmed.checkout":
-      await markOrderPaid(event.requestId, event.txHash);
+      await markOrderPaid(event.requestId, event.txHash, deliveryId);
       break;
 
     case "payment.partial":
@@ -128,25 +113,39 @@ async function handleEvent(event: any) {
         event.requestId,
         event.amount,
         event.totalAmountPaid,
+        deliveryId,
       );
       break;
 
     case "payment.failed":
-      await flagFailedPayment(event.requestId);
+      await flagFailedPayment(event.requestId, deliveryId);
       break;
 
     case "request.recurring":
-      await onRecurringInvoice(event.originalRequestId, event.requestId);
+      await onRecurringInvoice(event.originalRequestId, event.requestId, deliveryId);
       break;
 
     case "compliance.updated":
-      await syncKycStatus(event.clientUserId, event.kycStatus);
+      await syncKycStatus(event.clientUserId, event.kycStatus, deliveryId);
+      break;
+
+    // Payer-funnel telemetry from the Secure Payment Page. Never reconcile
+    // money off this — a payer can approve in their wallet and still have the
+    // transaction fail on-chain. Wait for payment.confirmed for settlement.
+    case "secure_payment.user_event":
+      await recordFunnelStep(
+        event.securePaymentToken,
+        event.userEvent,
+        deliveryId,
+      );
       break;
 
     // ... others
   }
 }
 ```
+
+Webhook delivery is at least once, not exactly once. Each business operation must atomically record the delivery ID with the state it changes, then make a repeat delivery a successful no-op. If an operation calls another service, pass the delivery ID as that service's idempotency key too. A process can fail after a side effect but before it returns `200`.
 
 ## Headers reference
 
@@ -172,19 +171,39 @@ After 4 total attempts (initial + 3 retries) the delivery is dropped. Triggers: 
 
 ### Idempotency
 
-The same `payment.confirmed` event might arrive twice (network blip, retry overlap). Dedupe on `x-request-network-delivery`.
+The same `payment.confirmed` event might arrive twice (network blip, retry overlap). Use `x-request-network-delivery` as the idempotency key. Record it atomically with the business update in your durable store; do not use a check-then-act cache lookup, because overlapping deliveries can both pass the check.
+
+For a local database update, add a `webhook_deliveries` table with a unique `delivery_id` column, then insert that ID in the same transaction as the business update:
+
+```typescript
+async function markOrderPaid(
+  requestId: string,
+  txHash: string,
+  deliveryId: string,
+) {
+  await db.transaction(async (tx) => {
+    const order = await tx.orders.findOne({ where: { requestId } });
+    if (!order) return; // not ours
+
+    const claim = await tx.execute(
+      `INSERT INTO webhook_deliveries (delivery_id)
+       VALUES ($1)
+       ON CONFLICT (delivery_id) DO NOTHING`,
+      [deliveryId],
+    );
+    if (claim.rowCount === 0) return; // already applied
+
+    await tx.orders.update({
+      where: { id: order.id },
+      data: { paidAt: new Date(), txHash },
+    });
+  });
+}
+```
 
 ### Routing by Client ID
 
 If your platform has many merchants, give each their own Client ID. The webhook payload includes `clientId` so you can route events to the right tenant.
-
-```typescript
-async function markOrderPaid(requestId: string, txHash: string) {
-  const order = await db.orders.findOne({ where: { requestId } });
-  if (!order) return; // not ours
-  await db.orders.update({ where: { id: order.id }, data: { paidAt: new Date(), txHash } });
-}
-```
 
 ### Slack alerts on failure
 
