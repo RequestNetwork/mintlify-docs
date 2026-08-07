@@ -87,15 +87,9 @@ app.post(
       return res.status(401).send("invalid signature");
     }
 
-    // 2. Idempotency: dedupe on delivery ID
-    const claim = await redis.set(
-      `webhook:${deliveryId}`,
-      "1",
-      "EX",
-      86400, // 24h
-      "NX",
-    );
-    if (!claim && !isTest) {
+    // 2. Idempotency: dedupe deliveries that completed successfully.
+    const completedKey = `webhook:${deliveryId}`;
+    if (!isTest && (await redis.exists(completedKey))) {
       return res.status(200).send("duplicate, ignored");
     }
 
@@ -104,14 +98,14 @@ app.post(
 
     try {
       await handleEvent(event);
+
+      // Record completion only after downstream processing succeeds.
+      await redis.set(completedKey, "1", "EX", 86400); // 24h
+      return res.status(200).send("ok");
     } catch (err) {
-      // Release the claim before returning non-2xx so Request Network can retry.
-      await redis.del(`webhook:${deliveryId}`);
       console.error("handler failed", err);
       return res.status(500).send("handler error");
     }
-
-    res.status(200).send("ok");
   },
 );
 
