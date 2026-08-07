@@ -173,17 +173,37 @@ After 4 total attempts (initial + 3 retries) the delivery is dropped. Triggers: 
 
 The same `payment.confirmed` event might arrive twice (network blip, retry overlap). Use `x-request-network-delivery` as the idempotency key. Record it atomically with the business update in your durable store; do not use a check-then-act cache lookup, because overlapping deliveries can both pass the check.
 
+For a local database update, add a `webhook_deliveries` table with a unique `delivery_id` column, then insert that ID in the same transaction as the business update:
+
+```typescript
+async function markOrderPaid(
+  requestId: string,
+  txHash: string,
+  deliveryId: string,
+) {
+  await db.transaction(async (tx) => {
+    const order = await tx.orders.findOne({ where: { requestId } });
+    if (!order) return; // not ours
+
+    const claim = await tx.execute(
+      `INSERT INTO webhook_deliveries (delivery_id)
+       VALUES ($1)
+       ON CONFLICT (delivery_id) DO NOTHING`,
+      [deliveryId],
+    );
+    if (claim.rowCount === 0) return; // already applied
+
+    await tx.orders.update({
+      where: { id: order.id },
+      data: { paidAt: new Date(), txHash },
+    });
+  });
+}
+```
+
 ### Routing by Client ID
 
 If your platform has many merchants, give each their own Client ID. The webhook payload includes `clientId` so you can route events to the right tenant.
-
-```typescript
-async function markOrderPaid(requestId: string, txHash: string) {
-  const order = await db.orders.findOne({ where: { requestId } });
-  if (!order) return; // not ours
-  await db.orders.update({ where: { id: order.id }, data: { paidAt: new Date(), txHash } });
-}
-```
 
 ### Slack alerts on failure
 
