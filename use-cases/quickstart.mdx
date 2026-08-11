@@ -314,6 +314,10 @@ Key fields to look for:
 | `compliance.updated` | Compliance status changed |
 | `secure_payment.user_event` | Payer progressed through a Secure Payment Page step (`userEvent`: `wallet_connected`, `payment_sent_to_wallet`, `payment_approved_in_wallet`) — funnel telemetry, not a settlement signal |
 
+<Note>
+`secure_payment.user_event` is best-effort browser telemetry. The payer's browser can fail to reach the API, and retries begin only once the API has accepted the event — so a missing event is not evidence that the payer skipped the step. Use `payment.confirmed` for settlement and reconciliation.
+</Note>
+
 ## Step 5: Create a Secure Payment (Payment Link)
 
 With the `destinationId` from Step 2 and the `clientId` from Step 3, you can now create a payment link. When the payment is completed, the webhook from Step 4 will be notified automatically.
