@@ -8,6 +8,7 @@ description: "Orchestrators are fee and branding partners in Request Network: li
 An **orchestrator** is a fee and branding partner in Request Network. It is a first-class account that can:
 
 - **Link client IDs** — associate the developer [Client IDs](/api-features/client-id-management) (`cli_*` tokens) of the platforms you serve with your orchestrator.
+- **Create payment links** — use your key with a linked client ID to create incoming payment links and outgoing payout links for a platform.
 - **Configure fees** — set [orchestrator fees](/orchestrators/fees) (and per-client-ID overrides) that apply to payments made under those client IDs.
 - **Apply branding** — give the hosted [Secure Payment](/tools/secure-payments) experience your own [whitelabel branding](/orchestrators/whitelabel-branding).
 
@@ -16,6 +17,12 @@ This is aimed at platforms, PSPs, and partners who orchestrate payments on behal
 <Note>
 "Orchestrator" here is the formal fee/branding partner account described on this page. It builds on — but is broader than — the lightweight "orchestrator pattern" of binding a single Client ID to a payee destination described in [Client ID Management](/api-features/client-id-management#orchestrator-pattern).
 </Note>
+
+## Roles in an orchestrated flow
+
+- **Platform** — a merchant, business, or service whose `cli_*` client ID is linked to an orchestrator. It is the payee for incoming payments and the payer for outgoing payouts.
+- **Orchestrator** — a partner that manages Request Network payment flows for a platform.
+- **End user** — a customer of the platform: payer of an incoming payment and payee of an outgoing payout.
 
 ## Getting provisioned
 
