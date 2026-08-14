@@ -9,6 +9,8 @@ Link a platform's [Client ID](/api-features/client-id-management) (`cli_*`) to y
 
 All linking endpoints use the `x-orchestrator-key` header.
 
+If you use hosted onboarding, [register an orchestrator webhook](/orchestrators/webhooks) before you send the onboarding URL. It receives the resulting client ID after the platform completes the flow.
+
 <Note>
 A client ID can be linked to one orchestrator only. A second link request is rejected, whether it is for the same orchestrator or a different one. If you need to check whether a link request succeeded, list your linked client IDs instead of retrying it. Unlinking removes the active connection, but does not make the client ID linkable again.
 </Note>
@@ -118,7 +120,7 @@ The hosted flow asks the platform to:
 3. Choose any applicable compliance preference.
 4. Confirm the connection to your orchestrator.
 
-After confirmation, Request Network creates a new `cli_*` client ID, copies any allowed domains from the intent, links it to your orchestrator, and binds it to the platform's active payment destination.
+After confirmation, Request Network creates a new `cli_*` client ID, copies any allowed domains from the intent, links it to your orchestrator, and binds it to the platform's active payment destination. Active orchestrator webhooks receive a [`client_id.linked` event](/orchestrators/webhooks) with the client ID, link identifiers, and destination details. Direct links do not send this event.
 
 <Note>
 A link intent is single-use and expires after two days. Create a new intent if the platform has not completed the flow before it expires.

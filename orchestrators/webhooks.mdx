@@ -1,0 +1,139 @@
+---
+title: "Orchestrator webhooks"
+description: "Receive signed notifications when a platform completes hosted onboarding with your orchestrator."
+---
+
+## Overview
+
+Orchestrator webhooks notify you when a platform completes [hosted onboarding](/orchestrators/client-id-linking#onboard-a-platform-with-a-link-intent). They are owned by your orchestrator and use your `x-orchestrator-key`, not a platform's `x-client-id`.
+
+Register a webhook before you send an onboarding URL to a platform. Its active endpoints receive the `client_id.linked` event after the platform completes the flow.
+
+## Register a webhook
+
+Register an endpoint with your orchestrator key:
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/webhooks" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "url": "https://partner.example.com/webhooks/request-network" }'
+```
+
+The response includes the webhook and a signing secret:
+
+```json
+{
+  "webhook": {
+    "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "url": "https://partner.example.com/webhooks/request-network",
+    "isActive": true,
+    "createdAt": "2026-08-14T10:00:00.000Z"
+  },
+  "secret": "4f2c5a8d1b3e6f709c2d4a7b0e1f3c5d8a2b4e6f9c1d3a5b7e0f2c4d6a8b1e3f"
+}
+```
+
+<Warning>
+Save the signing secret when you register the webhook. Request Network returns it only once and never includes it in list, deactivate, or reactivate responses.
+</Warning>
+
+Verify the `x-request-network-signature` HMAC-SHA256 header against the raw request body before you process an event. See the [webhook reconciliation guide](/use-cases/webhook-reconciliation) for a signature-verifying handler.
+
+Webhook deliveries may be retried. Make sure your endpoint can safely receive the same notification more than once.
+
+## Test your endpoint
+
+Send a signed mock `client_id.linked` event to every active endpoint:
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/webhooks/test" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "eventType": "client_id.linked" }'
+```
+
+The response reports the delivery result:
+
+```json
+{
+  "sent": 1,
+  "failed": 0
+}
+```
+
+Test deliveries have the `x-request-network-test: true` header. They use the same signing process and payload shape as a real event, with placeholder values.
+
+## Receive `client_id.linked`
+
+`client_id.linked` is sent after a platform completes hosted onboarding from a link intent. It is not sent for a direct `POST /v2/orchestrators/client-ids` link.
+
+```json
+{
+  "event": "client_id.linked",
+  "clientId": "cli_PLATFORM_CLIENT_ID",
+  "orchestratorId": "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+  "linkId": "01ARZ3NDEKTSV4RRFFQ69G5FAX",
+  "intentId": "01ARZ3NDEKTSV4RRFFQ69G5FAY",
+  "externalId": "merchant_123",
+  "destinationId": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e@eip155:8453#B4FD67BB:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "destinationWalletAddress": "0x742d35cc6634c0532925a3b844bc454e4438f44e",
+  "chain": "base",
+  "currency": "USDC",
+  "timestamp": "2026-08-14T10:00:00.000Z"
+}
+```
+
+Use `intentId` or your optional `externalId` to match the event to your onboarding record, then save the returned `clientId`. Use the stable `linkId` or `intentId` to identify a repeated delivery.
+
+The `destinationId`, wallet address, chain, and currency identify the payment destination that the hosted flow bound to the new client ID. Use that client ID with paired authentication to create payment links for the platform.
+
+## Manage webhook endpoints
+
+List every endpoint registered to your orchestrator, including inactive ones:
+
+```bash
+curl "https://api.request.network/v2/orchestrators/webhooks" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+```json
+{
+  "webhooks": [
+    {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "url": "https://partner.example.com/webhooks/request-network",
+      "isActive": true,
+      "createdAt": "2026-08-14T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+To stop delivery without removing the endpoint, deactivate it:
+
+```bash
+curl -X DELETE "https://api.request.network/v2/orchestrators/webhooks/01ARZ3NDEKTSV4RRFFQ69G5FAV" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+To resume delivery, reactivate the same endpoint:
+
+```bash
+curl -X PATCH "https://api.request.network/v2/orchestrators/webhooks/01ARZ3NDEKTSV4RRFFQ69G5FAV" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+Deactivation preserves the endpoint URL and signing secret. Registering the same URL again is rejected, even while it is inactive; reactivate it instead. To use a different URL, deactivate the old endpoint and register the new one.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Client ID linking" href="/orchestrators/client-id-linking" icon="link">
+    Create a hosted onboarding link and receive its result through a webhook.
+  </Card>
+
+  <Card title="Webhook reconciliation" href="/use-cases/webhook-reconciliation" icon="check-double">
+    Verify signatures and process webhook deliveries safely.
+  </Card>
+</CardGroup>
