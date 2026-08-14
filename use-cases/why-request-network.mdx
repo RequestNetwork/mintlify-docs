@@ -7,11 +7,11 @@ Businesses accepting stablecoin or crypto payments often start by asking how Req
 
 ## How do the fees compare?
 
-Request Network charges a small, flat protocol fee — a fraction of what traditional card processors like Stripe and PayPal charge, which is typically a percentage of every transaction plus a fixed per-transaction fee. For the current Request Network rate, [contact the team](https://request.network/discord).
+Request Network charges a small, percentage-based transaction fee — a fraction of what traditional card processors like Stripe and PayPal charge, which is typically a percentage of every transaction plus a fixed per-transaction fee. For the current Request Network rate, [contact the team](https://request.network/discord).
 
-| | Request Network | Stripe / PayPal |
-|---|---|---|
-| Fee model | Small, flat protocol fee | Percentage of each transaction + fixed per-transaction fee |
+|  | Request Network | Stripe / PayPal |
+| --- | --- | --- |
+| Fee model | Small, percentage-based transaction fee | Percentage of each transaction \+ fixed per-transaction fee |
 
 ## What does non-custodial mean for me?
 
@@ -35,7 +35,7 @@ This means:
 - No per-dispute chargeback fees like those card processors charge
 - Fewer losses from chargeback fraud, which is a common problem for international card payments and digital goods
 
-Card processors carry chargeback risk on every transaction: a merchant can lose the product *and* the payment, then pay a dispute fee on top.
+Card processors carry chargeback risk on every transaction: a merchant can lose the product _and_ the payment, then pay a dispute fee on top.
 
 For businesses that still want buyer protection, Request Network supports **escrow-based flows**. Funds are held in a smart contract until agreed conditions are met, which enables refunds when needed without reintroducing custodial risk.
 
@@ -43,7 +43,7 @@ For businesses that still want buyer protection, Request Network supports **escr
 
 Request Network is built for crypto from the ground up, rather than adding crypto support to a fiat-first system.
 
-- **553+ currencies** supported across EVM chains (Ethereum, Polygon, BSC, and others) plus Tron
+- **553\+ currencies** supported across EVM chains (Ethereum, Polygon, BSC, and others) plus Tron
 - **No forced fiat conversion** — funds can stay in crypto end-to-end
 - **Native wallet integration** — connects directly with MetaMask, WalletConnect, and other Web3 wallets
 - **Crosschain payments** — a payer can pay in one token on one chain and the recipient receives a different token on a different chain
@@ -54,8 +54,8 @@ Traditional processors typically support a handful of assets (often just BTC, ET
 
 Both Request Network and traditional processors offer reconciliation, but the underlying guarantees differ.
 
-| | Request Network | Stripe / PayPal |
-|---|---|---|
+|  | Request Network | Stripe / PayPal |
+| --- | --- | --- |
 | Record integrity | Cryptographically guaranteed, on-chain | Stored in a company database |
 | Retention | No retention limit — records are permanent | Typically limited (for example, 7 years) |
 | Status updates | Real-time via webhooks | Real-time via webhooks |
@@ -65,12 +65,12 @@ Because Request Network payment records live on-chain, they can't be altered or 
 
 ## Full comparison at a glance
 
-| | Request Network | Stripe / PayPal |
-|---|---|---|
-| Fee model | Small, flat protocol fee | Percentage of each transaction + fixed per-transaction fee |
+|  | Request Network | Stripe / PayPal |
+| --- | --- | --- |
+| Fee model | Small, percentage-based transaction fee | Percentage of each transaction \+ fixed per-transaction fee |
 | Settlement | Direct payer → recipient, on-chain | 2-7 day hold before payout |
 | Custody | Non-custodial | Processor holds funds during settlement |
 | Chargebacks | None by default; optional escrow for buyer protection | Standard; per-dispute fees apply |
-| Crypto/stablecoin support | 553+ currencies, native | Limited (typically BTC, ETH, USDC) |
-| Chains | EVM chains + Tron | N/A (fiat-first, crypto bolted on) |
+| Crypto/stablecoin support | 553\+ currencies, native | Limited (typically BTC, ETH, USDC) |
+| Chains | EVM chains \+ Tron | N/A (fiat-first, crypto bolted on) |
 | Crosschain payments | Pay in one token, receive in another | Not supported |
