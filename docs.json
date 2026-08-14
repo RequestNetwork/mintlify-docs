@@ -547,6 +547,7 @@
                   "orchestrators/overview",
                   "orchestrators/fees",
                   "orchestrators/client-id-linking",
+                  "orchestrators/kyt-plans",
                   "orchestrators/webhooks",
                   "orchestrators/whitelabel-branding"
                 ]
