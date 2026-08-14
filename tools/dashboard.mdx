@@ -6,7 +6,7 @@ description: "dashboard.request.network — sign in with your wallet to manage p
 The **Request Network Dashboard** ([dashboard.request.network](https://dashboard.request.network)) is the no-code home for everything you do with Request Network as a receiver: setting up where you want to be paid, generating API credentials, sending and receiving payment links. Sign in with an EVM or Tron wallet — no email, no password.
 
 <Frame>
-  <img src="/images/dashboard/home-with-destination.webp" alt="Dashboard home with active payment destination" />
+  <img src="/images/dashboard/home-with-destination.webp" alt="Dashboard home with active payment destination" width="1280" height="720" />
 </Frame>
 
 ## Sign-in
@@ -18,14 +18,14 @@ The login screen offers EVM and Tron as parallel tabs.
 Connect MetaMask, Coinbase Wallet, or WalletConnect. Sign the SIWE message when prompted to start your session.
 
 <Frame>
-  <img src="/images/dashboard/login-evm.webp" alt="Dashboard sign-in (EVM)" />
+  <img src="/images/dashboard/login-evm.webp" alt="Dashboard sign-in (EVM)" width="1440" height="900" loading="lazy" />
 </Frame>
 </Tab>
 <Tab title="Tron">
 Connect TronLink, Guarda, Trust, or WalletConnect-Tron. Sign the message when prompted to start your session.
 
 <Frame>
-  <img src="/images/dashboard/login-tron.webp" alt="Dashboard sign-in (Tron)" />
+  <img src="/images/dashboard/login-tron.webp" alt="Dashboard sign-in (Tron)" width="1440" height="900" loading="lazy" />
 </Frame>
 </Tab>
 </Tabs>
@@ -37,7 +37,7 @@ Your session is a wallet-bound cookie with a 15-minute idle timeout, shared acro
 A **payment destination** registers where you want to receive payments. It's a single chain × token × wallet combo, encoded as an [ERC-7828 humanReadableInteropAddress](/api-features/payee-destinations).
 
 <Frame>
-  <img src="/images/dashboard/create-destination.webp" alt="Create payment destination dialog" />
+  <img src="/images/dashboard/create-destination.webp" alt="Create payment destination dialog" width="1280" height="720" loading="lazy" />
 </Frame>
 
 Supported chain × token combinations in the Dashboard UI:
@@ -64,11 +64,11 @@ The Dashboard's **Generate New Client ID** dialog collects:
 - **Allowed Domains** — one or more HTTPS origins (leave empty for backend-only Client IDs)
 
 <Frame>
-  <img src="/images/dashboard/manage-destination.webp" alt="Manage destination and Client IDs" />
+  <img src="/images/dashboard/manage-destination.webp" alt="Manage destination and Client IDs" width="1280" height="720" loading="lazy" />
 </Frame>
 
 <Frame>
-  <img src="/images/dashboard/generate-client-id.webp" alt="Generate Client ID dialog" />
+  <img src="/images/dashboard/generate-client-id.webp" alt="Generate Client ID dialog" width="1280" height="720" loading="lazy" />
 </Frame>
 
 Advanced fields — `feePercentage`, `feeAddress`, `operatorWalletAddress`, `payeeDestinationId`, `defaultPreApprovalExpiry`, `defaultAuthorizationExpiry` — are only configurable via the [Auth API](https://auth.request.network/open-api/#tag/client-ids). Existing Client IDs created from the Dashboard can be edited (allowed domains) or revoked from the same screen.
@@ -91,13 +91,13 @@ See [Webhooks](/api-features/webhooks-events) for the payload format and how to 
 The **Get Paid** tab is your incoming-payments view. Create a request — amount, currency, optional reference and payer identifier — and the Dashboard generates a `pay.request.network` link to share.
 
 <Frame>
-  <img src="/images/dashboard/get-paid-list.webp" alt="Get Paid list" />
+  <img src="/images/dashboard/get-paid-list.webp" alt="Get Paid list" width="1280" height="720" loading="lazy" />
 </Frame>
 
 Each request shows status (Pending / Paid), the on-chain transaction hash once paid, and a copyable payment URL. Works identically for EVM and Tron destinations.
 
 <Frame>
-  <img src="/images/dashboard/get-paid-detail.webp" alt="Request detail with payment link" />
+  <img src="/images/dashboard/get-paid-detail.webp" alt="Request detail with payment link" width="1280" height="720" loading="lazy" />
 </Frame>
 
 ## Pay (outgoing)
@@ -105,7 +105,7 @@ Each request shows status (Pending / Paid), the on-chain transaction hash once p
 The **Pay** tab is your outgoing-payments view. Create a single-recipient payout, sign the resulting transaction, and the Dashboard tracks settlement.
 
 <Frame>
-  <img src="/images/dashboard/pay-list.webp" alt="Pay list (outgoing payouts)" />
+  <img src="/images/dashboard/pay-list.webp" alt="Pay list (outgoing payouts)" width="1280" height="720" loading="lazy" />
 </Frame>
 
 The Dashboard supports single-recipient payouts on both EVM and Tron, and lets you select multiple pending payouts and settle them together as a [multicall payout](/api-features/payouts#multicall-payouts) — reviewing every recipient before signing. For fully programmatic batch payouts, you can also call the API directly — see [Batch payouts](/use-cases/batch-payouts).

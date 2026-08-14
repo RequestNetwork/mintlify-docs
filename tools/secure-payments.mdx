@@ -6,7 +6,7 @@ description: "pay.request.network — the hosted payment link app payers open to
 **Secure Payment** ([pay.request.network](https://pay.request.network)) is the hosted page your payers land on when they click a payment link. It's a defense-in-depth checkout: trusted contract addresses are hardcoded, every transaction is decoded and verified client-side, and the payer can pay from any of 8 supported chains in any supported wallet.
 
 <Frame>
-  <img src="/images/secure-payments/payment-options.webp" alt="Secure Payment options view" />
+  <img src="/images/secure-payments/payment-options.webp" alt="Secure Payment options view" width="1280" height="720" />
 </Frame>
 
 ## Why it exists
@@ -30,7 +30,7 @@ The Secure Payment page is intentionally separated from the merchant frontend so
     The connect modal lists EVM and Tron wallets side by side.
 
     <Frame>
-      <img src="/images/secure-payments/connect-wallet.webp" alt="Connect wallet modal — EVM" />
+      <img src="/images/secure-payments/connect-wallet.webp" alt="Connect wallet modal — EVM" width="1280" height="720" loading="lazy" />
     </Frame>
 
     When the destination is on Tron, the same modal shows Tron wallets (TronLink, Guarda, Trust, WalletConnect-Tron) instead of the EVM list — try a [Tron-destination payment link](https://pay.request.network) to see it.
@@ -44,7 +44,7 @@ The Secure Payment page is intentionally separated from the merchant frontend so
     For ERC-20s, an approval transaction precedes the payment. The page shows a stepper (connect → confirm → setup → pay) and an optional **Advanced** view that decodes the calldata for inspection.
 
     <Frame>
-      <img src="/images/secure-payments/advanced-view.webp" alt="Advanced view with decoded calldata" />
+      <img src="/images/secure-payments/advanced-view.webp" alt="Advanced view with decoded calldata" width="1280" height="720" loading="lazy" />
     </Frame>
   </Step>
 
@@ -52,7 +52,7 @@ The Secure Payment page is intentionally separated from the merchant frontend so
     The success screen shows the source and destination transaction hashes, with explorer links per chain. For cross-chain payments, a Li.Fi badge is displayed. If you set a `redirectUrl` when creating the payment link, an extra button appears at the bottom of the screen — defaulting to **"Go Back and Close"**, or whatever you set as `redirectLabel` — that takes the payer back to your site.
 
     <Frame>
-      <img src="/images/secure-payments/payment-success.webp" alt="Payment success screen" />
+      <img src="/images/secure-payments/payment-success.webp" alt="Payment success screen" width="1280" height="720" loading="lazy" />
     </Frame>
   </Step>
 </Steps>
