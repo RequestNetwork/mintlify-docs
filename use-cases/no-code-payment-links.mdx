@@ -25,7 +25,7 @@ A repeatable workflow for sending one-off crypto payment links to customers, con
     Open [dashboard.request.network](https://dashboard.request.network), connect your wallet, and sign the auth message. Both EVM and Tron wallets work — the Dashboard auto-detects the type and gives you parallel sign-in tabs.
 
     <Frame>
-      <img src="/images/dashboard/login-evm.webp" alt="Dashboard sign-in (EVM)" />
+      <img src="/images/dashboard/login-evm.webp" alt="Dashboard sign-in (EVM)" width="1440" height="900" />
     </Frame>
   </Step>
 
@@ -33,7 +33,7 @@ A repeatable workflow for sending one-off crypto payment links to customers, con
     On the home page, click **Set up payment destination**. Pick the chain (one of 7 EVM chains plus Tron) and the token (USDC and/or USDT — exact catalog varies by chain; see [Supported Chains and Currencies](/resources/supported-chains-and-currencies)). Confirm.
 
     <Frame>
-      <img src="/images/dashboard/create-destination.webp" alt="Create payment destination dialog" />
+      <img src="/images/dashboard/create-destination.webp" alt="Create payment destination dialog" width="1280" height="720" loading="lazy" />
     </Frame>
 
     The Dashboard generates a **destination ID** in the ERC-7828 format. You only need to do this once per chain/token combo you want to receive on.
@@ -43,7 +43,7 @@ A repeatable workflow for sending one-off crypto payment links to customers, con
     Open **Manage Destination → Client IDs → Generate New Client ID**. Give it a label (e.g. "freelance invoices"). For dashboard-only use, leave **Allowed Domains** empty. Save the generated value.
 
     <Frame>
-      <img src="/images/dashboard/generate-client-id.webp" alt="Generate Client ID dialog" />
+      <img src="/images/dashboard/generate-client-id.webp" alt="Generate Client ID dialog" width="1280" height="720" loading="lazy" />
     </Frame>
 
     The Client ID is the credential the Dashboard uses on your behalf when you create payment links.
@@ -57,7 +57,7 @@ A repeatable workflow for sending one-off crypto payment links to customers, con
     - **Payer identifier** (optional) — your internal order or invoice ID
 
     <Frame>
-      <img src="/images/dashboard/get-paid-new.webp" alt="Create new request form" />
+      <img src="/images/dashboard/get-paid-new.webp" alt="Create new request form" width="1280" height="720" loading="lazy" />
     </Frame>
 
     Click **Create**. The Dashboard returns a hosted payment URL on `pay.request.network`.
@@ -71,7 +71,7 @@ A repeatable workflow for sending one-off crypto payment links to customers, con
     The **Get Paid** list shows status (Pending / Paid) for every link you've created, with on-chain transaction hashes for paid ones.
 
     <Frame>
-      <img src="/images/dashboard/get-paid-list.webp" alt="Get Paid list" />
+      <img src="/images/dashboard/get-paid-list.webp" alt="Get Paid list" width="1280" height="720" loading="lazy" />
     </Frame>
   </Step>
 </Steps>

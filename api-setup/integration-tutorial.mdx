@@ -62,7 +62,7 @@ Create a new project. In it create a folder called `rn-test-backend` inside and 
 The folder structure for the demo is going to be simple:
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/folder-structure.webp" alt="Folder structure" />
+<img src="/images/api-setup/integration-tutorial/folder-structure.webp" alt="Folder structure" width="381" height="429" />
 </Frame>
 
 ```typescript
@@ -382,7 +382,7 @@ The response should look something like the following object ([full API referenc
 Now you can check your database with `npm run db:studio` and assert that the payment is there.
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/database-studio.webp" alt="Database Studio" />
+<img src="/images/api-setup/integration-tutorial/database-studio.webp" alt="Database Studio" width="768" height="253" loading="lazy" />
 </Frame>
 
 ### Setting up webhooks
@@ -450,7 +450,7 @@ We'll go into more detail on how to get the `RN_WEBHOOK_SECRET` in the next subs
 As you may know, it's impossible for our webhooks to call your locally running server. In order to test them, use a tool like [ngrok](https://ngrok.com/). Install it and run `ngrok http 3000` in your terminal. In a few moments, you should see something similar to the screenshot below and copy the URL.
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/ngrok-terminal.webp" alt="ngrok terminal" />
+<img src="/images/api-setup/integration-tutorial/ngrok-terminal.webp" alt="ngrok terminal" width="768" height="237" loading="lazy" />
 </Frame>
 
 Next up, register the webhook via the Auth API. The URL is the ngrok URL from above with `/webhooks` appended (e.g. `https://34c701d1d7f9.ngrok-free.app/webhooks`):
@@ -617,7 +617,7 @@ We'll be using [Vite](https://vite.dev/) to create a simple React app. Move to t
 *NOTE*: We are not going to be using any advanced patterns or libraries here, we'll try to keep it as simple as possible and let you build in your own way.
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/vite-setup.webp" alt="Vite setup" />
+<img src="/images/api-setup/integration-tutorial/vite-setup.webp" alt="Vite setup" width="396" height="458" loading="lazy" />
 </Frame>
 
 Next up, let's scaffold our app. Create a folder called `components`, and then create two files `CreatePayment.tsx` and `ViewPayments.tsx`.
@@ -755,7 +755,7 @@ h1 {
 The final result should look something like this:
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/initial-ui.webp" alt="Initial UI" />
+<img src="/images/api-setup/integration-tutorial/initial-ui.webp" alt="Initial UI" width="768" height="548" loading="lazy" />
 </Frame>
 
 ### Connecting the user's wallet
@@ -943,11 +943,11 @@ export default App
 The final result should look something like this with the wallet connection working.
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/wallet-conencted.webp" alt="Wallet connected" />
+<img src="/images/api-setup/integration-tutorial/wallet-conencted.webp" alt="Wallet connected" width="768" height="521" loading="lazy" />
 </Frame>
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/wallet-disconnected.webp" alt="Wallet disconnected" />
+<img src="/images/api-setup/integration-tutorial/wallet-disconnected.webp" alt="Wallet disconnected" width="768" height="466" loading="lazy" />
 </Frame>
 
 ### Viewing payments
@@ -1139,7 +1139,7 @@ export default ViewPayments;
 It should look something like this:
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/view-payments.webp" alt="View payments" />
+<img src="/images/api-setup/integration-tutorial/view-payments.webp" alt="View payments" width="768" height="627" loading="lazy" />
 </Frame>
 
 ### Creating payments
@@ -1467,7 +1467,7 @@ input[type="number"] {
 The end result is a form that looks like the following:
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/create-payment-form.webp" alt="Create payment form" />
+<img src="/images/api-setup/integration-tutorial/create-payment-form.webp" alt="Create payment form" width="768" height="780" loading="lazy" />
 </Frame>
 
 ### Trying everything out
@@ -1479,29 +1479,29 @@ We recommend using two different Metamask accounts you own. That way you will be
 1. Let's create a payment from the client, moving 0.02 Sepolia ETH to our second account
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/create-payment-step-1.webp" alt="Create payment step 1" />
+<img src="/images/api-setup/integration-tutorial/create-payment-step-1.webp" alt="Create payment step 1" width="768" height="731" loading="lazy" />
 </Frame>
 
 2. Create the payment and sign the transaction
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/sign-transaction-1.webp" alt="Sign transaction 1" />
+<img src="/images/api-setup/integration-tutorial/sign-transaction-1.webp" alt="Sign transaction 1" width="768" height="461" loading="lazy" />
 </Frame>
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/sign-transaction-2.webp" alt="Sign transaction 2" />
+<img src="/images/api-setup/integration-tutorial/sign-transaction-2.webp" alt="Sign transaction 2" width="768" height="751" loading="lazy" />
 </Frame>
 
 3. Navigate to the `View payments tab` , verify that the last payment is `In progress` and let's wait for the transaction to go through. You can patiently watch your server's logs to check when the webhook is called.
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/payment-in-progress.webp" alt="Payment in progress" />
+<img src="/images/api-setup/integration-tutorial/payment-in-progress.webp" alt="Payment in progress" width="768" height="711" loading="lazy" />
 </Frame>
 
 4. In a few moments the payment's status should be set to `Confirmed` .
 
 <Frame>
-<img src="/images/api-setup/integration-tutorial/payment-confirmed.webp" alt="Payment confirmed" />
+<img src="/images/api-setup/integration-tutorial/payment-confirmed.webp" alt="Payment confirmed" width="768" height="800" loading="lazy" />
 </Frame>
 
 This is it, you have successfully built a basic application integrating our API to move actual test funds between two wallets.
