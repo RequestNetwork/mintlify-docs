@@ -313,6 +313,7 @@ Key fields to look for:
 | `payment_detail.updated` | Payment detail metadata changed |
 | `compliance.updated` | Compliance status changed |
 | `secure_payment.user_event` | Payer progressed through a Secure Payment Page step (`userEvent`: `wallet_connected`, `payment_sent_to_wallet`, `payment_approved_in_wallet`) — funnel telemetry, not a settlement signal |
+| `secure_payment.access_rejected` | A wallet not on a Secure Payment's payer-wallet allowlist tried to access or pay it |
 
 <Note>
 `secure_payment.user_event` is best-effort browser telemetry. The payer's browser can fail to reach the API, and retries begin only once the API has accepted the event — so a missing event is not evidence that the payer skipped the step. Use `payment.confirmed` for settlement and reconciliation.

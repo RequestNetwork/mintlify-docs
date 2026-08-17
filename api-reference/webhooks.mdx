@@ -9,7 +9,7 @@ Webhooks deliver real-time notifications when payment and request events occur. 
 
 ## Webhook Configuration
 
-Webhooks are managed **programmatically** via the Auth API at `auth.request.network` — there is no Dashboard UI for webhook CRUD. Each webhook is scoped to the Client ID that creates it; events for any payment link or request created with that Client ID are delivered to that webhook.
+Manage webhooks in the [Dashboard](https://dashboard.request.network) or programmatically through the Auth API at `auth.request.network`. Each webhook is scoped to the Client ID that creates it; events for any payment link or request created with that Client ID are delivered to that webhook.
 
 ### Create a webhook
 
@@ -104,11 +104,12 @@ Emitted **in addition to** the core events when the request was created via a Se
 | `compliance.updated` | KYC or agreement status changed | **kycStatus values:** not_started, pending, approved, rejected, retry_required<br/>**agreementStatus values:** not_started, pending, completed, rejected, failed | Update user permissions, notify status |
 | `payment_detail.updated` | Bank account verification status updated | States: approved, failed, pending | Enable fiat payments, update profiles |
 
-### Secure Payment Page Events (payer funnel)
+### Secure Payment Events
 
 | Event | Description | Context | Primary Use |
 |-------|-------------|---------|-------------|
 | `secure_payment.user_event` | Payer progressed through a step of the Secure Payment Page | **userEvent values:** wallet_connected, payment_sent_to_wallet, payment_approved_in_wallet | Real-time payer-funnel visibility, drop-off analytics |
+| `secure_payment.access_rejected` | A wallet not on a payment's payer-wallet allowlist attempted to access or pay it | Incoming Secure Payments with `allowedPayerAddresses` | Monitor rejected payer attempts |
 
 Sent to the same registered webhook endpoints as every other event — same Client ID scoping, `x-request-network-signature` HMAC verification, delivery headers, timeout, and 1s/5s/15s retry semantics described elsewhere on this page.
 
@@ -127,6 +128,12 @@ The `userEvent` field distinguishes the 3 funnel steps:
 
 When the Secure Payment Page includes wallet information in `properties`, it uses `wallet_address_hashed` rather than a raw wallet address.
 </Note>
+
+### Payer-wallet access rejections
+
+`secure_payment.access_rejected` is generated server-side when a wallet that is not on an incoming payment's `allowedPayerAddresses` allowlist tries to access or pay it. It is not emitted for KYT decisions. See [Restrict payer wallets](/use-cases/restrict-payer-wallets) to configure the allowlist.
+
+The event is sent to the payment's platform-wide and Client ID webhooks, not to an orchestrator webhook. Repeated attempts by the same wallet on the same payment are normally suppressed for 10 minutes. If every configured webhook endpoint fails, the next access attempt can trigger another notification.
 
 ## Security Implementation
 
@@ -348,6 +355,24 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
 }
 ```
 
+### Secure Payment Access Rejected
+```json
+{
+  "event": "secure_payment.access_rejected",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "attemptedPayerWalletAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
+  "timestamp": "2026-08-10T10:05:00.000Z"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `requestId` | The request the wallet tried to access. |
+| `attemptedPayerWalletAddress` | The rejected wallet address. EVM addresses are lowercased; TRON addresses keep their original case. |
+| `timestamp` | When Request Network emitted the event. |
+
+Use `POST /v1/webhook/test` with `{ "eventType": "secure_payment.access_rejected" }` to test this event without a rejected access attempt.
+
 ## Implementation Examples
 
 For a complete working example, see [Webhook reconciliation](/use-cases/webhook-reconciliation) which implements webhook handling for payment notifications.
@@ -375,6 +400,7 @@ app.post("/webhook/payment", async (req, res) => {
   try {
     // Verify signature against raw body
     const signature = req.headers["x-request-network-signature"];
+    const deliveryId = req.headers["x-request-network-delivery"];
     const rawBody = req.rawBody;
 
     const expectedSignature = crypto
@@ -382,7 +408,11 @@ app.post("/webhook/payment", async (req, res) => {
       .update(rawBody)
       .digest("hex");
 
-    if (!signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+    if (!signature || !deliveryId) {
+      return res.status(400).json({ error: "Missing webhook headers" });
+    }
+
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
       return res.status(401).json({ error: "Invalid signature" });
     }
 
@@ -406,6 +436,13 @@ app.post("/webhook/payment", async (req, res) => {
         break;
       case "compliance.updated":
         await handleComplianceUpdate(body);
+        break;
+      case "secure_payment.access_rejected":
+        await recordPayerWalletRejection(
+          requestId,
+          body.attemptedPayerWalletAddress,
+          deliveryId,
+        );
         break;
       default:
         console.log(`Unhandled event: ${event}`);
@@ -541,6 +578,6 @@ app.post("/webhook", (req, res) => {
   </Card>
 
   <Card title="Request Dashboard" href="https://dashboard.request.network" icon="browser">
-    Manage Client IDs and payment destinations (webhooks are managed via the Auth API above)
+    Manage Client IDs, payment destinations, and webhooks
   </Card>
 </CardGroup>
