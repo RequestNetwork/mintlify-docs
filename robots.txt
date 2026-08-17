@@ -5,21 +5,45 @@ Allow: /_next/image
 Disallow: /_next/
 
 User-agent: GPTBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Disallow: /cdn-cgi/
+Allow: /_next/image
+Disallow: /_next/
 Allow: /
 
 User-agent: OAI-SearchBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Disallow: /cdn-cgi/
+Allow: /_next/image
+Disallow: /_next/
 Allow: /
 
 User-agent: ClaudeBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Disallow: /cdn-cgi/
+Allow: /_next/image
+Disallow: /_next/
 Allow: /
 
 User-agent: anthropic-ai
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Disallow: /cdn-cgi/
+Allow: /_next/image
+Disallow: /_next/
 Allow: /
 
 User-agent: PerplexityBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Disallow: /cdn-cgi/
+Allow: /_next/image
+Disallow: /_next/
 Allow: /
 
 User-agent: Google-Extended
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Disallow: /cdn-cgi/
+Allow: /_next/image
+Disallow: /_next/
 Allow: /
 
 Sitemap: https://docs.request.network/sitemap.xml
