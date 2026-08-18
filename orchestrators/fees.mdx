@@ -1,6 +1,6 @@
 ---
 title: "Orchestrator fees"
-description: "Configure orchestrator fees and per-client-ID overrides: rates, caps, fee bearer, flow direction, and how fee layers resolve."
+description: "Configure orchestrator fee defaults and client-specific configurations, including caps, fee bearer, payment flow, and resolution."
 ---
 
 ## Overview
@@ -13,11 +13,17 @@ Orchestrator fees are separate from — and stack with — the Request Network [
 
 A payment can be subject to up to three fee layers. They resolve from most to least specific:
 
-1. **Per-client-ID override** — an orchestrator fee scoped to a single linked client ID. Wins its slot over the orchestrator default.
+1. **Per-client-ID configuration** — an orchestrator fee scoped to a single linked client ID. It replaces the orchestrator default with the same `flow` and `feeBearer` pair.
 2. **Orchestrator default** — an orchestrator fee that applies to all of the orchestrator's linked client IDs.
 3. **Protocol fee** — set by Request Network (falls back to the standard protocol default when none is configured).
 
-There is no per-client-ID protocol fee — client IDs can only override orchestrator fees.
+If a client-specific configuration uses a `flow` and `feeBearer` pair that the default does not use, it adds that fee instead of replacing anything. There is no per-client-ID protocol fee — client IDs can only configure orchestrator fees.
+
+Each default or client-specific configuration can use the four unique `flow` and `feeBearer` combinations: `incoming` or `outgoing`, paired with `payer` or `recipient`. A single flow can have at most two configurations: one payer-borne and one recipient-borne.
+
+<Note>
+The fee configuration is captured when a payment is created. Later changes apply only to newly created payments.
+</Note>
 
 ## Fee configuration fields
 
@@ -34,7 +40,7 @@ Who absorbs the fee: `payer` (added on top of what the payer pays) or `recipient
 </ParamField>
 
 <ParamField body="flow" type="string" required>
-Which payment direction the fee applies to: `incoming` (get-paid flows) or `outgoing` (pay/payout flows). **Immutable** — see below.
+Which payment direction the fee applies to: `incoming` (get-paid flows) or `outgoing` (pay/payout flows).
 </ParamField>
 
 <ParamField body="evmRecipientAddress" type="string">
@@ -45,21 +51,34 @@ EVM address that receives the fee. At least one of `evmRecipientAddress` or `tro
 Tron address that receives the fee. At least one of `evmRecipientAddress` or `tronRecipientAddress` is required.
 </ParamField>
 
+<ParamField body="status" type="string">
+Optional activation state: `active` (the default) or `disabled`.
+</ParamField>
+
+<ParamField body="clientId" type="string">
+Optional linked `cli_*` client ID. On creation, it creates a client-specific configuration instead of the orchestrator-wide default. On update, it targets that client-specific configuration; it is not itself mutable.
+</ParamField>
+
 <Note>
-A fee config's identity is its combination of fee type, `flow`, and `feeBearer`. These are **immutable** — to change `flow` or `feeBearer`, disable the existing config and create a new one. You can update `bps`, `usdCap`, recipient addresses, and `status`.
+A single fee configuration can include both recipient addresses to apply on EVM and Tron. Provide only the address for the chain you collect on when the fee is single-chain.
+</Note>
+
+<Note>
+A fee config's identity is its fee type (always `orchestrator_fee`), `flow`, and `feeBearer`. These fields are **immutable**. To change the flow or bearer, disable the existing configuration and create a new one. You can update `bps`, `usdCap`, recipient addresses, and `status`. Disabling a configuration does not free its `flow` and `feeBearer` pair; update or reactivate that configuration instead of creating a duplicate.
 </Note>
 
 ## Fee bearer and flow semantics
 
-- **`flow: incoming`** applies to payments you receive ("get paid"); its default bearer is the recipient.
-- **`flow: outgoing`** applies to payouts you send ("pay"); its default bearer is the payer.
+- **`flow: incoming`** applies to payments you receive ("get paid").
+- **`flow: outgoing`** applies to payouts you send ("pay").
 - **`feeBearer: payer`** adds the fee on top of the amount the payer pays.
 - **`feeBearer: recipient`** deducts the fee from the amount the recipient receives. A recipient-borne fee cannot exceed the gross amount.
 
 ## Managing fee configs
 
+Create an example orchestrator-wide default:
+
 ```bash
-# Create an orchestrator default fee (2.5%, payer-borne, on incoming payments)
 curl -X POST "https://api.request.network/v2/orchestrators/fee-configs" \
   -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
   -H "Content-Type: application/json" \
@@ -73,12 +92,12 @@ curl -X POST "https://api.request.network/v2/orchestrators/fee-configs" \
 
 | Operation | Endpoint |
 | --- | --- |
-| Create a fee or per-client-ID override | `POST /v2/orchestrators/fee-configs` |
+| Create a default fee or client-specific configuration | `POST /v2/orchestrators/fee-configs` |
 | List fee configs (filter with `?clientId`) | `GET /v2/orchestrators/fee-configs` |
 | Update a fee config | `PATCH /v2/orchestrators/fee-configs/:id` |
 | Disable a fee config | `DELETE /v2/orchestrators/fee-configs/:id` |
 
-To scope a fee to a single linked client ID (an **override** rather than the orchestrator-wide default), provide that `clientId` when creating, listing, or disabling the config.
+Omit `clientId` to manage the orchestrator-wide default. To target a single linked client ID, provide `clientId` when creating or updating a configuration, and as a query parameter when listing or disabling one. Refer to the endpoint reference for the request schema.
 
 ## Related
 
