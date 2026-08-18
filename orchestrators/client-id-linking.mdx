@@ -1,30 +1,21 @@
 ---
 title: "Client ID linking"
-description: "Link platform Client IDs to your orchestrator — directly or via onboarding link intents — so your fees and branding apply to their payments."
+description: "Link existing Client IDs or create them through platform onboarding so your orchestrator can create payment links, apply fees, and show its branding."
 ---
 
 ## Overview
 
-To apply your [orchestrator fees](/orchestrators/fees) and [branding](/orchestrators/whitelabel-branding) to a platform's payments, link that platform's [Client ID](/api-features/client-id-management) (`cli_*` token) to your orchestrator. There are two ways to link: directly, when you already have the client ID, or via an onboarding **link intent**, when a recipient creates and links the client ID themselves.
+Link a platform's [Client ID](/api-features/client-id-management) (`cli_*`) to your [orchestrator](/orchestrators/overview) to apply your [fees](/orchestrators/fees) and [branding](/orchestrators/whitelabel-branding). You can either link an existing client ID directly or create one through a hosted onboarding link.
 
 All linking endpoints use the `x-orchestrator-key` header.
 
 <Note>
-Linking is **one-to-one from the client ID side**: a client ID can be actively linked to at most one orchestrator. Re-linking a client ID that is already linked to a *different* orchestrator is rejected; re-linking to the *same* orchestrator is idempotent.
+A client ID can be linked to one orchestrator only. A second link request is rejected, whether it is for the same orchestrator or a different one. If you need to check whether a link request succeeded, list your linked client IDs instead of retrying it. Unlinking removes the active connection, but does not make the client ID linkable again.
 </Note>
-
-## List linked client IDs
-
-```bash
-curl -X GET "https://api.request.network/v2/orchestrators/client-ids?page=1&limit=20" \
-  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
-```
-
-Results are paginated with `page` and `limit`.
 
 ## Link an existing client ID
 
-When the platform has already shared its `cli_*` token with you, link it directly:
+Use direct linking only when the platform has shared an existing `cli_*` token with you:
 
 ```bash
 curl -X POST "https://api.request.network/v2/orchestrators/client-ids" \
@@ -33,31 +24,141 @@ curl -X POST "https://api.request.network/v2/orchestrators/client-ids" \
   -d '{ "clientId": "cli_PLATFORM_CLIENT_ID" }'
 ```
 
-## Onboard with a link intent
+On success, the response confirms an active link:
 
-When you want a recipient to create and link a client ID themselves, create a **link intent**. It returns a single-use onboarding URL you hand to the recipient; redeeming it creates a client ID under the name you chose and links it to your orchestrator.
-
-```bash
-curl -X POST "https://api.request.network/v2/orchestrators/client-id-link-intents" \
-  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{ "clientIdName": "Acme Store" }'
+```json
+{
+  "link": {
+    "clientId": "cli_PLATFORM_CLIENT_ID",
+    "status": "active"
+  },
+  "alreadyLinked": false
+}
 ```
 
-The response contains an onboarding `url` carrying a single-use access token. Share it with the recipient to complete onboarding.
+The client ID must not already have a link record. A linked client ID can have client-specific orchestrator fee configurations; see [Orchestrator fees](/orchestrators/fees).
 
-<Note>
-A link intent is single-use and expires. Once redeemed, the new client ID is linked to your orchestrator and appears in `GET /v2/orchestrators/client-ids`.
-</Note>
+## Manage linked client IDs
 
-## Unlink a client ID
+### List linked client IDs
+
+List active links with pagination:
+
+```bash
+curl "https://api.request.network/v2/orchestrators/client-ids?page=1&limit=20" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
+```
+
+The response returns active links and pagination details:
+
+```json
+{
+  "links": [{ "clientId": "cli_PLATFORM_CLIENT_ID", "status": "active" }],
+  "total": 1,
+  "page": 1,
+  "limit": 20
+}
+```
+
+### Unlink a client ID
+
+To revoke an active link:
 
 ```bash
 curl -X DELETE "https://api.request.network/v2/orchestrators/client-ids/cli_PLATFORM_CLIENT_ID" \
   -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
 ```
 
-Unlinking revokes the active link. The client ID itself continues to exist and work; it simply no longer carries your orchestrator's fees and branding.
+Unlinking does not delete the client ID, but it removes the active association with your orchestrator. As noted above, it does not make that client ID linkable again.
+
+## Onboard a platform with a link intent
+
+Use a link intent when a platform should connect its own wallet, choose where it receives funds, and approve the connection to your orchestrator. The endpoint returns a hosted onboarding URL; send that URL to the platform.
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/client-id-link-intents" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "clientIdName": "Acme Store",
+    "domains": ["https://app.example.com"],
+    "externalId": "user_123"
+  }'
+```
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `clientIdName` | Yes | The name of the client ID created after the platform completes the hosted flow. |
+| `domains` | No | Up to 10 unique allowed origins to copy to the new client ID. Each must be an HTTPS origin with no path, query, or fragment. HTTP is allowed only for `localhost`, `127.0.0.1`, or `[::1]` development origins. |
+| `externalId` | No | Your correlation ID for the platform or onboarding session. Store it with the returned intent. |
+
+The response contains `url` and `intent`:
+
+```json
+{
+  "url": "https://onboarding.request.network/?token=YOUR_ONBOARDING_TOKEN",
+  "intent": {
+    "id": "01JBQ8R2A6K3R7YJ8N6R4T7V9XF",
+    "clientIdName": "Acme Store",
+    "externalId": "user_123",
+    "used": false,
+    "expiresAt": "2026-08-15T10:00:00.000Z"
+  }
+}
+```
+
+Store the intent ID, returned onboarding URL, and any `externalId` before sending the URL to the platform.
+
+### What the platform does
+
+The hosted flow asks the platform to:
+
+1. Connect their wallet.
+2. Create or update their active payment destination.
+3. Choose any applicable compliance preference.
+4. Confirm the connection to your orchestrator.
+
+After confirmation, Request Network creates a new `cli_*` client ID, copies any allowed domains from the intent, links it to your orchestrator, and binds it to the platform's active payment destination.
+
+<Note>
+A link intent is single-use and expires after two days. Create a new intent if the platform has not completed the flow before it expires.
+</Note>
+
+## Payment destination behavior
+
+The client ID created through onboarding is bound to the payment destination selected in the hosted flow. When you create a secure payment link with that linked client ID, omit `destinationId` or provide that same destination. The API rejects a different destination ID.
+
+The platform can manage its payment destination through the hosted flow; your orchestrator key does not choose it.
+
+## Create payment links for a platform
+
+To create a payment link for a platform, send both your orchestrator key and the platform's client ID.
+
+After a client ID is linked, `x-client-id` alone cannot create a secure payment link. Use the same headers for incoming payment links and outgoing payout links.
+
+These headers do not give you access to the platform's other client ID or account-management endpoints.
+
+```bash
+curl -X POST "https://api.request.network/v2/secure-payments" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "x-client-id: cli_LINKED_CLIENT_ID" \
+  -H "Content-Type: application/json" \
+  -d '{ "requests": [{ "amount": "100" }] }'
+```
+
+On success, the response includes the payment token and hosted payment URL:
+
+```json
+{
+  "requestIds": ["01e273ecc29d4b526df3a0f1f05ffc59372af8752c2b678096e49ac270416a7cdb"],
+  "securePaymentUrl": "https://pay.request.network/?token=01ABC123DEF456GHI789JKL",
+  "token": "01ABC123DEF456GHI789JKL"
+}
+```
+
+For an outgoing payout link, use the same headers with `POST /v2/secure-payments/payouts`.
+
+The API validates that the client ID is active, linked to the orchestrator behind the supplied key, and has an active bound destination. This allows the payment link to use the platform's destination and your orchestrator configuration.
 
 ## Related
 
