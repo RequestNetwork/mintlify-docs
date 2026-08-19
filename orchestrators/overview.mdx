@@ -50,6 +50,10 @@ All partner-facing orchestrator endpoints live under `/v2/orchestrators` and are
 | `POST /v2/orchestrators/client-ids` | Link an existing `cli_*` client ID |
 | `DELETE /v2/orchestrators/client-ids/:clientId` | Unlink a client ID |
 | `POST /v2/orchestrators/client-id-link-intents` | Create an onboarding link intent |
+| `POST /v2/orchestrators/branding` | Create default or per-client-ID branding |
+| `GET /v2/orchestrators/branding` | Get effective branding |
+| `PATCH /v2/orchestrators/branding` | Update branding |
+| `DELETE /v2/orchestrators/branding` | Remove branding |
 | `POST /v2/orchestrators/webhooks` | Register a webhook endpoint |
 | `GET /v2/orchestrators/webhooks` | List registered webhook endpoints |
 | `PATCH /v2/orchestrators/webhooks/:id` | Reactivate a webhook endpoint |
@@ -60,7 +64,7 @@ All partner-facing orchestrator endpoints live under `/v2/orchestrators` and are
 | `PATCH /v2/orchestrators/fee-configs/:id` | Update a fee config |
 | `DELETE /v2/orchestrators/fee-configs/:id` | Disable a fee config |
 
-See [Client ID linking](/orchestrators/client-id-linking), [Orchestrator webhooks](/orchestrators/webhooks), and [Orchestrator fees](/orchestrators/fees) for details.
+See [Client ID linking](/orchestrators/client-id-linking), [Whitelabel branding](/orchestrators/whitelabel-branding), [Orchestrator webhooks](/orchestrators/webhooks), and [Orchestrator fees](/orchestrators/fees) for details.
 
 ## How orchestrators apply at payment time
 

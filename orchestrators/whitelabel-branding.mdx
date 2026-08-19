@@ -1,13 +1,13 @@
 ---
 title: "Whitelabel branding"
-description: "Theme the hosted Secure Payment page with your own colors, logo, and legal links as an orchestrator or per linked client ID."
+description: "Theme hosted Secure Payment and onboarding pages with your own colors, logo, and legal links."
 ---
 
 ## Overview
 
-As an [orchestrator](/orchestrators/overview), you can whitelabel the hosted [Secure Payment](/tools/secure-payments) page with your own colors, logo, and legal links. Branding can be set at the orchestrator level (applies to all your linked client IDs) or overridden per linked client ID.
+As an [orchestrator](/orchestrators/overview), you can whitelabel the hosted [Secure Payment](/tools/secure-payments) page and hosted onboarding flow with your own colors, logo, and legal links. Orchestrator-level branding applies to all your linked client IDs and hosted onboarding. You can override it per linked client ID for Secure Payment.
 
-Branding is resolved server-side and delivered embedded in the `GET /v2/secure-payments/:token` response, so the hosted page renders your theme without any extra call.
+For Secure Payment, branding is resolved server-side and embedded in the `GET /v2/secure-payments/:token` response. Hosted onboarding uses the orchestrator-level branding when its link is validated.
 
 ## Color tokens
 
@@ -43,7 +43,7 @@ Asset files must be **bundled with the deployed Secure Payment app** under `publ
 
 `displayRequestBranding` (boolean) controls whether the footer shows **"Made easy by Request Network"**. It defaults to off for orchestrator-branded payments. Set it to `true` to keep the attribution.
 
-## Resolution priority
+## Secure Payment resolution priority
 
 Branding is selected **one row at a time**, most specific wins:
 
@@ -53,9 +53,22 @@ Branding is selected **one row at a time**, most specific wins:
 
 In other words, defining client-level branding replaces the orchestrator branding entirely for that client ID, so set every field you want at the level you use.
 
-## Setting branding
+## Manage branding
 
-Branding is managed through your orchestrator surface using the `x-orchestrator-key` header. Provide a `clientId` to set a per-client-ID override; omit it to set the orchestrator-level branding that applies to all your linked client IDs. Because logo and legal asset files must be bundled into the deployed app (see warning above), coordinate branding setup with Request Network during onboarding.
+Use your `x-orchestrator-key` header for every branding operation.
+
+| Action | Endpoint |
+| --- | --- |
+| Create branding | `POST /v2/orchestrators/branding` |
+| Get effective branding | `GET /v2/orchestrators/branding` |
+| Update branding | `PATCH /v2/orchestrators/branding` |
+| Remove branding | `DELETE /v2/orchestrators/branding` |
+
+To target a linked client ID, include `clientId` in the JSON body when creating or updating branding. To get or remove its branding, pass `?clientId=cli_YOUR_CLIENT_ID`. Omit `clientId` to manage orchestrator-level branding, which applies to all your linked client IDs and hosted onboarding.
+
+Creating branding where it already exists returns `409`; use `PATCH` instead. `PATCH` updates only the fields you provide and cannot clear a field. `DELETE` is idempotent.
+
+Request Network must bundle logo and legal asset files into the deployed Secure Payment app. Contact the Request Network team to add or change those assets.
 
 ## Related
 
