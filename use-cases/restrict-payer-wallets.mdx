@@ -1,0 +1,77 @@
+---
+title: "Restrict payer wallets"
+description: "Create Secure Payment links that only specified wallet addresses can pay."
+---
+
+## Overview
+
+Use `accessPolicy.allowedPayerAddresses` when you create an incoming Secure Payment to restrict it to known payer wallets. A payer whose wallet is not on the list cannot continue to payment.
+
+Omit the field, or send an empty array, to allow any payer wallet.
+
+## Create a restricted payment
+
+Add one or more payer addresses to the secure-payment request. This example uses a Client ID with a configured payment destination; use an `Origin` allowed for that Client ID.
+
+<RequestExample>
+```bash cURL
+curl -X POST "https://api.request.network/v2/secure-payments" \
+  -H "x-client-id: YOUR_CLIENT_ID" \
+  -H "Origin: https://your-app.example" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requests": [
+      {
+        "amount": "100"
+      }
+    ],
+    "reference": "INV-2026-0042",
+    "accessPolicy": {
+      "allowedPayerAddresses": [
+        "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+      ]
+    }
+  }'
+```
+</RequestExample>
+
+| Field | Rules |
+| --- | --- |
+| `accessPolicy.allowedPayerAddresses` | Optional array of valid EVM or TRON wallet addresses. Include one or more addresses to restrict the payment. |
+
+EVM addresses are matched case-insensitively. TRON addresses are case-sensitive. Invalid addresses are rejected when you create the payment.
+
+## How the restriction works
+
+- Payer-wallet allowlisting applies only to incoming payment links, where it controls which connected wallet can send funds. The API does not enforce it for outgoing payout links.
+- For an EVM smart-account payment, Request Network checks the payer's connected EOA. Add the EOA to the allowlist, not the smart-account address.
+- Request Network stores the allowlist on the secure payment when you create it. To change who can pay, create a new payment.
+- A wallet that is not allowed receives the `wallet_not_allowed` access decision before it can continue to payment.
+
+## Use an allowlist with KYT screening
+
+`allowedPayerAddresses` is a wallet allowlist, separate from the KYT policy. It controls which wallets can pay this Secure Payment. KYT separately screens the risk of an allowed wallet.
+
+You can use the allowlist without KYT. When both are configured, Request Network checks the allowlist first, so a wallet that is not allowed is not screened.
+
+You can also use `allowedPayerAddresses` when creating a payment for a platform through [paired authentication](/orchestrators/client-id-linking#create-payment-links-for-a-platform). An orchestrator-controlled KYT plan prevents changing the screening provider or mode, but it does not prevent you from restricting payer wallets.
+
+## Use the Dashboard
+
+When creating an incoming payment link in the Dashboard, enable **Wallet allowlist** and add the payer wallets. The request details page shows the saved addresses.
+
+## Related
+
+<CardGroup cols={3}>
+  <Card title="Secure Payment Pages" href="/api-features/secure-payment-pages" icon="credit-card">
+    Create hosted payment links for your payers.
+  </Card>
+
+  <Card title="Compliance-gated payments" href="/use-cases/compliance-gated-payments" icon="shield-halved">
+    Screen payer wallets before payment with KYT.
+  </Card>
+
+  <Card title="Orchestrator KYT plans" href="/orchestrators/kyt-plans" icon="shield-halved">
+    Apply a screening plan to payments created for a linked platform.
+  </Card>
+</CardGroup>

@@ -452,6 +452,7 @@
               "use-cases/multi-chain-checkout",
               "use-cases/batch-payouts",
               "use-cases/webhook-reconciliation",
+              "use-cases/restrict-payer-wallets",
               {
                 "group": "Compliance-gated payments",
                 "pages": [
