@@ -1,42 +1,46 @@
 ---
 title: "Client ID Management"
-description: "Create and manage Client IDs for frontend authentication, domain whitelisting, and orchestrator flows"
+description: "Create and manage Client IDs for frontend authentication, domain whitelisting, and payment destination configuration"
 ---
 
 ## Overview
 
-Client IDs enable frontend/browser-side authentication with the Request Network API. Unlike API keys (which are for server-to-server calls), Client IDs are designed to be used in client-side code with domain restrictions.
+Client IDs identify applications using the Request Network API. Domain-restricted Client IDs support frontend/browser integrations; Client IDs without allowed domains support server-side applications.
 
 **Key differences from API keys:**
 
 | | API Key | Client ID |
 |---|---------|-----------|
-| **Use case** | Backend integrations | Frontend/browser apps |
-| **Auth header** | `x-api-key` | `x-client-id` + `Origin` |
+| **Use case** | Backend integrations | Frontend/browser or server-side applications |
+| **Auth header** | `x-api-key` | `x-client-id` (plus `Origin` when domain-restricted) |
 | **Domain restriction** | None | Optional whitelist |
 | **Fee configuration** | Per-request | Configurable per client ID |
 
 ## Backend vs Frontend Client IDs
 
 - **Frontend Client IDs** — have `allowedDomains` set. The API validates the `Origin` header against the whitelist.
-- **Backend Client IDs** — have empty `allowedDomains`. No domain validation is performed. Useful for server-side orchestrators that need client ID scoping without browser restrictions.
+- **Backend Client IDs** — have empty `allowedDomains`. No domain validation is performed. Useful for server-side applications that need Client ID scoping without browser restrictions.
 
-## Orchestrator Pattern
+## Using a Client ID with a payment destination
 
-When a Client ID is bound to a [payee destination](/api-features/payee-destinations), requests created with that Client ID automatically resolve the payee from the destination. This enables orchestrator flows where a third party creates payment requests on behalf of a merchant without knowing the merchant's wallet details.
+When a Client ID is bound to a [payee destination](/api-features/payee-destinations), a standard `POST /v2/request` call made with that Client ID can omit the payee. Request Network resolves it from the bound destination. This lets an application create requests without including wallet details each time.
 
 ```
-Orchestrator (with Client ID) → POST /v2/request (no payee field)
+Application (with its Client ID) → POST /v2/request (no payee field)
   → API resolves payee from Client ID's bound destination
-  → Payment goes to merchant's configured wallet
+  → Payment goes to the configured wallet
 ```
+
+<Note>
+This is separate from a formal [orchestrator](/orchestrators/overview). For a Client ID linked to an orchestrator, creating a Secure Payment link or payout requires both `x-client-id` and `x-orchestrator-key`. A request using that linked Client ID alone is rejected. See [paired authentication](/orchestrators/client-id-linking#create-payment-links-for-a-platform).
+</Note>
 
 ## Two ways to manage Client IDs
 
 | Method | Best for |
 | --- | --- |
 | **Dashboard** ([dashboard.request.network](https://dashboard.request.network)) | Most users — sign in with your wallet, generate a Client ID, set allowed domains, copy the value |
-| **Auth API** (`POST /v1/client-ids`) | Automation, dynamic provisioning, multi-tenant orchestration |
+| **Auth API** (`POST /v1/client-ids`) | Automation, dynamic provisioning, multi-tenant applications |
 
 Both paths use the same Client ID — there is no functional difference.
 
@@ -74,7 +78,7 @@ Fee recipient address. Required when `feePercentage` is set.
 </ParamField>
 
 <ParamField body="payeeDestinationId" type="string">
-ERC-7828 destination ID to bind to this Client ID. Enables the orchestrator pattern.
+ERC-7828 destination ID to bind to this Client ID. A standard Client-ID-authenticated request can then resolve its payee from this destination.
 </ParamField>
 
 <ParamField body="operatorWalletAddress" type="string">
