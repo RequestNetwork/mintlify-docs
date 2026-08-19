@@ -9,7 +9,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 
 **Audience:** any backend integrating Request Network where payment events drive state changes downstream.
 
-## The 13 events
+## The 14 events
 
 | Category | Event | When it fires |
 | --- | --- | --- |
@@ -26,6 +26,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 | Compliance | `compliance.updated` | KYC or agreement status changed |
 | Bank details | `payment_detail.updated` | Bank account verification status changed |
 | Secure Payment Page | `secure_payment.user_event` | Payer progressed through a step of the Secure Payment Page (`userEvent`: `wallet_connected`, `payment_sent_to_wallet`, `payment_approved_in_wallet`) — funnel telemetry, **not** a settlement signal |
+| Secure Payment | `secure_payment.access_rejected` | A wallet not on a payer-wallet allowlist tried to access or pay the payment |
 
 `secure_payment.user_event` is best-effort browser telemetry, and the stream is intentionally incomplete: the payer's browser can fail to reach the API, and retries begin only once the API has accepted the event. A missing event is not evidence that the payer skipped the step, so do not drive drop-off, notification, or reconciliation logic off its absence.
 
@@ -138,6 +139,16 @@ async function handleEvent(event: any, deliveryId: string) {
       await recordFunnelStep(
         event.securePaymentToken,
         event.userEvent,
+        deliveryId,
+      );
+      break;
+
+    // A payer-wallet allowlist rejection. This is useful for monitoring and
+    // audit history, but it does not change the payment's settlement state.
+    case "secure_payment.access_rejected":
+      await recordPayerWalletRejection(
+        event.requestId,
+        event.attemptedPayerWalletAddress,
         deliveryId,
       );
       break;
