@@ -93,6 +93,7 @@ curl -X POST "https://api.request.network/v2/orchestrators/client-id-link-intent
 | `clientIdName` | Yes | The name of the client ID created after the platform completes the hosted flow. |
 | `domains` | No | Up to 10 unique allowed origins to copy to the new client ID. Each must be an HTTPS origin with no path, query, or fragment. HTTP is allowed only for `localhost`, `127.0.0.1`, or `[::1]` development origins. |
 | `externalId` | No | Your correlation ID for the platform or onboarding session. Store it with the returned intent. |
+| `kyt` | No | An orchestrator-controlled transaction-screening plan. Omit it to let the platform choose its screening preference. See [Orchestrator KYT plans](/orchestrators/kyt-plans). |
 
 The response contains `url` and `intent`:
 
@@ -117,7 +118,7 @@ The hosted flow asks the platform to:
 
 1. Connect their wallet.
 2. Create or update their active payment destination.
-3. Choose any applicable compliance preference.
+3. Review your screening plan, or choose a screening preference when you did not provide one.
 4. Confirm the connection to your orchestrator.
 
 After confirmation, Request Network creates a new `cli_*` client ID, copies any allowed domains from the intent, links it to your orchestrator, and binds it to the platform's active payment destination. Active orchestrator webhooks receive a [`client_id.linked` event](/orchestrators/webhooks) with the client ID, link identifiers, and destination details. Direct links do not send this event.
@@ -171,5 +172,9 @@ The API validates that the client ID is active, linked to the orchestrator behin
 
   <Card title="Client ID Management" href="/api-features/client-id-management" icon="id-card">
     How platforms create and manage the `cli_*` client IDs you link.
+  </Card>
+
+  <Card title="Orchestrator KYT plans" href="/orchestrators/kyt-plans" icon="shield-halved">
+    Choose who controls transaction screening for hosted onboarding.
   </Card>
 </CardGroup>

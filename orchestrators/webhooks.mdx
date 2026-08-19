@@ -1,13 +1,16 @@
 ---
 title: "Orchestrator webhooks"
-description: "Receive signed notifications when a platform completes hosted onboarding with your orchestrator."
+description: "Receive signed notifications when a platform completes hosted onboarding or a transaction screening decision is reached."
 ---
 
 ## Overview
 
-Orchestrator webhooks notify you when a platform completes [hosted onboarding](/orchestrators/client-id-linking#onboard-a-platform-with-a-link-intent). They are owned by your orchestrator and use your `x-orchestrator-key`, not a platform's `x-client-id`.
+Orchestrator webhooks notify you about [hosted onboarding](/orchestrators/client-id-linking#onboard-a-platform-with-a-link-intent) and [transaction screening](/orchestrators/kyt-plans). They are owned by your orchestrator and use your `x-orchestrator-key`, not a platform's `x-client-id`.
 
-Register a webhook before you send an onboarding URL to a platform. Its active endpoints receive the `client_id.linked` event after the platform completes the flow.
+Register a webhook before you send an onboarding URL to a platform. Its active endpoints receive:
+
+- `client_id.linked` after the platform completes hosted onboarding.
+- `kyt.screening.completed` after an orchestrator-linked payment reaches a definitive screening result.
 
 ## Register a webhook
 
@@ -44,7 +47,7 @@ Webhook deliveries may be retried. Make sure your endpoint can safely receive th
 
 ## Test your endpoint
 
-Send a signed mock `client_id.linked` event to every active endpoint:
+Send a signed mock event to every active endpoint. This example tests `client_id.linked`:
 
 ```bash
 curl -X POST "https://api.request.network/v2/orchestrators/webhooks/test" \
@@ -88,6 +91,37 @@ Use `intentId` or your optional `externalId` to match the event to your onboardi
 
 The `destinationId`, wallet address, chain, and currency identify the payment destination that the hosted flow bound to the new client ID. Use that client ID with paired authentication to create payment links for the platform.
 
+## Receive `kyt.screening.completed`
+
+`kyt.screening.completed` is sent to active orchestrator webhooks after an orchestrator-linked payment has a definitive `approved` or `rejected` screening result. It is not sent for a provider error. When an orchestrator-controlled plan has a backup provider, Request Network tries that backup after a technical failure before deciding whether screening completed.
+
+```json
+{
+  "event": "kyt.screening.completed",
+  "paymentToken": "01KYM5CZ51K0N1KJ4F8S73BE3N",
+  "walletAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
+  "eoaAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
+  "smartAccountAddress": null,
+  "status": "approved",
+  "provider": "hypernative",
+  "policyId": "11111111-1111-4111-8111-111111111111",
+  "timestamp": "2026-08-14T10:00:00.000Z"
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `paymentToken` | The secure-payment token whose screening result completed. |
+| `walletAddress` | The wallet evaluated for this payment. |
+| `eoaAddress` | The connected externally owned account, when available. |
+| `smartAccountAddress` | The connected smart-account address, when available; otherwise `null`. |
+| `status` | `approved` or `rejected`. |
+| `provider` | The provider that produced the definitive result. This can be the backup provider. |
+| `policyId` | The provider policy used, or `null` when the provider account default was used. |
+| `timestamp` | When Request Network evaluated the result. |
+
+To test this payload shape, send `{ "eventType": "kyt.screening.completed" }` to `POST /v2/orchestrators/webhooks/test`. Test deliveries use placeholder values and do not confirm which provider or policy a real payment would use.
+
 ## Manage webhook endpoints
 
 List every endpoint registered to your orchestrator, including inactive ones:
@@ -128,12 +162,16 @@ Deactivation preserves the endpoint URL and signing secret. Registering the same
 
 ## Related
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Client ID linking" href="/orchestrators/client-id-linking" icon="link">
     Create a hosted onboarding link and receive its result through a webhook.
   </Card>
 
   <Card title="Webhook reconciliation" href="/use-cases/webhook-reconciliation" icon="check-double">
     Verify signatures and process webhook deliveries safely.
+  </Card>
+
+  <Card title="Orchestrator KYT plans" href="/orchestrators/kyt-plans" icon="shield-halved">
+    Configure screening and receive its result.
   </Card>
 </CardGroup>

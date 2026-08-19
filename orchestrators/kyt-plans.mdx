@@ -1,0 +1,98 @@
+---
+title: "Orchestrator KYT plans"
+description: "Choose whether your orchestrator or the linked platform controls transaction screening during hosted onboarding."
+---
+
+## Overview
+
+When you create a [hosted onboarding link](/orchestrators/client-id-linking#onboard-a-platform-with-a-link-intent), you choose who controls transaction screening (KYT) for the resulting linked client ID:
+
+- **Orchestrator-controlled** — include a `kyt` plan in the link intent. The platform can review the plan, but cannot change it during onboarding or later in the Request dashboard.
+- **Platform-controlled** — omit `kyt`. During onboarding, the platform chooses Hypernative, Merkle Science, or no screening. It can update that choice later.
+
+The selection is stored on the client ID created during onboarding. It does not change the KYT policy configured on the payment destination.
+
+Directly linked client IDs do not have an orchestrator KYT plan. Their secure payments use the KYT policy configured on the payment destination instead.
+
+## Configure an orchestrator-controlled plan
+
+Add `kyt.providers` when you create the onboarding link intent:
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/client-id-link-intents" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "clientIdName": "Acme Store",
+    "externalId": "merchant_123",
+    "kyt": {
+      "providers": [
+        {
+          "provider": "hypernative",
+          "policyId": "11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "provider": "merklescience"
+        }
+      ]
+    }
+  }'
+```
+
+| Field | Rules |
+| --- | --- |
+| `providers` | Include one or two unique providers. |
+| `provider` | `hypernative` or `merklescience`. |
+| `policyId` | Optional provider-policy UUID. If omitted, Request Network uses the provider account's default policy. |
+
+The first provider is primary and the second, if present, is the backup. Do not send a `priority` field; Request Network assigns it from the array order.
+
+If the primary provider has a technical failure, Request Network tries the backup. A definitive rejection does not use the backup.
+
+To let the platform control screening, omit `kyt` entirely:
+
+```json
+{
+  "clientIdName": "Acme Store",
+  "externalId": "merchant_123"
+}
+```
+
+<Warning>
+Do not send an empty `kyt.providers` array. It is invalid. Omit `kyt` to give the platform control instead.
+</Warning>
+
+## How a plan applies to payments
+
+Use paired authentication when you create a payment or payout for the linked platform. Request Network applies the plan stored on that client ID link and captures the resolved screening configuration on the new secure payment.
+
+- For an incoming payment, Request Network screens the payer wallet when the payer accesses or completes the payment.
+- For an outgoing payout, Request Network screens the recipient wallet while it creates the payout.
+- An explicit link plan cannot be overridden with `accessPolicy.mode` or `accessPolicy.screeningProvider` on the payment or payout request.
+
+## Receive screening results
+
+Your active [orchestrator webhooks](/orchestrators/webhooks#receive-kyt-screeningcompleted) receive `kyt.screening.completed` after a linked payment reaches a definitive screening result. The event is sent for `approved` and `rejected` results, not provider errors.
+
+Test your receiver with the existing webhook test endpoint:
+
+```bash
+curl -X POST "https://api.request.network/v2/orchestrators/webhooks/test" \
+  -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "eventType": "kyt.screening.completed" }'
+```
+
+The test verifies delivery and signature handling with placeholder data. Create a real payment or payout to verify that your intended provider and policy are applied.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Client ID linking" href="/orchestrators/client-id-linking" icon="link">
+    Create the hosted onboarding link that carries an orchestrator KYT plan.
+  </Card>
+
+  <Card title="Orchestrator webhooks" href="/orchestrators/webhooks" icon="webhook">
+    Verify and process `kyt.screening.completed` events.
+  </Card>
+</CardGroup>
