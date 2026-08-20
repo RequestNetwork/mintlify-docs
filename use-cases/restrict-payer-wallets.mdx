@@ -46,6 +46,7 @@ EVM addresses are matched case-insensitively. TRON addresses are case-sensitive.
 - Payer-wallet allowlisting applies only to incoming payment links, where it controls which connected wallet can send funds. The API does not enforce it for outgoing payout links.
 - For an EVM smart-account payment, Request Network checks the payer's connected EOA. Add the EOA to the allowlist, not the smart-account address.
 - Request Network stores the allowlist on the secure payment when you create it. To change who can pay, create a new payment.
+- When an orchestrator creates a payment with paired authentication, it cannot retrieve the stored allowlist later with `x-orchestrator-key`. Keep the addresses you supplied alongside the payment record.
 - A wallet that is not allowed receives the `wallet_not_allowed` access decision before it can continue to payment.
 - You can monitor rejected attempts with the [`secure_payment.access_rejected` webhook](/api-reference/webhooks#payer-wallet-access-rejections). It goes to the payment's platform-wide and Client ID webhooks, not to an orchestrator webhook.
 
