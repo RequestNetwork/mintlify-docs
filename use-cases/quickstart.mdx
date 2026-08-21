@@ -259,7 +259,7 @@ Always verify against the **raw** request body before parsing.
 
 ### Webhook events for payment links
 
-When a payer completes a payment on a payment link you created, your webhook receives a `payment.confirmed` event (or `payment.partial` for partial payments). For Client ID-scoped variants you'll also receive `payment.confirmed.client_id` / `payment.partial.client_id` with extra `clientId` and `origin` fields.
+When a payer completes a payment on a payment link you created, your webhook receives a `payment.confirmed` event (or `payment.partial` for partial payments).
 
 **Example `payment.confirmed` payload:**
 
@@ -302,10 +302,6 @@ Key fields to look for:
 | --- | --- |
 | `payment.confirmed` | Payment fully confirmed |
 | `payment.partial` | Partial payment received |
-| `payment.confirmed.client_id` | Client ID-scoped variant of `payment.confirmed` |
-| `payment.partial.client_id` | Client ID-scoped variant of `payment.partial` |
-| `payment.confirmed.checkout` | Secure-payment-scoped variant of `payment.confirmed` |
-| `payment.partial.checkout` | Secure-payment-scoped variant of `payment.partial` |
 | `payment.failed` | Payment failed |
 | `payment.refunded` | Payment refunded |
 | `payment.processing` | Offramp processing started |
