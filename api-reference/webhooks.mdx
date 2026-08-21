@@ -67,24 +67,6 @@ See [Payload Examples](#payload-examples) below for detailed webhook structures.
 | `payment.failed` | Payment execution failed | Recurring payments, cross-chain transfers | Notify failure, retry logic, pause subscriptions |
 | `payment.refunded` | Payment has been refunded to payer | Cross-chain payment failures, refund scenarios | Update order status, notify customer |
 
-### Payment Events (Client ID-scoped)
-
-Emitted **in addition to** the core events when the originating request was created with a Client ID. Payload includes extra `clientId` and `origin` fields.
-
-| Event | Description |
-|-------|-------------|
-| `payment.confirmed.client_id` | Same as `payment.confirmed`, scoped to a Client ID |
-| `payment.partial.client_id` | Same as `payment.partial`, scoped to a Client ID |
-
-### Payment Events (Checkout / Secure Payment-scoped)
-
-Emitted **in addition to** the core events when the request was created via a Secure Payment / checkout flow.
-
-| Event | Description |
-|-------|-------------|
-| `payment.confirmed.checkout` | Same as `payment.confirmed`, originating from a Secure Payment link |
-| `payment.partial.checkout` | Same as `payment.partial`, originating from a Secure Payment link |
-
 ### Processing Events
 
 | Event | Description | Context | Primary Use |
@@ -229,8 +211,8 @@ All payment events include an `explorer` field linking to [Request Scan](https:/
 - `paymentReference`: Short reference, also unique to a request, used to link payments to the request
 - `timestamp`: ISO 8601 formatted event timestamp
 - `paymentProcessor`: Either `request-network` (crypto) or `request-tech` (fiat)
-- `payerAddress`: Resolved payer wallet — the on-chain sender for plain direct payments, or the resolved payer for recurring and intent-based flows (Secure Payment Page, LiFi, Safe, ERC-4337, multicall). `null` when it cannot be determined. Included on `payment.confirmed` and `payment.partial` events (and their `.client_id` / `.checkout` variants).
-- `payerEoaAddress`: The payer's connected wallet address. It can differ from `payerAddress` when a smart account is used. `null` when unavailable. Included on `payment.confirmed` and `payment.partial` events (and their `.client_id` / `.checkout` variants).
+- `payerAddress`: Resolved payer wallet — the on-chain sender for plain direct payments, or the resolved payer for recurring and intent-based flows (Secure Payment Page, LiFi, Safe, ERC-4337, multicall). `null` when it cannot be determined. Included on `payment.confirmed` and `payment.partial` events.
+- `payerEoaAddress`: The payer's connected wallet address. It can differ from `payerAddress` when a smart account is used. `null` when unavailable. Included on `payment.confirmed` and `payment.partial` events.
 
 The `client_id.linked` and `kyt.screening.completed` examples below are delivered to an orchestrator endpoint. Register that endpoint with `x-orchestrator-key` as described in [Orchestrator webhooks](/orchestrators/webhooks).
 

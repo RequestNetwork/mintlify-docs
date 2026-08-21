@@ -9,7 +9,7 @@ A webhook handler that receives signed payment events from Request Network, veri
 
 **Audience:** any backend integrating Request Network where payment events drive state changes downstream.
 
-## The 14 events
+## The 10 events
 
 | Category | Event | When it fires |
 | --- | --- | --- |
@@ -17,10 +17,6 @@ A webhook handler that receives signed payment events from Request Network, veri
 | | `payment.partial` | Partial payment received, more expected |
 | | `payment.failed` | Payment execution failed (recurring, cross-chain) |
 | | `payment.refunded` | Payment refunded to payer |
-| Payment (Client ID) | `payment.confirmed.client_id` | Same as `payment.confirmed`, request was created via Client ID — payload includes `clientId` and `origin` |
-| | `payment.partial.client_id` | Client ID-scoped partial |
-| Payment (Checkout) | `payment.confirmed.checkout` | Same as `payment.confirmed`, request originated from a Secure Payment link |
-| | `payment.partial.checkout` | Secure Payment-scoped partial |
 | Processing | `payment.processing` | Crypto-to-fiat offramp in progress (with detailed `subStatus`) |
 | Request | `request.recurring` | A new recurring billing cycle fired |
 | Compliance | `compliance.updated` | KYC or agreement status changed |
@@ -104,14 +100,10 @@ app.post(
 async function handleEvent(event: any, deliveryId: string) {
   switch (event.event) {
     case "payment.confirmed":
-    case "payment.confirmed.client_id":
-    case "payment.confirmed.checkout":
       await markOrderPaid(event.requestId, event.txHash, deliveryId);
       break;
 
     case "payment.partial":
-    case "payment.partial.client_id":
-    case "payment.partial.checkout":
       await recordPartialPayment(
         event.requestId,
         event.amount,
