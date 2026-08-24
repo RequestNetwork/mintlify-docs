@@ -9,7 +9,7 @@ An **orchestrator** is a fee and branding partner in Request Network. It is a fi
 
 - **Link client IDs** — associate the developer [Client IDs](/api-features/client-id-management) (`cli_*` tokens) of the platforms you serve with your orchestrator.
 - **Create payment links** — use your key with a linked client ID to create incoming payment links and outgoing payout links for a platform.
-- **Receive webhooks** — receive signed `client_id.linked` notifications after a platform completes hosted onboarding and `kyt.screening.completed` notifications after a definitive screening result.
+- **Receive webhooks** — receive signed `client_id.linked` notifications after a platform completes hosted onboarding and `kyt.screening.completed` notifications after a definitive screening result. See [Orchestrator webhooks](/api-reference/webhooks#orchestrator-webhooks).
 - **Configure fees** — set [orchestrator fees](/orchestrators/fees) (and per-client-ID overrides) that apply to payments made under those client IDs.
 - **Apply branding** — give the hosted [Secure Payment](/tools/secure-payments) experience your own [whitelabel branding](/orchestrators/whitelabel-branding).
 
@@ -64,7 +64,7 @@ All partner-facing orchestrator endpoints live under `/v2/orchestrators` and are
 | `PATCH /v2/orchestrators/fee-configs/:id` | Update a fee config |
 | `DELETE /v2/orchestrators/fee-configs/:id` | Disable a fee config |
 
-See [Client ID linking](/orchestrators/client-id-linking), [Whitelabel branding](/orchestrators/whitelabel-branding), [Orchestrator webhooks](/orchestrators/webhooks), and [Orchestrator fees](/orchestrators/fees) for details.
+See [Client ID linking](/orchestrators/client-id-linking), [Whitelabel branding](/orchestrators/whitelabel-branding), [Orchestrator webhooks](/api-reference/webhooks#orchestrator-webhooks), and [Orchestrator fees](/orchestrators/fees) for details.
 
 ## How orchestrators apply at payment time
 
@@ -91,7 +91,7 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
     Link client IDs directly or via onboarding link intents.
   </Card>
 
-  <Card title="Orchestrator webhooks" href="/orchestrators/webhooks" icon="webhook">
+  <Card title="Orchestrator webhooks" href="/api-reference/webhooks#orchestrator-webhooks" icon="webhook">
     Receive signed onboarding and KYT screening notifications.
   </Card>
 
