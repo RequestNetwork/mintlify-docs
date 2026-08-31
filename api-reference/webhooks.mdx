@@ -5,19 +5,32 @@ description: "Configure platform Client ID and orchestrator webhooks, including 
 
 ## Overview
 
-Webhooks deliver HMAC-signed notifications for platform Client ID and orchestrator flows. Each endpoint is configured separately and can receive automatic retries.
+Webhooks deliver HMAC-signed notifications for platform Client ID and orchestrator flows, including payment processing, KYT screening, and hosted onboarding. Each endpoint is configured separately and can receive automatic retries.
+
+## Choose who receives notifications
+
+A platform owns its Client IDs and Secure Payments. When it links a Client ID to an orchestrator, the orchestrator can create Secure Payments on the platform's behalf. Some events are then delivered to both the platform's Client ID endpoint and the linked orchestrator's endpoint.
+
+You do not subscribe an endpoint to individual event types. An active endpoint receives the events available to the Client ID or orchestrator that registered it.
+
+| Recipient | Authentication | Receives |
+| --- | --- | --- |
+| Platform's Client ID | `x-client-id` or the platform's Dashboard session | Events for Secure Payments created with that Client ID. |
+| Orchestrator | `x-orchestrator-key` | Hosted-onboarding events and events for Secure Payments it created on behalf of a linked platform. |
+
+Register each role separately, even if both roles use the same callback URL. Each registration has its own signing secret.
 
 ## Platform Client ID webhooks
 
-Manage webhooks in the [Dashboard](https://dashboard.request.network) or programmatically through the Auth API at `auth.request.network`. Each webhook is scoped to the Client ID that creates it; events for any payment link or request created with that Client ID are delivered to that webhook.
+Use the platform's Client ID to register an endpoint:
 
-### Create a webhook
+### Register an endpoint
 
 ```bash
 curl -X POST "https://auth.request.network/v1/webhook" \
   -H "Content-Type: application/json" \
-  -H "x-client-id: YOUR_CLIENT_ID" \
-  -d '{ "url": "https://yourapp.com/webhooks/request-network" }'
+  -H "x-client-id: cli_YOUR_CLIENT_ID" \
+  -d '{ "url": "https://platform.example.com/webhooks/request-network" }'
 ```
 
 **Response (201 Created):**
@@ -29,10 +42,10 @@ curl -X POST "https://auth.request.network/v1/webhook" \
 ```
 
 <Warning>
-The `secret` is only returned once at creation. Store it securely — you cannot retrieve it again. Use HTTPS in production. `localhost` URLs are accepted for local testing.
+Save `secret` when you create the endpoint. Request Network returns it only once. Use HTTPS in production; `localhost` is accepted for local development.
 </Warning>
 
-### Manage webhooks
+### Manage platform endpoints
 
 All endpoints accept `x-client-id` and operate on the webhooks owned by that Client ID.
 
@@ -43,7 +56,7 @@ All endpoints accept `x-client-id` and operate on the webhooks owned by that Cli
 | `DELETE` | `/v1/webhook/:webhookId` | Permanently delete |
 | `POST` | `/v1/webhook/test` | Body `{ "eventType": "payment.confirmed" }` — fire a test delivery |
 
-Open the [Auth API Scalar docs](https://auth.request.network/open-api/#tag/webhook) to call these interactively with your wallet session — signing in to the [Dashboard](https://dashboard.request.network) sets the session cookie that's shared across all `*.request.network` services.
+Open the [Auth API Scalar docs](https://auth.request.network/open-api/#tag/webhook) to call these interactively with your wallet session. Signing in to the [Dashboard](https://dashboard.request.network) sets the session cookie shared across Request Network services.
 
 ### Local Development
 Use [ngrok](https://ngrok.com/docs/traffic-policy/getting-started/agent-endpoints/cli) to receive webhooks locally, then pass the public URL to `POST /v1/webhook`:
@@ -59,7 +72,7 @@ Orchestrator webhooks are owned by your orchestrator. Register and manage them w
 Register an endpoint before you send a hosted onboarding URL to a platform. Its active endpoints receive:
 
 - [`client_id.linked`](#client-id-linked) after the platform completes hosted onboarding.
-- [`kyt.screening.completed`](#kyt-screening-completed) after an orchestrator-linked payment reaches a definitive screening result.
+- [`payment.confirmed`](#payment-confirmed), [`kyt.screening.completed`](#kyt-screening-completed), and [`secure_payment.user_event`](#secure-payment-user-event) for Secure Payments the orchestrator created on a linked platform's behalf.
 
 ### Register an endpoint
 
@@ -135,48 +148,18 @@ curl -X PATCH "https://api.request.network/v2/orchestrators/webhooks/01ARZ3NDEKT
 
 Deactivation preserves the endpoint URL and signing secret. Registering the same URL again is rejected, even while it is inactive; reactivate it instead. To use a different URL, deactivate the old endpoint and register the new one.
 
-## Event Types
+## Current webhook events
 
-<Info>
-See [Payload Examples](#payload-examples) below for detailed webhook structures.
-</Info>
+These are the events for current Secure Payment and orchestrator integrations. The platform's Client ID receives the events shown below for Secure Payments created with that Client ID.
 
-### Payment Events (core)
-
-| Event | Description | Context | Primary Use |
-|-------|-------------|---------|-------------|
-| `payment.confirmed` | Payment fully completed and settled | After blockchain confirmation | Complete fulfillment, release goods |
-| `payment.partial` | Partial payment received for request | Installments, partial orders | Update balance, allow additional payments |
-| `payment.failed` | Payment execution failed | Recurring payments, cross-chain transfers | Notify failure, retry logic, pause subscriptions |
-| `payment.refunded` | Payment has been refunded to payer | Cross-chain payment failures, refund scenarios | Update order status, notify customer |
-
-### Processing Events
-
-| Event | Description | Context | Primary Use |
-|-------|-------------|---------|-------------|
-| `payment.processing` | Crypto-to-fiat payment in progress | **subStatus values:** initiated, pending_internal_assessment, ongoing_checks, sending_fiat, fiat_sent, bounced | Track crypto-to-fiat payment status, update UI |
-
-### Request Events
-
-| Event | Description | Context | Primary Use |
-|-------|-------------|---------|-------------|
-| `request.recurring` | New recurring request generated | Subscription renewals, scheduled payments | Send renewal notifications, update billing |
-
-### Compliance Events
-
-| Event | Description | Context | Primary Use |
-|-------|-------------|---------|-------------|
-| `compliance.updated` | KYC or agreement status changed | **kycStatus values:** not_started, pending, approved, rejected, retry_required<br/>**agreementStatus values:** not_started, pending, completed, rejected, failed | Update user permissions, notify status |
-| `payment_detail.updated` | Bank account verification status updated | States: approved, failed, pending | Enable fiat payments, update profiles |
-
-### Secure Payment Events
-
-| Event | Description | Context | Primary Use |
-|-------|-------------|---------|-------------|
-| `secure_payment.user_event` | Payer progressed through a step of the Secure Payment Page | **userEvent values:** wallet_connected, payment_sent_to_wallet, payment_approved_in_wallet | Real-time payer-funnel visibility, drop-off analytics |
-| `secure_payment.access_rejected` | A wallet not on a payment's payer-wallet allowlist attempted to access or pay it | Incoming Secure Payments with `allowedPayerAddresses` | Monitor rejected payer attempts |
-
-Sent to the same registered webhook endpoints as every other event — same Client ID scoping, `x-request-network-signature` HMAC verification, delivery headers, timeout, and 1s/5s/15s retry semantics described elsewhere on this page.
+| Event | Platform's Client ID | Linked orchestrator | Notes |
+| --- | --- | --- | --- |
+| `client_id.linked` | No | Yes | Sent after hosted onboarding completes. Direct API links do not emit this event. |
+| `payment.confirmed` | Yes | Yes | Both receive it when the linked orchestrator created the Secure Payment for the platform. |
+| `payment.failed` | Yes | No | Payment execution fails. |
+| `kyt.screening.completed` | Yes | Yes | Sent after a definitive `approved` or `rejected` result. Provider errors do not emit it. |
+| `secure_payment.user_event` | Yes | Yes | Best-effort payer activity from the Secure Payment Page. Do not use it as a settlement signal. |
+| `secure_payment.access_rejected` | Yes | No | A wallet outside an incoming payment's payer-wallet allowlist tries to access or pay it. |
 
 The `userEvent` field distinguishes the 3 funnel steps:
 
@@ -187,18 +170,16 @@ The `userEvent` field distinguishes the 3 funnel steps:
 | `payment_approved_in_wallet` | The payer approved/signed the payment in their wallet. `properties` includes the submission id (e.g. tx hash / user-operation hash) |
 
 <Note>
-`securePaymentToken` is the platform's correlation key, returned when the secure payment was created. `requestId` is present only when exactly one request is linked to the secure payment (see `requestIds` for the full list). `timestamp` is server-stamped on receipt. `occurredAt` and `properties` are **client-reported telemetry from the payer's browser** — useful for analytics, but not authoritative.
-
-`secure_payment.user_event` is best-effort browser telemetry. Navigation, network errors, or browser extensions can prevent the API from receiving it. Webhook retries begin only after the API accepts the event. Do not treat an absent event as evidence that the payer did not take the step; use `payment.confirmed` for settlement and reconciliation.
+`payment.confirmed` is the settlement signal. `secure_payment.user_event` is browser-reported activity: navigation, network failures, or browser extensions can prevent Request Network from receiving it. Its absence does not prove that the payer did not take that step.
 
 When the Secure Payment Page includes wallet information in `properties`, it uses `wallet_address_hashed` rather than a raw wallet address.
 </Note>
 
 ### Payer-wallet access rejections
 
-`secure_payment.access_rejected` is generated server-side when a wallet that is not on an incoming payment's `allowedPayerAddresses` allowlist tries to access or pay it. It is not emitted for KYT decisions. See [Restrict payer wallets](/use-cases/restrict-payer-wallets) to configure the allowlist.
+`secure_payment.access_rejected` is generated server-side when a wallet that is not on an incoming payment's `allowedPayerAddresses` allowlist tries to access or pay it. It is not emitted for KYT decisions. It is sent to the payment's platform Client ID webhook, not to an orchestrator endpoint. See [Restrict payer wallets](/use-cases/restrict-payer-wallets) to configure the allowlist.
 
-The event is sent to the payment's platform-wide and Client ID webhooks, not to an orchestrator webhook. Repeated attempts by the same wallet on the same payment are normally suppressed for 10 minutes. If every configured webhook endpoint fails, the next access attempt can trigger another notification.
+Repeated attempts by the same wallet on the same payment are normally suppressed for 10 minutes. If every configured webhook endpoint fails, the next access attempt can trigger another notification.
 
 ## Security Implementation
 
@@ -285,19 +266,15 @@ Request API logs all webhook delivery failures with:
 - Error details
 - Final failure after all retries
 
-## Payload Examples
+## Payload identity and examples
 
-All payment events include an `explorer` field linking to [Request Scan](https://scan.request.network) for transaction details.
+For a Secure Payment created with a Client ID, payloads include `clientId`. When it was created through an orchestrator, payloads also include `orchestratorId`.
 
-**Common Fields:**
-- `requestId` / `requestID`: Unique identifier for the payment request
-- `paymentReference`: Short reference, also unique to a request, used to link payments to the request
-- `timestamp`: ISO 8601 formatted event timestamp
-- `paymentProcessor`: Either `request-network` (crypto) or `request-tech` (fiat)
-- `payerAddress`: Resolved payer wallet — the on-chain sender for plain direct payments, or the resolved payer for recurring and intent-based flows (Secure Payment Page, LiFi, Safe, ERC-4337, multicall). `null` when it cannot be determined. Included on `payment.confirmed` and `payment.partial` events.
-- `payerEoaAddress`: The payer's connected wallet address. It can differ from `payerAddress` when a smart account is used. `null` when unavailable. Included on `payment.confirmed` and `payment.partial` events.
+`orchestratorId` is the orchestrator recorded when the Secure Payment was created. Linking, unlinking, or relinking that Client ID later does not change historical payment events. Use `requestId`, `paymentToken`, or `securePaymentToken` to correlate an event with your records.
 
-The `client_id.linked` and `kyt.screening.completed` examples below are delivered to an orchestrator endpoint. Register that endpoint with `x-orchestrator-key` as described in [Orchestrator webhooks](#orchestrator-webhooks).
+Payment events include an `explorer` field linking to [Request Scan](https://scan.request.network) when one is available. `requestId` and `requestID` identify the request, and `paymentReference` is its short unique reference.
+
+`payerAddress` is the resolved payer wallet and `payerEoaAddress` is the payer's connected wallet. They can differ when a smart account is used. Both are `null` when unavailable and are included on `payment.confirmed` and `payment.partial` events.
 
 ### Client ID linked
 
@@ -328,6 +305,8 @@ Use `intentId` or `externalId` to match this event to your onboarding record. Us
   "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "paymentReference": "0x2c3366941274c34c",
+  "clientId": "cli_PLATFORM_CLIENT_ID",
+  "orchestratorId": "01ARZ3NDEKTSV4RRFFQ69G5FAW",
   "explorer": "https://scan.request.network/request/0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "amount": "100.0",
   "totalAmountPaid": "100.0",
@@ -351,6 +330,96 @@ Use `intentId` or `externalId` to match this event to your onboarding record. Us
   ]
 }
 ```
+
+### Payment Failed
+```json
+{
+  "event": "payment.failed",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "paymentReference": "0x2c3366941274c34c",
+  "clientId": "cli_PLATFORM_CLIENT_ID",
+  "subStatus": "insufficient_funds",
+  "paymentProcessor": "request-network"
+}
+```
+
+### KYT Screening Completed
+
+`kyt.screening.completed` is sent after a Secure Payment reaches an `approved` or `rejected` screening result.
+
+```json
+{
+  "event": "kyt.screening.completed",
+  "paymentToken": "01KYM5CZ51K0N1KJ4F8S73BE3N",
+  "clientId": "cli_PLATFORM_CLIENT_ID",
+  "orchestratorId": "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+  "walletAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
+  "eoaAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
+  "smartAccountAddress": null,
+  "status": "approved",
+  "provider": "hypernative",
+  "policyId": "11111111-1111-4111-8111-811111111111",
+  "timestamp": "2026-08-14T10:00:00.000Z"
+}
+```
+
+`provider` is the provider that produced the result. `policyId` is `null` when the provider account default was used.
+
+### Secure Payment User Event
+```json
+{
+  "event": "secure_payment.user_event",
+  "userEvent": "payment_approved_in_wallet",
+  "securePaymentToken": "spt_3fk29ax7...",
+  "requestId": "01JD3E6JD46KY4KKV7X9V0MZ7W",
+  "requestIds": ["01JD3E6JD46KY4KKV7X9V0MZ7W"],
+  "clientId": "cli_PLATFORM_CLIENT_ID",
+  "orchestratorId": "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+  "occurredAt": "2026-08-05T14:03:21.512Z",
+  "timestamp": "2026-08-05T14:03:22.104Z",
+  "properties": {
+    "wallet_provider": "metamask",
+    "payment_submission_id": "0x6a4f...e21b",
+    "payment_submission_id_type": "evm_tx_hash",
+    "selected_source_chain": "base",
+    "payment_type": "single"
+  }
+}
+```
+
+### Secure Payment Access Rejected
+```json
+{
+  "event": "secure_payment.access_rejected",
+  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
+  "clientId": "cli_PLATFORM_CLIENT_ID",
+  "orchestratorId": "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+  "attemptedPayerWalletAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
+  "timestamp": "2026-08-10T10:05:00.000Z"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `requestId` | The request the wallet tried to access. |
+| `attemptedPayerWalletAddress` | The rejected wallet address. EVM addresses are lowercased; TRON addresses keep their original case. |
+| `timestamp` | When Request Network emitted the event. |
+
+Use `POST /v1/webhook/test` with `{ "eventType": "secure_payment.access_rejected" }` to test this event without a rejected access attempt.
+
+## Legacy integrations
+
+These events remain available for existing API integrations. They do not apply to current Dashboard, Secure Payment Page, or orchestrator workflows.
+
+| Event | Legacy flow |
+| --- | --- |
+| `payment.partial` | Partial-payment flow |
+| `payment.refunded` | Existing refund flows |
+| `payment.processing` | Crypto-to-fiat processing |
+| `compliance.updated` | Crypto-to-fiat compliance updates |
+| `payment_detail.updated` | Crypto-to-fiat bank-detail updates |
+| `request.recurring` | Recurring requests |
 
 ### Payment Processing
 ```json
@@ -395,18 +464,6 @@ Use `intentId` or `externalId` to match this event to your onboarding record. Us
 }
 ```
 
-### Payment Failed
-```json
-{
-  "event": "payment.failed",
-  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
-  "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
-  "paymentReference": "0x2c3366941274c34c",
-  "subStatus": "insufficient_funds",
-  "paymentProcessor": "request-network"
-}
-```
-
 ### Compliance Updated
 ```json
 {
@@ -422,65 +479,6 @@ Use `intentId` or `externalId` to match this event to your onboarding record. Us
   }
 }
 ```
-
-### KYT Screening Completed
-
-`kyt.screening.completed` is sent after an orchestrator-linked payment reaches an `approved` or `rejected` screening result.
-
-```json
-{
-  "event": "kyt.screening.completed",
-  "paymentToken": "01KYM5CZ51K0N1KJ4F8S73BE3N",
-  "walletAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
-  "eoaAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
-  "smartAccountAddress": null,
-  "status": "approved",
-  "provider": "hypernative",
-  "policyId": "11111111-1111-4111-8111-811111111111",
-  "timestamp": "2026-08-14T10:00:00.000Z"
-}
-```
-
-`provider` is the provider that produced the result. `policyId` is `null` when the provider account default was used.
-
-### Secure Payment User Event
-```json
-{
-  "event": "secure_payment.user_event",
-  "userEvent": "payment_approved_in_wallet",
-  "securePaymentToken": "spt_3fk29ax7...",
-  "requestId": "01JD3E6JD46KY4KKV7X9V0MZ7W",
-  "requestIds": ["01JD3E6JD46KY4KKV7X9V0MZ7W"],
-  "orchestratorId": "orch_12345",
-  "occurredAt": "2026-08-05T14:03:21.512Z",
-  "timestamp": "2026-08-05T14:03:22.104Z",
-  "properties": {
-    "wallet_provider": "metamask",
-    "payment_submission_id": "0x6a4f...e21b",
-    "payment_submission_id_type": "evm_tx_hash",
-    "selected_source_chain": "base",
-    "payment_type": "single"
-  }
-}
-```
-
-### Secure Payment Access Rejected
-```json
-{
-  "event": "secure_payment.access_rejected",
-  "requestId": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
-  "attemptedPayerWalletAddress": "0x2e2e5c79f571ef1658d4c2d3684a1fe97dd30570",
-  "timestamp": "2026-08-10T10:05:00.000Z"
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `requestId` | The request the wallet tried to access. |
-| `attemptedPayerWalletAddress` | The rejected wallet address. EVM addresses are lowercased; TRON addresses keep their original case. |
-| `timestamp` | When Request Network emitted the event. |
-
-Use `POST /v1/webhook/test` with `{ "eventType": "secure_payment.access_rejected" }` to test this event without a rejected access attempt.
 
 ## Process webhook deliveries
 

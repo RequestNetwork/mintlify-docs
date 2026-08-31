@@ -9,7 +9,7 @@ An **orchestrator** is a fee and branding partner in Request Network. It is a fi
 
 - **Link client IDs** — associate the developer [Client IDs](/api-features/client-id-management) (`cli_*` tokens) of the platforms you serve with your orchestrator.
 - **Create payment links** — use your key with a linked client ID to create incoming payment links and outgoing payout links for a platform.
-- **Receive webhooks** — receive signed `client_id.linked` notifications after a platform completes hosted onboarding and `kyt.screening.completed` notifications after a definitive screening result. See [Orchestrator webhooks](/api-reference/webhooks#orchestrator-webhooks).
+- **Receive webhooks** — receive signed hosted-onboarding, payment, KYT-screening, and payer-activity notifications for the flows you manage. See [Orchestrator webhooks](/api-reference/webhooks#orchestrator-webhooks).
 - **Configure fees** — set [orchestrator fees](/orchestrators/fees) (and per-client-ID overrides) that apply to payments made under those client IDs.
 - **Apply branding** — give the hosted [Secure Payment](/tools/secure-payments) experience your own [whitelabel branding](/orchestrators/whitelabel-branding).
 
@@ -92,7 +92,7 @@ curl -X POST "https://api.request.network/v2/secure-payments" \
   </Card>
 
   <Card title="Orchestrator webhooks" href="/api-reference/webhooks#orchestrator-webhooks" icon="webhook">
-    Receive signed onboarding and KYT screening notifications.
+    Receive signed onboarding, payment, KYT-screening, and payer-activity notifications.
   </Card>
 
   <Card title="Whitelabel branding" href="/orchestrators/whitelabel-branding" icon="palette">
