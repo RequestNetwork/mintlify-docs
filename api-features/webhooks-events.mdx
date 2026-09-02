@@ -1,28 +1,29 @@
 ---
 title: "Webhooks & Events"
-description: "Real-time notifications for payment lifecycle events and request status changes"
+description: "Real-time notifications for Secure Payment, KYT screening, and hosted onboarding events."
 ---
 
 ## Overview
 
-Webhooks provide real-time notifications when payment and request events occur, enabling immediate response to status changes without constant polling.
+Webhooks notify your server when Request Network processes a Secure Payment, completes KYT screening, or finishes hosted onboarding. The [Webhooks reference](/api-reference/webhooks) is the canonical guide for endpoint setup, recipients, and payloads.
 
-## Event Categories
+## Event categories
 
-The platform and Client ID webhook catalog includes **10 event types** across six categories:
+Current Secure Payment and orchestrator integrations use these events:
 
 | Category | Events |
 | --- | --- |
-| **Payment** (core) | `payment.confirmed`, `payment.partial`, `payment.failed`, `payment.refunded` |
-| **Processing** (crypto-to-fiat) | `payment.processing` (with `subStatus`) |
-| **Request** | `request.recurring` |
-| **Compliance / Bank** | `compliance.updated`, `payment_detail.updated` |
-| **Secure Payment Page** (payer funnel) | `secure_payment.user_event` (with `userEvent`) |
-| **Secure Payment** (payer-wallet allowlist) | `secure_payment.access_rejected` |
+| **Payment** | `payment.confirmed`, `payment.failed` |
+| **KYT screening** | `kyt.screening.completed` |
+| **Secure Payment Page** | `secure_payment.user_event` |
+| **Payer-wallet allowlist** | `secure_payment.access_rejected` |
+| **Hosted onboarding** | `client_id.linked` — a platform completes onboarding to link its Client ID to an orchestrator |
 
-<Note>
-Payment webhook payloads include `payerAddress`, the address used to make the payment, and `payerEoaAddress`, the payer's connected wallet address. These can differ when a smart account is used. Both are `null` when unavailable. See the [Webhooks reference](/api-reference/webhooks) for the full payload schema.
-</Note>
+The platform's Client ID and a linked orchestrator do not receive the same events. See the [current webhook event catalog](/api-reference/webhooks#current-webhook-events) for the recipient of each event and its authentication.
+
+### Legacy integrations
+
+Some older API-only webhook events remain available for existing integrations. They do not apply to current Dashboard, Secure Payment Page, or orchestrator workflows. See [Legacy integrations](/api-reference/webhooks#legacy-integrations).
 
 For full payload schemas and headers, see the [Webhooks reference](/api-reference/webhooks).
 
@@ -37,24 +38,23 @@ graph LR
 ```
 
 **Process:**
-1. **Event occurs:** Payment confirmed, request created, compliance updated
+1. **Event occurs:** Payment confirmed, KYT screening completes, or hosted onboarding finishes
 2. **Secure delivery:** HMAC SHA-256 signed POST to your configured endpoint
 3. **Your processing:** Verify `x-request-network-signature`, update application state
-4. **Reliable delivery:** 3 retries (1s, 5s, 15s delays) with 5-second timeout
+4. **Reliable delivery:** Request Network automatically retries a failed delivery. See the [Webhooks reference](/api-reference/webhooks#retry-logic) for the delivery policy.
 
 ## Key Features
 
 ### Reliability
-- **Idempotency support:** Use `x-request-network-delivery` header for duplicate detection
-- **Delivery confirmation:** Monitor `x-request-network-retry-count` header to track attempts
+- **Idempotency support:** Every delivery has an ID you can use to prevent duplicate processing.
+- **Automatic retries:** Request Network retries failed deliveries.
 
 ### Security
-- **HMAC SHA-256 signatures:** Every webhook includes `x-request-network-signature` header
-- **HTTPS required:** Production endpoints must use secure connections
-- **Test webhook identification:** `x-request-network-test` header for development
+- **Signed deliveries:** Every webhook is HMAC-SHA256 signed.
+- **HTTPS required:** Production endpoints must use secure connections.
 
 ### Development Tools
-- **Test deliveries:** Fire test events via `POST /v1/webhook/test` (Auth API) — see [Webhooks reference](/api-reference/webhooks#testing)
+- **Test deliveries:** Use the relevant platform or orchestrator test endpoint to confirm your setup. Test deliveries use placeholder data, so handle them separately from real events. See the [Webhooks reference](/api-reference/webhooks).
 - **ngrok integration:** Receive webhooks locally during development
 - **Comprehensive logging:** Request API logs all delivery failures with attempt details
 
@@ -62,24 +62,24 @@ graph LR
 
 - **Invoice systems:** Automatically mark invoices as paid when `payment.confirmed` received
 - **Order fulfillment:** Release goods or services immediately after payment confirmation
-- **Subscription management:** Handle `request.recurring` for automatic billing renewals
-- **Compliance workflows:** Update user permissions when `compliance.updated` shows KYC approval
-- **Real-time dashboards:** Display live payment status using `payment.processing` subStatus values
-- **Payer-funnel visibility:** Track wallet connection and signature progress on the Secure Payment Page via `secure_payment.user_event`
+- **Failed-payment handling:** Respond to `payment.failed` when payment execution fails
+- **KYT workflows:** Respond to approved or rejected `kyt.screening.completed` results
+- **User-event visibility:** Track wallet connection and signature progress on the Secure Payment Page via `secure_payment.user_event`
 - **Payer-wallet monitoring:** Detect attempts by wallets that are not allowed to pay via `secure_payment.access_rejected`
+- **Hosted onboarding:** Complete a platform's onboarding to your orchestrator after `client_id.linked`
 
 ## Implementation
 
 <CardGroup cols={2}>
-  <Card title="Webhook Reference" href="/api-reference/webhooks">
-    Complete technical documentation with setup, payloads, and code examples
+  <Card title="Webhook Reference" href="/api-reference/webhooks" icon="book">
+    Endpoint setup, event recipients, payloads, and delivery behavior
   </Card>
 
-  <Card title="Implementation Examples" href="/api-reference/webhooks">
-    Working webhook handlers with Express.js and Next.js
+  <Card title="Webhook reconciliation" href="/use-cases/webhook-reconciliation" icon="webhook">
+    Build a signed, idempotent webhook handler
   </Card>
 
-  <Card title="Auth API webhook endpoints" href="https://auth.request.network/open-api/#tag/webhook" icon="webhook">
+  <Card title="Auth API webhook endpoints" href="https://auth.request.network/open-api/#tag/webhook" icon="code">
     POST /v1/webhook to create, GET/PUT/DELETE to manage, /test to fire test deliveries
   </Card>
 </CardGroup>
