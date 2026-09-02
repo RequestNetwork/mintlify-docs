@@ -429,6 +429,10 @@
     {
       "source": "/webhooks",
       "destination": "/api-features/webhooks-events"
+    },
+    {
+      "source": "/orchestrators/webhooks",
+      "destination": "/api-reference/webhooks"
     }
   ],
   "navigation": {
@@ -546,10 +550,10 @@
                 "group": "Orchestrators",
                 "pages": [
                   "orchestrators/overview",
+                  "orchestrators/webhooks",
                   "orchestrators/fees",
                   "orchestrators/client-id-linking",
                   "orchestrators/kyt-plans",
-                  "orchestrators/webhooks",
                   "orchestrators/whitelabel-branding"
                 ]
               }

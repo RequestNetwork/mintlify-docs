@@ -72,7 +72,7 @@ Use paired authentication when you create a payment or payout for the linked pla
 
 ## Receive screening results
 
-Your active [orchestrator webhooks](/orchestrators/webhooks#receive-kyt-screeningcompleted) receive `kyt.screening.completed` after a linked payment reaches a definitive screening result. The event is sent for `approved` and `rejected` results, not provider errors.
+Your active [orchestrator webhooks](/api-reference/webhooks#kyt-screening-completed) receive `kyt.screening.completed` after a linked payment reaches a definitive screening result. The event is sent for `approved` and `rejected` results, not provider errors.
 
 Test your receiver with the existing webhook test endpoint:
 
@@ -92,7 +92,7 @@ The test verifies delivery and signature handling with placeholder data. Create 
     Create the hosted onboarding link that carries an orchestrator KYT plan.
   </Card>
 
-  <Card title="Orchestrator webhooks" href="/orchestrators/webhooks" icon="webhook">
+  <Card title="Webhooks" href="/api-reference/webhooks#orchestrator-webhooks" icon="webhook">
     Verify and process `kyt.screening.completed` events.
   </Card>
 </CardGroup>
