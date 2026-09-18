@@ -152,10 +152,11 @@ window.open(securePaymentUrl, "_blank", "noopener,noreferrer");
 
 Use webhook events as your payment status source of truth.
 
+See [Secure Payment Page lifecycle events](/api-features/secure-payment-lifecycle-events) for the expected incoming and outgoing flows, screening rejection branches, and example payloads. Wallet approval is a progress event; use `payment.confirmed` to mark an order as paid.
+
 Typical mapping:
 - `payment.confirmed` -> mark order as paid
-- `payment.partial` -> mark order as partially paid
-- `payment.failed` -> mark order as failed
+- `payment.failed` -> handle an exceptional payment execution failure; it does not automatically follow wallet cancellation or an access/screening rejection
 
 ### Webhook handler example (signature verification + reconciliation)
 

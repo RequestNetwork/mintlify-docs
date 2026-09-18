@@ -150,6 +150,8 @@ Deactivation preserves the endpoint URL and signing secret. Registering the same
 
 ## Current webhook events
 
+For incoming and outgoing checkout flows with allowlist/KYT rejection branches, see [Secure Payment Page lifecycle events](/api-features/secure-payment-lifecycle-events).
+
 These are the events for current Secure Payment and orchestrator integrations. The platform's Client ID receives the events shown below for Secure Payments created with that Client ID.
 
 | Event | Platform's Client ID | Linked orchestrator | Notes |
@@ -332,6 +334,9 @@ Use `intentId` or `externalId` to match this event to your onboarding record. Us
 ```
 
 ### Payment Failed
+
+This example shows a generic payment-intent failure. For Secure Payment Pages, this can follow an explicit LI.FI failure or a monitored Safe execution failure or deadline expiry. Allowlist rejection, KYT rejection, and wallet cancellation do not automatically emit it.
+
 ```json
 {
   "event": "payment.failed",
@@ -339,7 +344,8 @@ Use `intentId` or `externalId` to match this event to your onboarding record. Us
   "requestID": "0151b394e3c482c5aebaa04eb04508a8db70595470760293f1b258ed96d1fafa93",
   "paymentReference": "0x2c3366941274c34c",
   "clientId": "cli_PLATFORM_CLIENT_ID",
-  "subStatus": "insufficient_funds",
+  "payee": "0x3333333333333333333333333333333333333333",
+  "subStatus": "",
   "paymentProcessor": "request-network"
 }
 ```
