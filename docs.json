@@ -522,6 +522,7 @@
                 "pages": [
                   "api-features/secure-payment-pages",
                   "api-features/secure-payment-integration-guide",
+                  "api-features/secure-payment-lifecycle-events",
                   "api-features/safe-multisig-payments",
                   "api-features/secure-payment-supported-networks-and-currencies"
                 ]
