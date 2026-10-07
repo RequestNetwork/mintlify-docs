@@ -21,7 +21,11 @@ If validation fails, the secure page warns the payer and prevents continuing wit
 
 ## Double payment prevention
 
-A payment link can only be paid once. When the payer signs a payment, the payment link locks. If they refresh the page or reopen the link, they see that a payment is in progress. They cannot pay again.<br /><br />The link unlocks only if the payment does not go through. If the payer rejects it in their wallet, or the transaction fails, the link can be paid again.<br /><br />If the payment goes through, the link stays locked and is marked as paid.<br />
+Secure Payment Pages help prevent accidental duplicate payments. When the page detects a payment in progress, including after refreshing or reopening the link, it shows that status and blocks another attempt.
+
+If the payer rejects the wallet request, they can try again. If a submitted transaction fails or its status is unclear, they should check the payment status before retrying.
+
+Once the payment is recorded as paid, the page prevents further payment attempts through that link.
 
 ## KYT wallet screening
 
