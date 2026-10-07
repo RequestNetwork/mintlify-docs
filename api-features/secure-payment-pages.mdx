@@ -19,7 +19,7 @@ The payer-facing status copy is:
 
 If validation fails, the secure page warns the payer and prevents continuing with unsafe contract interactions.
 
-## **_Double payment prevention_**
+## Double payment prevention
 
 A payment link can only be paid once. When the payer signs a payment, the payment link locks. If they refresh the page or reopen the link, they see that a payment is in progress. They cannot pay again.<br /><br />The link unlocks only if the payment does not go through. If the payer rejects it in their wallet, or the transaction fails, the link can be paid again.<br /><br />If the payment goes through, the link stays locked and is marked as paid.<br />
 
