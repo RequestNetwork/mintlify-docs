@@ -174,7 +174,12 @@ The `userEvent` field distinguishes the 3 funnel steps:
 <Note>
 `payment.confirmed` is the settlement signal. `secure_payment.user_event` is browser-reported activity: navigation, network failures, or browser extensions can prevent Request Network from receiving it. Its absence does not prove that the payer did not take that step.
 
-When the Secure Payment Page includes wallet information in `properties`, it uses `wallet_address_hashed` rather than a raw wallet address.
+When the connected payer's wallet address is available, all three steps include both fields in `properties`:
+
+- `wallet_address`: the actual connected payer wallet address, trimmed and lowercased for EVM, or trimmed with case preserved for TRON. This is not the payee, destination, or a substituted execution account.
+- `wallet_address_hashed`: the existing `0x`-prefixed SHA-256 hash of that normalized address, retained for integrations that already use it.
+
+Both fields are omitted when the connected address is unavailable. They describe browser-reported activity and do not prove wallet ownership or payment settlement.
 </Note>
 
 ### Payer-wallet access rejections
@@ -385,7 +390,10 @@ This example shows a generic payment-intent failure. For Secure Payment Pages, t
   "occurredAt": "2026-08-05T14:03:21.512Z",
   "timestamp": "2026-08-05T14:03:22.104Z",
   "properties": {
+    "wallet_protocol": "evm",
     "wallet_provider": "metamask",
+    "wallet_address": "0x1234567890123456789012345678901234567890",
+    "wallet_address_hashed": "0x21f9cf6aab4b051de0aa1a6abcc3bc59761a9a622f9951291091fe7c9646ad41",
     "payment_submission_id": "0x6a4f...e21b",
     "payment_submission_id_type": "evm_tx_hash",
     "selected_source_chain": "base",
