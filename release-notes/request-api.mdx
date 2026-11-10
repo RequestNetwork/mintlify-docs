@@ -7,6 +7,14 @@ This page tracks notable changes to the Request Network v2 API.
 
 ## Recent updates
 
+<Update label="2026-Q4" description="Linked client ID destinations">
+
+### Improvements
+
+- **Destination on linked client IDs** — `GET /v2/orchestrators/client-ids` returns each link's current destination `chain` and `currency`, using the same values as the `client_id.linked` webhook. Both are `null` when the client ID has no working destination. The response also includes the payee destination and saved route when one is set. See [List linked client IDs](/orchestrators/client-id-linking#list-linked-client-ids).
+
+</Update>
+
 <Update label="2026-Q3" description="Wallet reconciliation, rate limits, and hardened routing">
 
 ### New Features

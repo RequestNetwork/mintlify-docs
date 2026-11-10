@@ -44,23 +44,64 @@ The client ID must not already have a link record. A linked client ID can have c
 
 ### List linked client IDs
 
-List active links with pagination:
+List the client IDs currently linked to your orchestrator. Use `page` and `limit` to page through the results. `page` starts at 1, and `limit` can be at most 200.
 
 ```bash
 curl "https://api.request.network/v2/orchestrators/client-ids?page=1&limit=20" \
   -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
 ```
 
-The response returns active links and pagination details:
+This endpoint returns active links only, so every `status` is `active`.
+
+Each link includes the client ID's current destination `chain` and `currency`. These are the same values as the [`client_id.linked`](/api-reference/webhooks#client-id-linked) webhook, such as `base` and `USDC`. Both are `null` when the client ID has no active destination, or when that destination's network and currency cannot be named. `destinationId` and the saved route fields can still be present in that case.
 
 ```json
 {
-  "links": [{ "clientId": "cli_PLATFORM_CLIENT_ID", "status": "active" }],
+  "links": [
+    {
+      "id": "01JBQ8M0ZK3W2YJ8N6R4T7V9XC",
+      "clientIdId": "01JBQ8M0ZK3W2YJ8N6R4T7V9AB",
+      "orchestratorId": "01JBQ8K7P5N3M2QXR9V6T4W8YZ",
+      "status": "active",
+      "consentedAt": "2026-06-09T10:00:00.000Z",
+      "createdAt": "2026-06-09T10:00:00.000Z",
+      "updatedAt": "2026-06-09T10:00:00.000Z",
+      "clientId": "cli_a1b2c3d4e5f6",
+      "destinationId": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e@eip155:8453#B4FD67BB:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "displayName": "Acme Storefront",
+      "destinationChainId": 8453,
+      "destinationTokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "destinationWalletAddress": "0x742d35cc6634c0532925a3b844bc454e4438f44e",
+      "chain": "base",
+      "currency": "USDC"
+    }
+  ],
   "total": 1,
   "page": 1,
   "limit": 20
 }
 ```
+
+| Field | Description |
+| --- | --- |
+| `id` | Link ID. |
+| `clientId` | Public `cli_*` client ID. |
+| `clientIdId` | Internal client ID. |
+| `orchestratorId` | Orchestrator ID. |
+| `status` | `active`. Pending and revoked links are omitted. |
+| `chain` | Current destination network name. `null` when there is no working destination. |
+| `currency` | Current destination currency symbol. `null` in the same cases as `chain`. |
+| `destinationId` | Payee destination ID, when one is set. |
+| `displayName` | Management display name. Uses the private onboarding label when one exists, otherwise the client ID label. |
+| `destinationChainId` | Saved receiving chain ID. |
+| `destinationTokenAddress` | Saved receiving token address. |
+| `destinationWalletAddress` | Saved receiving wallet address. |
+| `consentedAt` | When the platform consented to the link. |
+| `createdAt` | When the link was created. |
+| `updatedAt` | When the link was last updated. |
+| `total` | Number of active links across all pages. |
+| `page` | Current page, starting at 1. |
+| `limit` | Page size. |
 
 ### Unlink a client ID
 
