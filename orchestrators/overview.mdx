@@ -46,7 +46,7 @@ All partner-facing orchestrator endpoints live under `/v2/orchestrators` and are
 
 | Endpoint | Purpose |
 | --- | --- |
-| `GET /v2/orchestrators/client-ids` | List the client IDs linked to your orchestrator |
+| `GET /v2/orchestrators/client-ids` | List linked client IDs, including each current destination chain and currency |
 | `POST /v2/orchestrators/client-ids` | Link an existing `cli_*` client ID |
 | `DELETE /v2/orchestrators/client-ids/:clientId` | Unlink a client ID |
 | `POST /v2/orchestrators/client-id-link-intents` | Create an onboarding link intent |
