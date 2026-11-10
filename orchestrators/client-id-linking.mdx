@@ -51,6 +51,8 @@ curl "https://api.request.network/v2/orchestrators/client-ids?page=1&limit=20" \
   -H "x-orchestrator-key: orc_YOUR_ORCHESTRATOR_KEY"
 ```
 
+This endpoint returns active links only, so every `status` is `active`.
+
 Each link includes the client ID's current destination `chain` and `currency`. These are the same values as the [`client_id.linked`](/api-reference/webhooks#client-id-linked) webhook, such as `base` and `USDC`. Both are `null` when the client ID has no active destination, or when that destination's network and currency cannot be named. `destinationId` and the saved route fields can still be present in that case.
 
 ```json
@@ -86,7 +88,7 @@ Each link includes the client ID's current destination `chain` and `currency`. T
 | `clientId` | Public `cli_*` client ID. |
 | `clientIdId` | Internal client ID. |
 | `orchestratorId` | Orchestrator ID. |
-| `status` | `pending`, `active`, or `revoked`. |
+| `status` | `active`. Pending and revoked links are omitted. |
 | `chain` | Current destination network name. `null` when there is no working destination. |
 | `currency` | Current destination currency symbol. `null` in the same cases as `chain`. |
 | `destinationId` | Payee destination ID, when one is set. |
