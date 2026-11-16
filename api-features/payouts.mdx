@@ -1,6 +1,6 @@
 ---
 title: "Payouts"
-description: "Initiate single, batch, and recurring payments directly via the API"
+description: "Initiate single and batch payments directly via the API"
 ---
 
 ## Overview
@@ -10,7 +10,6 @@ Payouts let you initiate payments without a separate request creation step. The 
 **Payout modes:**
 - **Single** — Pay one recipient
 - **Batch** — Pay multiple recipients in one transaction (same network, EVM)
-- **Recurring** — Automated payment schedules with ERC20 permit signatures
 - **Multicall** — Combine multiple existing payout links into one bundle, including across chains and on Tron
 
 ## Single Payout
@@ -58,7 +57,7 @@ curl -X POST "https://api.request.network/v2/payouts" \
 - `reference` — Merchant reference for reconciliation
 - `feePercentage` and `feeAddress` — Platform fee configuration
 - `customerInfo` — optional structured metadata to attach to the request
-- `payer` — Payer wallet address (required for recurring)
+- `payerWallet` — Payer wallet address, used to check whether payer approval exists
 
 The response includes `requestId` and a `transactions` array with executable calldata.
 
@@ -121,17 +120,9 @@ When you omit `requestedExecutionKind`, it is derived from the payer's source se
 
 See [Multicall payouts in the Secure Payments reference](/api-reference/secure-payments#post-v2secure-paymentsmulticall-payouts) for the full request/response schema, eligibility rules, and validation errors.
 
-## Recurring Payouts
+## Recurring Payments
 
-Create automated payment schedules where the payer authorizes a series of payments with a single EIP-712 signature.
-
-See [Recurring Payments](/api-features/recurring-payments) for the full lifecycle (create, authorize, monitor, manage).
-
-**Endpoints:**
-- `POST /v2/payouts` with `recurrence` object — Create a recurring schedule
-- `POST /v2/payouts/recurring/:id` — Submit the payer's permit signature to activate
-- `GET /v2/payouts/recurring/:id` — Check status and next payment date
-- `PATCH /v2/payouts/recurring/:id` — Cancel or unpause
+Payouts no longer create recurring schedules. Create them as Secure Payment links instead; see [Recurring Payments](/api-features/recurring-payments).
 
 ## Error Handling
 
@@ -139,7 +130,7 @@ See [Recurring Payments](/api-features/recurring-payments) for the full lifecycl
 |--------|---------|
 | `400` | Invalid request body — check required fields and currency IDs |
 | `401` | Authentication failed — verify your `x-client-id` header |
-| `404` | Request or recurring payment not found |
+| `404` | Request not found |
 | `429` | Rate limited — back off and retry |
 | `500` | Server error — safe to retry with exponential backoff |
 
@@ -149,7 +140,7 @@ For batch payouts, a `400` may indicate that payments span multiple networks (al
 
 <CardGroup cols={2}>
   <Card title="POST /v2/payouts" icon="paper-plane" href="https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts">
-    Create a single or recurring payout.
+    Create a single payout.
   </Card>
 
   <Card title="POST /v2/payouts/batch" icon="layer-group" href="https://api.request.network/open-api/#tag/v2payouts/POST/v2/payouts/batch">
