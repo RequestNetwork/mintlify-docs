@@ -134,7 +134,7 @@ OpenAPI v2 spec: https://docs.request.network/api-reference/openapi.v2.json
 - [Batch payments](https://docs.request.network/api-features/batch-payments.md): Process multiple payments in a single transaction for gas optimization.
 - [Cross-chain payments](https://docs.request.network/api-features/crosschain-payments.md): Multi-network payment routing with automatic bridging via LiFi.
 - [Partial payments](https://docs.request.network/api-features/partial-payments.md): Split payments across multiple transactions and funding sources.
-- [Recurring payments](https://docs.request.network/api-features/recurring-payments.md): Automated payment schedules for subscriptions and recurring billing.
+- [Recurring payments](https://docs.request.network/api-features/recurring-payments.md): Charge a payer automatically on a schedule through a Secure Payment link.
 - [Payment detection](https://docs.request.network/api-features/payment-detection.md): Automatic reference-based payment detection system for blockchain transactions.
 - [Query requests](https://docs.request.network/api-features/query-requests.md): Request status monitoring, lifecycle management, and information retrieval.
 - [Query payments](https://docs.request.network/api-features/query-payments.md): Advanced payment search and filtering with the GET /v2/payments endpoint.
@@ -144,7 +144,7 @@ OpenAPI v2 spec: https://docs.request.network/api-reference/openapi.v2.json
 - [Secure payment integration guide](https://docs.request.network/api-features/secure-payment-integration-guide.md): Integrate a secure payment experience via a secured link (redirect).
 - [Safe multisig payments](https://docs.request.network/api-features/safe-multisig-payments.md): Pay a secure payment from an existing Gnosis Safe multisig.
 - [Secure payment supported networks and currencies](https://docs.request.network/api-features/secure-payment-supported-networks-and-currencies.md): Chain and currency coverage for Secure Payment Pages.
-- [Payouts](https://docs.request.network/api-features/payouts.md): Initiate single, batch, and recurring payments directly via the API.
+- [Payouts](https://docs.request.network/api-features/payouts.md): Initiate single and batch payments directly via the API.
 - [Platform fees](https://docs.request.network/api-features/platform-fees.md): Configure platform fees with feePercentage and feeAddress.
 - [Protocol fees](https://docs.request.network/api-features/protocol-fees.md): Protocol fee model applied by Request Network API payments.
 - [Fee breakdowns](https://docs.request.network/api-features/fee-breakdowns.md): Where to read fee details in routes, payment search, and status responses.
